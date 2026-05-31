@@ -4,10 +4,6 @@ import FloatingConcierge from "@/components/FloatingConcierge";
 import { CatalogGrid, catalogItems } from "@/components/CatalogGrid";
 import { categoryLabel, siteConfig } from "@/lib/site";
 
-export function generateStaticParams() {
-  return siteConfig.categoryLinks.map((item) => ({ category: item.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: {

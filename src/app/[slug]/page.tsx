@@ -6,16 +6,8 @@ import InfoSectionPage from "@/components/InfoSectionPage";
 import ProductPrice from "@/components/ProductPrice";
 import ProductPurchaseCtas from "@/components/ProductPurchaseCtas";
 import StickyInquiryBar from "@/components/StickyInquiryBar";
-import {
-  catalogProducts,
-  getCatalogProduct,
-  getCatalogSlugs,
-} from "@/lib/catalog";
-import {
-  getHomeSection,
-  homeSectionSlugs,
-  siteConfig,
-} from "@/lib/site";
+import { catalogProducts, getCatalogProduct } from "@/lib/catalog";
+import { getHomeSection, siteConfig } from "@/lib/site";
 import { getProductGallery } from "@/lib/site-images";
 
 const RESERVED_SLUGS = new Set([
@@ -25,15 +17,6 @@ const RESERVED_SLUGS = new Set([
   "manifest.json",
   "apple-touch-icon.png",
 ]);
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return [
-    ...homeSectionSlugs.map((slug) => ({ slug })),
-    ...getCatalogSlugs().map((slug) => ({ slug })),
-  ];
-}
 
 export async function generateMetadata({
   params,

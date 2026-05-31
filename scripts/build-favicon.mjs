@@ -16,5 +16,4 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="i
 </svg>`;
 
 fs.writeFileSync("public/favicon.svg", svg);
-fs.writeFileSync("html/favicon.svg", svg);
-console.log("Favicon SVG written.");
+console.log("Favicon SVG written to public/favicon.svg");

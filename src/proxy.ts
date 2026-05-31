@@ -1,18 +1,20 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export function proxy(request: NextRequest) {
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const isDev = process.env.NODE_ENV === "development";
+export function proxy(_request: NextRequest) {
+  // HTML only — never run CSP on /_next/static (CSS, JS, fonts)
+  if (process.env.NODE_ENV === "development") {
+    return NextResponse.next();
+  }
 
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""};
-    style-src 'self' 'nonce-${nonce}' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
     style-src-attr 'unsafe-inline';
     img-src 'self' blob: data: https://images.unsplash.com;
     font-src 'self';
-    connect-src 'self'${isDev ? " ws: wss:" : ""};
+    connect-src 'self';
     object-src 'none';
     base-uri 'self';
     form-action 'self';
@@ -21,14 +23,7 @@ export function proxy(request: NextRequest) {
     .replace(/\s{2,}/g, " ")
     .trim();
 
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-nonce", nonce);
-  requestHeaders.set("Content-Security-Policy", cspHeader);
-
-  const response = NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-
+  const response = NextResponse.next();
   response.headers.set("Content-Security-Policy", cspHeader);
   response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
   response.headers.set("X-Content-Type-Options", "nosniff");
@@ -44,7 +39,7 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     {
-      source: "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)",
+      source: "/((?!_next|api|favicon.ico|.*\\..*).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },
