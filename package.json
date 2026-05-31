@@ -2,11 +2,21 @@
   "name": "siteaudit",
   "version": "0.1.0",
   "private": true,
+  "browserslist": [
+    "chrome >= 111",
+    "edge >= 111",
+    "firefox >= 111",
+    "safari >= 16.4"
+  ],
   "scripts": {
     "dev": "next dev",
+    "dev:5789": "next dev -p 5789",
     "build": "next build",
+    "prod": "npm run build && next start -p 3000",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "import:epoxa": "node scripts/import-epoxa.mjs",
+    "import:epoxa:resume": "node scripts/import-epoxa.mjs --resume"
   },
   "dependencies": {
     "next": "16.2.6",

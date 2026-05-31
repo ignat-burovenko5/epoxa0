@@ -1,0 +1,7 @@
+# Project-local reference — active config is F:\b33\FKA\backend\Caddyfile
+# levushkin.art block proxies to Next.js on 127.0.0.1:3000
+
+levushkin.art, www.levushkin.art {
+	encode gzip zstd
+	reverse_proxy localhost:3000
+}
