@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import CollectionCatalog from "@/components/CollectionCatalog";
 import FloatingConcierge from "@/components/FloatingConcierge";
-import { CatalogGrid, catalogItems } from "@/components/CatalogGrid";
+import { getCategoryProductCount } from "@/lib/catalog";
 import { categoryLabel, siteConfig } from "@/lib/site";
 
 export async function generateMetadata({
@@ -36,6 +37,7 @@ export default async function CategoryListing({
 
   const label = categoryLabel(category);
   const isSale = category === "vesennyaya-rasprodazha";
+  const total = getCategoryProductCount(category);
 
   return (
     <div className="pb-16 md:pb-20">
@@ -50,11 +52,11 @@ export default async function CategoryListing({
         </h1>
         <p className="font-sans text-sm md:text-base text-luxury-charcoal/70 max-w-xl leading-relaxed">
           Подборка предметов из раздела «{formatCategoryIntro(label)}».{" "}
-          <span className="text-luxury-charcoal/50">{catalogItems.length} предметов</span>
+          <span className="text-luxury-charcoal/50">{total} предметов</span>
         </p>
       </header>
 
-      <CatalogGrid items={catalogItems} />
+      <CollectionCatalog categorySlug={category} />
       <FloatingConcierge />
     </div>
   );

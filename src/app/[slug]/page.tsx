@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import ContentEntryPage from "@/components/ContentEntryPage";
 import FloatingConcierge from "@/components/FloatingConcierge";
 import InfoSectionPage from "@/components/InfoSectionPage";
 import ProductPrice from "@/components/ProductPrice";
 import ProductPurchaseCtas from "@/components/ProductPurchaseCtas";
 import StickyInquiryBar from "@/components/StickyInquiryBar";
 import { catalogProducts, getCatalogProduct } from "@/lib/catalog";
+import { getContentEntryBySlug } from "@/lib/content";
 import { getHomeSection, siteConfig } from "@/lib/site";
 import { getProductGallery } from "@/lib/site-images";
 
@@ -24,8 +26,22 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const infoSection = getHomeSection(slug);
 
+  const contentEntry = getContentEntryBySlug(slug);
+  if (contentEntry) {
+    const description = contentEntry.excerpt.slice(0, 160);
+    return {
+      title: `${contentEntry.title} | ${siteConfig.name}`,
+      description,
+      openGraph: {
+        locale: "ru_RU",
+        title: contentEntry.title,
+        description,
+      },
+    };
+  }
+
+  const infoSection = getHomeSection(slug);
   if (infoSection) {
     return {
       title: `${infoSection.title} | ${siteConfig.name}`,
@@ -63,20 +79,17 @@ export default async function ProductDossier({
     notFound();
   }
 
-  const infoSection = getHomeSection(slug);
-  if (infoSection) {
-    return <InfoSectionPage section={infoSection} />;
+  const contentEntry = getContentEntryBySlug(slug);
+  if (contentEntry) {
+    return <ContentEntryPage entry={contentEntry} />;
   }
 
   const product = catalogProducts[slug];
-  if (!product) {
-    notFound();
-  }
+  if (product) {
+    const title = product.title;
+    const [galleryMain, galleryDetail, galleryInterior] = getProductGallery(slug);
 
-  const title = product.title;
-  const [galleryMain, galleryDetail, galleryInterior] = getProductGallery(slug);
-
-  return (
+    return (
     <main className="bg-museum-light text-luxury-charcoal min-h-screen relative pb-40 lg:pb-0">
       <div className="flex flex-col lg:flex-row min-h-screen">
         <div className="w-full lg:w-3/5 lg:sticky lg:top-0 lg:h-screen overflow-y-auto hidden-scrollbar bg-museum-warm">
@@ -197,5 +210,13 @@ export default async function ProductDossier({
       </script>
       <FloatingConcierge />
     </main>
-  );
+    );
+  }
+
+  const infoSection = getHomeSection(slug);
+  if (infoSection) {
+    return <InfoSectionPage section={infoSection} />;
+  }
+
+  notFound();
 }

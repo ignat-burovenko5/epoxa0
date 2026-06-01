@@ -35,22 +35,11 @@ export default function ProductPurchaseCtas({
         href={buyHref}
         target="_blank"
         rel="noopener noreferrer"
-        className={`btn-buy-primary group relative flex w-full flex-col items-center justify-center gap-0.5 px-5 text-museum-light transition-[transform,box-shadow,background-color] duration-300 ease-luxury-ease hover:bg-[#5c2428] active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-luxury-bordeaux touch-manipulation ${
-          isSticky ? "min-h-14 py-3.5" : "min-h-[3.75rem] py-4 md:min-h-[4rem] md:py-5"
+        className={`btn-buy-primary flex w-full items-center justify-center px-5 font-sans text-sm font-semibold uppercase text-museum-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-luxury-bordeaux touch-manipulation sm:text-base ${
+          isSticky ? "min-h-14 py-3.5" : "min-h-[3.75rem] py-4 md:min-h-14 md:py-4"
         }`}
       >
-        <span className="flex items-center gap-2 font-sans text-sm sm:text-base font-semibold tracking-[0.16em] uppercase">
-          Купить
-          <span
-            aria-hidden="true"
-            className="text-base transition-transform duration-300 group-hover:translate-x-0.5"
-          >
-            ⟶
-          </span>
-        </span>
-        <span className="font-sans text-[11px] sm:text-xs font-normal tracking-wide text-museum-light/85">
-          {priceLabel}
-        </span>
+        <span className="relative z-[1]">Купить</span>
       </a>
 
       {!isSticky ? (

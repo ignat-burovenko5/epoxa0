@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import CollectionCatalog from "@/components/CollectionCatalog";
 import FloatingConcierge from "@/components/FloatingConcierge";
-import { CatalogGrid, catalogItems } from "@/components/CatalogGrid";
+import { getCategoryProductCount } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Коллекция — антикварная мебель и предметы интерьера",
@@ -9,6 +10,8 @@ export const metadata: Metadata = {
 };
 
 export default function CollectionListing() {
+  const total = getCategoryProductCount(null);
+
   return (
     <div className="pb-16 md:pb-20">
       <header className="mb-8 md:mb-10">
@@ -33,11 +36,11 @@ export default function CollectionListing() {
           </button>
         </div>
         <p className="text-luxury-charcoal/50 normal-case tracking-normal text-xs md:text-sm shrink-0">
-          {catalogItems.length} предметов
+          {total} предметов
         </p>
       </div>
 
-      <CatalogGrid items={catalogItems} />
+      <CollectionCatalog />
       <FloatingConcierge />
     </div>
   );

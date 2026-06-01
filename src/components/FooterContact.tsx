@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ClockIcon, EmailIcon, LocationIcon, PhoneIcon } from "@/components/NavContactIcons";
+import {
+  ClockIcon,
+  DeliveryIcon,
+  EmailIcon,
+  LocationIcon,
+  PhoneIcon,
+} from "@/components/NavContactIcons";
 import { siteConfig } from "@/lib/site";
 
 type ContactRowProps = {
@@ -110,6 +116,16 @@ export default function FooterContact() {
           </span>
           <span className="font-serif text-sm leading-snug text-museum-light/80 md:text-base">
             {siteConfig.workingHours}
+          </span>
+        </span>
+      </div>
+      <div className="flex w-full max-w-sm items-start gap-3.5 px-1 py-2.5 -mx-1">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-accent-gold/20 bg-museum-light/[0.03] text-accent-gold">
+          <DeliveryIcon className={iconClass} />
+        </span>
+        <span className="flex min-w-0 flex-col justify-center pt-1.5">
+          <span className="font-serif text-sm leading-snug text-museum-light/90 md:text-base">
+            Доставка по Москве, Санкт‑Петербургу и всей России.
           </span>
         </span>
       </div>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import ProductBuyButton from "@/components/ProductBuyButton";
 import ProductPrice from "@/components/ProductPrice";
 import { catalogItems, getDiscountPercent, type CatalogProduct } from "@/lib/catalog";
 import { getCatalogImage } from "@/lib/site-images";
@@ -13,8 +14,8 @@ export function CatalogGrid({ items }: { items: CatalogItem[] }) {
         const discountPercent = getDiscountPercent(item.price, item.compareAtPrice);
 
         return (
-          <article key={item.slug} className="group cursor-pointer">
-            <Link href={`/${item.slug}`} className="block">
+          <article key={item.slug} className="group flex flex-col">
+            <Link href={`/${item.slug}`} className="block flex-1">
               <div className="relative aspect-[3/4] bg-museum-warm mb-4 overflow-hidden">
                 <div className="absolute inset-0 bg-luxury-base/5 group-hover:bg-transparent transition-colors z-10" />
                 <Image
@@ -38,12 +39,14 @@ export function CatalogGrid({ items }: { items: CatalogItem[] }) {
                 price={item.price}
                 compareAtPrice={item.compareAtPrice}
                 size="sm"
-                className="mb-3"
+                className="mb-0"
               />
-              <span className="font-sans text-xs tracking-widest uppercase border-b border-accent-brass pb-1 text-luxury-base group-hover:text-accent-brass transition-colors">
-                Зарезервировать
-              </span>
             </Link>
+            <ProductBuyButton
+              productName={item.title}
+              price={item.price}
+              className="mt-3"
+            />
           </article>
         );
       })}

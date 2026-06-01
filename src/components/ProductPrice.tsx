@@ -15,17 +15,17 @@ type ProductPriceProps = {
 
 const sizeClasses = {
   sm: {
-    price: "text-base md:text-lg",
+    price: "text-[18px] md:text-[20px]",
     compare: "text-sm",
     badge: "text-[10px] px-2 py-0.5",
   },
   md: {
-    price: "text-lg md:text-xl",
+    price: "text-[20px] md:text-[22px]",
     compare: "text-sm md:text-base",
     badge: "text-[10px] px-2.5 py-1",
   },
   lg: {
-    price: "text-2xl md:text-3xl",
+    price: "text-[26px] md:text-[32px]",
     compare: "text-base md:text-lg",
     badge: "text-xs px-2.5 py-1",
   },

@@ -76,7 +76,7 @@ export default function HeaderBurgerMenu() {
     open && typeof document !== "undefined"
       ? createPortal(
           <div
-            className="fixed inset-0 z-[200] flex"
+            className="fixed inset-0 z-[55] flex"
             role="presentation"
             onClick={(e) => {
               if (e.target === e.currentTarget) close();
@@ -95,7 +95,7 @@ export default function HeaderBurgerMenu() {
               role="dialog"
               aria-modal="true"
               aria-label="Категории каталога"
-              className="relative z-[201] flex h-full w-full max-w-[min(100vw,22rem)] flex-col border-r border-museum-light/10 bg-luxury-base shadow-2xl"
+              className="relative z-[1] flex h-full w-full max-w-[min(100vw,22rem)] flex-col border-r border-museum-light/10 bg-luxury-base shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between gap-4 border-b border-museum-light/10 px-5 py-4">

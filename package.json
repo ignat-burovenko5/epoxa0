@@ -16,7 +16,8 @@
     "start": "next start",
     "lint": "eslint",
     "import:epoxa": "node scripts/import-epoxa.mjs",
-    "import:epoxa:resume": "node scripts/import-epoxa.mjs --resume"
+    "import:epoxa:resume": "node scripts/import-epoxa.mjs --resume",
+    "scrape:sections": "node scripts/scrape-epoxa-sections.mjs"
   },
   "dependencies": {
     "next": "16.2.6",

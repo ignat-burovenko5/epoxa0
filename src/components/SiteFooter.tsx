@@ -1,7 +1,6 @@
 import Link from "next/link";
 import FooterBrand from "@/components/FooterBrand";
 import FooterContact from "@/components/FooterContact";
-import { DeliveryIcon } from "@/components/NavContactIcons";
 import PageContainer from "@/components/PageContainer";
 import { footerLegalLinks } from "@/lib/legal";
 import { siteConfig } from "@/lib/site";
@@ -33,11 +32,7 @@ export default function SiteFooter() {
           ))}
         </nav>
 
-        <div className="mt-10 border-t border-museum-light/10 pt-8 font-sans text-xs text-museum-light/55 md:mt-12">
-          <p className="mb-5 flex items-center gap-3 text-sm leading-snug text-museum-light/80 md:gap-3.5 md:text-base">
-            <DeliveryIcon className="h-6 w-6 shrink-0 text-accent-gold md:h-7 md:w-7" />
-            <span>Доставка по Москве, Санкт‑Петербургу и всей России.</span>
-          </p>
+        <div className="mt-10 border-t border-museum-light/10 pt-8 text-center font-sans text-xs text-museum-light/55 md:mt-12">
           <p>© {new Date().getFullYear()} {siteConfig.name}</p>
         </div>
       </PageContainer>

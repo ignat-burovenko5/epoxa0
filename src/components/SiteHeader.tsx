@@ -14,15 +14,15 @@ const navContactTextClass =
 
 export default function SiteHeader() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 overflow-visible bg-luxury-base/95 backdrop-blur-md border-b border-museum-light/5 supports-[backdrop-filter]:bg-luxury-base/90">
+    <header className="site-header fixed top-0 left-0 right-0 overflow-visible border-b border-museum-light/5 bg-luxury-base/95 backdrop-blur-md supports-[backdrop-filter]:bg-luxury-base/90">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-3 sm:gap-4 md:py-4 px-4 sm:px-6 lg:px-8">
-        <div className="relative z-[120] shrink-0">
+        <div className="site-header-menu relative shrink-0">
           <HeaderBurgerMenu />
         </div>
-        <div className="relative z-0 min-w-0 overflow-hidden">
+        <div className="site-header-logo relative min-w-0 overflow-visible">
           <Logo className="shrink-0 max-w-full" />
         </div>
-        <div className="flex shrink-0 flex-col justify-center gap-0.5 sm:gap-1">
+        <div className="site-header-contacts flex shrink-0 flex-col justify-center gap-0.5 sm:gap-1">
           <a
             href={siteConfig.salonEmailHref}
             className={`${navContactLinkClass} contact-link-email contact-enter-delay-1`}

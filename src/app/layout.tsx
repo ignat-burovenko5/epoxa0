@@ -86,7 +86,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col selection:bg-accent-brass selection:text-luxury-base">
         {/* analytics: Yandex.Metrika counter ID — подключить при деплое */}
         <SiteHeader />
-        <div className="flex-1 pt-[var(--site-header-offset)]">{children}</div>
+        <div className="relative z-0 flex-1 pt-[var(--site-header-offset)]">{children}</div>
         <SiteFooter />
       </body>
     </html>

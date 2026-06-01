@@ -48,5 +48,5 @@ export function getProductGallery(slug: string): [string, string, string] {
 }
 
 export const siteImages = {
-  hero: unsplashPhoto(photoIds.heroSalon, 3840),
+  hero: "/images/hero-salon.jpg",
 } as const;

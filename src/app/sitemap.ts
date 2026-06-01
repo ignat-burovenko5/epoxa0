@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getCatalogSlugs } from "@/lib/catalog";
+import { getAllContentEntrySlugs } from "@/lib/content";
 import { footerLegalLinks } from "@/lib/legal";
-import { homeSections, siteConfig } from "@/lib/site";
+import { infoSectionSlugs } from "@/lib/info-sections";
+import { siteConfig } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -10,9 +12,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     new Set([
       "",
       "/collection",
-      ...homeSections.map((section) => `/${section.id}`),
+      ...infoSectionSlugs.map((id) => `/${id}`),
       ...footerLegalLinks.map((link) => link.href),
       ...getCatalogSlugs().map((slug) => `/${slug}`),
+      ...getAllContentEntrySlugs().map((slug) => `/${slug}`),
       ...siteConfig.categoryLinks.map((item) => `/collection/${item.slug}`),
     ]),
   );

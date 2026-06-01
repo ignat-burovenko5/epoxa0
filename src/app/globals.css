@@ -29,21 +29,19 @@
 
 @layer base {
   :root {
-    /* Match SiteHeader: logo h-[6.875rem] + py-3 */
-    --site-header-offset: 8.5rem;
+    /* Match SiteHeader: logo 10rem + py-3 */
+    --site-header-offset: 11.5rem;
   }
 
   @media (min-width: 640px) {
     :root {
-      /* logo h-[7.5rem] + py-3 */
-      --site-header-offset: 9.25rem;
+      --site-header-offset: 12.5rem;
     }
   }
 
   @media (min-width: 768px) {
     :root {
-      /* logo h-[8.75rem] + py-4 */
-      --site-header-offset: 10.875rem;
+      --site-header-offset: 14rem;
     }
   }
 
@@ -51,6 +49,132 @@
     background-color: var(--color-luxury-base);
     color: var(--color-museum-light);
     font-family: var(--font-sans);
+  }
+}
+
+/* Next.js dev toolbar / indicator */
+[data-nextjs-toast],
+[data-nextjs-toast-wrapper],
+[data-next-badge-root],
+nextjs-portal {
+  display: none !important;
+}
+
+/* Hidden toggle: label opens sidenav via body:has (works even if React handlers fail) */
+.catalog-nav-toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.site-header {
+  /* Above page content (z-0–20), footer (z-50), and mobile menu overlay (z-55) */
+  z-index: 60;
+}
+
+.site-header-menu {
+  position: relative;
+  pointer-events: auto;
+}
+
+.site-header-burger {
+  pointer-events: auto;
+}
+
+/* Mobile catalog sidenav (portaled to body) */
+.catalog-sidenav-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  margin: 0;
+  padding: 0;
+}
+
+body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
+  display: flex;
+}
+
+.catalog-sidenav-root__backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: rgba(12, 12, 12, 0.82);
+  backdrop-filter: blur(2px);
+}
+
+.catalog-sidenav-root__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(100vw, 22rem);
+  height: 100%;
+  max-height: 100dvh;
+  border-right: 1px solid rgba(247, 245, 240, 0.1);
+  background-color: var(--color-luxury-base);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+  animation: catalog-sidenav-slide-in 0.42s var(--ease-luxury-ease) both;
+}
+
+@keyframes catalog-sidenav-slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-sidenav-root__panel {
+    animation-duration: 0.01ms;
+  }
+}
+
+/* Outside @layer so sizing beats Tailwind/img defaults. ~burger height (h-12 / h-14). */
+img.logo-nav-mark {
+  display: block;
+  filter: none;
+  width: auto;
+  height: 10rem;
+  max-height: 10rem;
+}
+
+@media (min-width: 640px) {
+  img.logo-nav-mark {
+    height: 11rem;
+    max-height: 11rem;
+  }
+}
+
+@media (min-width: 768px) {
+  img.logo-nav-mark {
+    height: 12rem;
+    max-height: 12rem;
+  }
+}
+
+img.logo-nav-mark--footer {
+  height: 5.5rem;
+  max-height: 5.5rem;
+}
+
+@media (min-width: 640px) {
+  img.logo-nav-mark--footer {
+    height: 6.5rem;
+    max-height: 6.5rem;
   }
 }
 
@@ -81,6 +205,20 @@
 
   .logo-artwork-offset {
     --logo-offset: 0.14444444444444443;
+  }
+
+  .logo-nav-link {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+    max-width: 100%;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo-nav-link img {
+    pointer-events: none;
   }
 
   .brand-hero {
@@ -141,6 +279,9 @@
   }
 
   .btn-buy-primary {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     background: linear-gradient(
       165deg,
       var(--color-luxury-bordeaux) 0%,
@@ -149,12 +290,253 @@
     box-shadow:
       0 4px 20px rgba(74, 28, 32, 0.38),
       inset 0 1px 0 rgba(247, 245, 240, 0.12);
+    letter-spacing: 0.14em;
+    transition:
+      transform 0.45s var(--ease-luxury-ease),
+      box-shadow 0.45s var(--ease-luxury-ease),
+      background 0.45s var(--ease-luxury-ease),
+      letter-spacing 0.45s var(--ease-luxury-ease);
+  }
+
+  .btn-buy-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      rgba(247, 245, 240, 0.14) 50%,
+      transparent 62%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
   }
 
   .btn-buy-primary:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(
+      165deg,
+      #5c282c 0%,
+      var(--color-luxury-bordeaux) 45%,
+      #3a1518 100%
+    );
     box-shadow:
-      0 6px 28px rgba(74, 28, 32, 0.48),
-      inset 0 1px 0 rgba(247, 245, 240, 0.14);
+      0 10px 36px rgba(74, 28, 32, 0.5),
+      0 0 0 1px rgba(184, 154, 112, 0.22),
+      inset 0 1px 0 rgba(247, 245, 240, 0.16);
+    letter-spacing: 0.18em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-buy-primary:hover::after {
+      animation: contact-shine 0.85s var(--ease-luxury-ease);
+    }
+  }
+
+  .btn-buy-primary:active {
+    transform: translateY(0);
+    box-shadow:
+      0 4px 16px rgba(74, 28, 32, 0.4),
+      inset 0 1px 0 rgba(247, 245, 240, 0.1);
+  }
+
+  .btn-trade-apply {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    letter-spacing: 0.14em;
+    transition:
+      transform 0.5s var(--ease-luxury-ease),
+      border-color 0.5s var(--ease-luxury-ease),
+      color 0.5s var(--ease-luxury-ease),
+      letter-spacing 0.5s var(--ease-luxury-ease),
+      box-shadow 0.5s var(--ease-luxury-ease);
+  }
+
+  .btn-trade-apply--light {
+    background: linear-gradient(
+      168deg,
+      #ebe5da 0%,
+      #f7f5f0 38%,
+      #ddd4c4 100%
+    );
+    box-shadow:
+      0 2px 14px rgba(12, 12, 12, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      inset 0 -1px 0 rgba(107, 83, 64, 0.18);
+  }
+
+  .btn-trade-apply::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      ellipse 80% 120% at 50% 120%,
+      rgba(166, 124, 82, 0.22) 0%,
+      transparent 58%
+    );
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .btn-trade-apply::after {
+    content: "";
+    position: absolute;
+    top: -20%;
+    bottom: -20%;
+    left: -40%;
+    width: 45%;
+    z-index: 1;
+    background: linear-gradient(
+      108deg,
+      transparent 0%,
+      rgba(184, 154, 112, 0.08) 28%,
+      rgba(255, 252, 245, 0.55) 48%,
+      rgba(166, 124, 82, 0.45) 52%,
+      rgba(184, 154, 112, 0.1) 62%,
+      transparent 100%
+    );
+    transform: translateX(-160%) skewX(-14deg);
+    pointer-events: none;
+    filter: blur(0.25px);
+  }
+
+  .btn-trade-apply__label {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .btn-trade-apply:hover {
+    transform: translateY(-1px);
+    border-color: rgba(166, 124, 82, 0.65);
+    color: var(--color-accent-gold-on-light);
+    letter-spacing: 0.17em;
+    box-shadow:
+      0 8px 28px rgba(107, 83, 64, 0.14),
+      0 0 0 1px rgba(184, 154, 112, 0.2),
+      inset 0 1px 0 rgba(247, 245, 240, 0.95);
+  }
+
+  .btn-trade-apply:active {
+    transform: translateY(0);
+  }
+
+  .btn-trade-apply--dark {
+    background: linear-gradient(
+      168deg,
+      #2a2220 0%,
+      #1a1a1a 48%,
+      #3a1518 100%
+    );
+    box-shadow:
+      0 2px 18px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(247, 245, 240, 0.1),
+      inset 0 -1px 0 rgba(184, 154, 112, 0.2);
+  }
+
+  .btn-trade-apply--dark .btn-trade-apply__label {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  }
+
+  .btn-trade-apply--dark::before {
+    background: radial-gradient(
+      ellipse 80% 120% at 50% 120%,
+      rgba(184, 154, 112, 0.28) 0%,
+      transparent 58%
+    );
+    opacity: 0.7;
+  }
+
+  .btn-trade-apply--dark::after {
+    background: linear-gradient(
+      108deg,
+      transparent 0%,
+      rgba(184, 154, 112, 0.08) 28%,
+      rgba(247, 245, 240, 0.42) 48%,
+      rgba(166, 124, 82, 0.65) 52%,
+      rgba(184, 154, 112, 0.18) 62%,
+      transparent 100%
+    );
+  }
+
+  .btn-trade-apply--dark:hover {
+    border-color: rgba(184, 154, 112, 0.55);
+    color: var(--color-accent-gold);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(184, 154, 112, 0.28),
+      inset 0 1px 0 rgba(247, 245, 240, 0.12);
+  }
+
+  @keyframes trade-btn-shine {
+    0%,
+    74% {
+      transform: translateX(-160%) skewX(-14deg);
+      opacity: 0;
+    }
+    78% {
+      opacity: 0.35;
+    }
+    86% {
+      transform: translateX(220%) skewX(-14deg);
+      opacity: 0.85;
+    }
+    92%,
+    100% {
+      transform: translateX(220%) skewX(-14deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes trade-btn-aura {
+    0%,
+    74%,
+    100% {
+      box-shadow:
+        0 2px 14px rgba(12, 12, 12, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        inset 0 -1px 0 rgba(107, 83, 64, 0.18);
+    }
+    84% {
+      box-shadow:
+        0 4px 22px rgba(166, 124, 82, 0.28),
+        0 0 28px rgba(184, 154, 112, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -1px 0 rgba(107, 83, 64, 0.22);
+    }
+  }
+
+  @keyframes trade-btn-aura-dark {
+    0%,
+    74%,
+    100% {
+      box-shadow:
+        0 2px 18px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(247, 245, 240, 0.08),
+        inset 0 -1px 0 rgba(184, 154, 112, 0.15);
+    }
+    84% {
+      box-shadow:
+        0 6px 28px rgba(0, 0, 0, 0.5),
+        0 0 36px rgba(184, 154, 112, 0.18),
+        inset 0 1px 0 rgba(247, 245, 240, 0.14),
+        inset 0 -1px 0 rgba(184, 154, 112, 0.22);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-trade-apply--light {
+      animation: trade-btn-aura 5s var(--ease-luxury-ease) infinite;
+    }
+
+    .btn-trade-apply::after {
+      animation: trade-btn-shine 5s var(--ease-luxury-ease) infinite;
+    }
+
+    .btn-trade-apply--dark {
+      animation: trade-btn-aura-dark 5s var(--ease-luxury-ease) infinite;
+    }
   }
 
   .footer-legal-link {

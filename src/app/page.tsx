@@ -1,9 +1,11 @@
 import BrandLines from "@/components/BrandLines";
+import ProductBuyButton from "@/components/ProductBuyButton";
 import ProductPrice from "@/components/ProductPrice";
 import Image from "next/image";
 import Link from "next/link";
 import FloatingConciergeLazy from "@/components/FloatingConciergeLazy";
 import HomeInfoSections from "@/components/HomeInfoSections";
+import TradeProgramSection from "@/components/TradeProgramSection";
 import PageContainer from "@/components/PageContainer";
 import { catalogItems, catalogProducts, featuredSlugs, getDiscountPercent } from "@/lib/catalog";
 import { getCatalogImage, siteImages } from "@/lib/site-images";
@@ -20,8 +22,8 @@ const featured = featuredSlugs.map((slug) => {
 export default function Homepage() {
   return (
     <main className="bg-luxury-base text-museum-light">
-      <section className="relative w-full min-h-[45vh] md:min-h-[55vh] -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)] flex flex-col justify-end items-start">
-        <div className="absolute inset-0 z-0 overflow-hidden bg-luxury-charcoal">
+      <section className="relative w-full min-h-[45vh] md:min-h-[55vh] -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)] flex flex-col justify-end items-start pointer-events-none">
+        <div className="absolute inset-0 z-0 overflow-hidden bg-luxury-charcoal pointer-events-none">
           <Image
             src={siteImages.hero}
             alt="Интерьер салона в духе XVIII века"
@@ -29,12 +31,12 @@ export default function Homepage() {
             priority
             fetchPriority="high"
             sizes="100vw"
-            className="object-cover object-left opacity-40 mix-blend-luminosity"
+            className="object-contain object-center opacity-40 mix-blend-luminosity"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-luxury-base via-luxury-base/20 to-luxury-base/40 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-luxury-base via-luxury-base/20 to-luxury-base/40 z-10 pointer-events-none" />
 
-        <PageContainer className="relative z-20 w-full pb-10 md:pb-16 pt-6 md:pt-10 text-left">
+        <PageContainer className="relative z-20 w-full pb-10 md:pb-16 pt-6 md:pt-10 text-left pointer-events-auto">
           <div className="max-w-3xl mr-auto">
             <BrandLines variant="hero" className="mb-5 md:mb-6" />
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.15] mb-5 text-museum-light">
@@ -76,9 +78,9 @@ export default function Homepage() {
               return (
               <article
                 key={item.slug}
-                className={`group cursor-pointer flex flex-col ${index === 2 ? "hidden lg:flex" : ""}`}
+                className={`group flex flex-col ${index === 2 ? "hidden lg:flex" : ""}`}
               >
-                <Link href={`/${item.slug}`} className="flex flex-col h-full">
+                <Link href={`/${item.slug}`} className="flex flex-col flex-1">
                   <div className="relative w-full aspect-[4/5] mb-5 overflow-hidden bg-museum-warm">
                     <Image
                       src={item.image}
@@ -107,9 +109,14 @@ export default function Homepage() {
                     price={item.price}
                     compareAtPrice={item.compareAtPrice}
                     size="sm"
-                    className="mt-auto"
+                    className="mb-0"
                   />
                 </Link>
+                <ProductBuyButton
+                  productName={item.title}
+                  price={item.price}
+                  className="mt-4"
+                />
               </article>
             );
             })}
@@ -132,27 +139,7 @@ export default function Homepage() {
 
       <HomeInfoSections />
 
-      <section className="section-y bg-museum-light text-luxury-charcoal border-t border-museum-light/10">
-        <PageContainer>
-          <div className="max-w-2xl">
-            <p className="font-sans text-xs tracking-widest uppercase text-accent-gold-on-light mb-3">
-              Для дизайнеров и архитекторов
-            </p>
-            <h2 className="font-serif text-3xl md:text-4xl mb-4 text-luxury-base">
-              Trade‑программа для профессионалов
-            </h2>
-            <p className="font-sans text-sm md:text-base text-luxury-charcoal/80 leading-relaxed mb-6">
-              Специальные условия, персональный менеджер, ранний доступ к новым поступлениям и PDF‑листы для презентаций клиентам.
-            </p>
-            <Link
-              href="/collection"
-              className="inline-block border border-luxury-base/40 px-6 py-3 font-sans text-xs tracking-widest uppercase text-luxury-base hover:bg-luxury-base/5 transition-colors"
-            >
-              Подать заявку
-            </Link>
-          </div>
-        </PageContainer>
-      </section>
+      <TradeProgramSection />
 
       <FloatingConciergeLazy />
     </main>
