@@ -384,23 +384,27 @@ img.logo-nav-mark--footer {
   .btn-trade-apply::after {
     content: "";
     position: absolute;
-    top: -20%;
-    bottom: -20%;
-    left: -40%;
-    width: 45%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 50%;
     z-index: 1;
+    border-radius: inherit;
     background: linear-gradient(
-      108deg,
+      105deg,
       transparent 0%,
-      rgba(184, 154, 112, 0.08) 28%,
-      rgba(255, 252, 245, 0.55) 48%,
-      rgba(166, 124, 82, 0.45) 52%,
-      rgba(184, 154, 112, 0.1) 62%,
+      transparent 28%,
+      rgba(184, 154, 112, 0.12) 38%,
+      rgba(255, 252, 245, 0.55) 50%,
+      rgba(166, 124, 82, 0.4) 52%,
+      rgba(184, 154, 112, 0.12) 62%,
+      transparent 72%,
       transparent 100%
     );
-    transform: translateX(-160%) skewX(-14deg);
+    transform: translate3d(-200%, 0, 0) skewX(-12deg);
+    will-change: transform;
+    backface-visibility: hidden;
     pointer-events: none;
-    filter: blur(0.25px);
   }
 
   .btn-trade-apply__label {
@@ -450,12 +454,14 @@ img.logo-nav-mark--footer {
 
   .btn-trade-apply--dark::after {
     background: linear-gradient(
-      108deg,
+      105deg,
       transparent 0%,
-      rgba(184, 154, 112, 0.08) 28%,
-      rgba(247, 245, 240, 0.42) 48%,
-      rgba(166, 124, 82, 0.65) 52%,
-      rgba(184, 154, 112, 0.18) 62%,
+      transparent 36%,
+      rgba(184, 154, 112, 0.1) 42%,
+      rgba(247, 245, 240, 0.42) 50%,
+      rgba(166, 124, 82, 0.55) 52%,
+      rgba(184, 154, 112, 0.14) 58%,
+      transparent 64%,
       transparent 100%
     );
   }
@@ -472,19 +478,19 @@ img.logo-nav-mark--footer {
   @keyframes trade-btn-shine {
     0%,
     74% {
-      transform: translateX(-160%) skewX(-14deg);
+      transform: translate3d(-200%, 0, 0) skewX(-12deg);
       opacity: 0;
     }
     78% {
       opacity: 0.35;
     }
     86% {
-      transform: translateX(220%) skewX(-14deg);
+      transform: translate3d(300%, 0, 0) skewX(-12deg);
       opacity: 0.85;
     }
     92%,
     100% {
-      transform: translateX(220%) skewX(-14deg);
+      transform: translate3d(300%, 0, 0) skewX(-12deg);
       opacity: 0;
     }
   }
@@ -531,7 +537,7 @@ img.logo-nav-mark--footer {
     }
 
     .btn-trade-apply::after {
-      animation: trade-btn-shine 5s var(--ease-luxury-ease) infinite;
+      animation: trade-btn-shine 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     }
 
     .btn-trade-apply--dark {

@@ -13,6 +13,7 @@
     "dev:5789": "next dev -p 5789",
     "build": "next build",
     "prod": "npm run build && next start -p 3000",
+    "deploy": "npm run build && node scripts/restart-prod.mjs",
     "start": "next start",
     "lint": "eslint",
     "import:epoxa": "node scripts/import-epoxa.mjs",
