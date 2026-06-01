@@ -6,7 +6,7 @@ export default function FooterBrand() {
     <div className="flex flex-col gap-4 max-w-sm">
       <Logo size="footerCompact" />
       <div>
-        <BrandLines size="compact" className="mb-2" />
+        <BrandLines variant="compact" className="mb-2" />
         <p className="font-serif text-base md:text-lg leading-snug text-museum-light/80">
           Музейные предметы с подтверждённым провенансом
         </p>

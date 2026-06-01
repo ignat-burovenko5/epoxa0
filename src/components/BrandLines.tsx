@@ -2,30 +2,14 @@ import { siteConfig } from "@/lib/site";
 
 const brandNameClass = "font-serif font-bold italic normal-case tracking-normal";
 
-type BrandLinesSize = "default" | "compact";
-
-const sizeStyles: Record<
-  BrandLinesSize,
-  { descriptor: string; name: string; gap: string }
-> = {
-  default: {
-    gap: "gap-x-2.5 gap-y-0.5",
-    descriptor:
-      "font-sans text-[1.25rem] leading-none tracking-[0.12em] uppercase text-accent-gold",
-    name: "font-serif text-[1.25rem] leading-none font-bold italic text-accent-gold",
-  },
-  compact: {
-    gap: "gap-x-2 gap-y-0.5",
-    descriptor:
-      "font-sans text-[1.125rem] leading-none uppercase tracking-[0.25em] text-accent-gold",
-    name: "font-serif text-[1.125rem] leading-none font-bold italic text-accent-gold",
-  },
-};
+type BrandLinesVariant = "hero" | "default" | "compact";
 
 type BrandLinesProps = {
   className?: string;
-  size?: BrandLinesSize;
-  /** @deprecated Use `size` instead */
+  variant?: BrandLinesVariant;
+  /** @deprecated Use `variant` instead */
+  size?: "default" | "compact";
+  /** @deprecated Use `variant` instead */
   lineClassName?: string;
 };
 
@@ -35,19 +19,59 @@ export function BrandName({ className = brandNameClass }: { className?: string }
 
 export default function BrandLines({
   className = "",
-  size = "default",
+  variant,
+  size,
   lineClassName,
 }: BrandLinesProps) {
-  const styles = sizeStyles[size];
-  const descriptorClass = lineClassName ?? styles.descriptor;
+  const resolved: BrandLinesVariant =
+    variant ?? (size === "compact" ? "compact" : "default");
+
+  if (resolved === "hero") {
+    return (
+      <div
+        className={`brand-hero ${className}`}
+        aria-label={`${siteConfig.descriptor} ${siteConfig.name}`}
+      >
+        <p className="brand-hero__descriptor font-sans text-[0.6875rem] sm:text-xs tracking-[0.32em] uppercase text-accent-gold/75">
+          {siteConfig.descriptor}
+        </p>
+        <p className="brand-hero__name font-serif font-semibold italic text-museum-light leading-[0.88] tracking-[-0.02em]">
+          {siteConfig.name}
+        </p>
+        <span className="brand-hero__rule" aria-hidden="true" />
+      </div>
+    );
+  }
+
+  if (resolved === "compact") {
+    return (
+      <div
+        className={`flex flex-wrap items-baseline gap-x-2 gap-y-0.5 ${className}`}
+        aria-label={`${siteConfig.descriptor} ${siteConfig.name}`}
+      >
+        <span className="font-sans text-sm uppercase tracking-[0.22em] text-accent-gold/80">
+          {siteConfig.descriptor}
+        </span>
+        <BrandName className="font-serif text-xl sm:text-2xl leading-none font-semibold italic text-accent-gold" />
+      </div>
+    );
+  }
+
+  const descriptorClass =
+    lineClassName ??
+    "font-sans text-[1.125rem] leading-none tracking-[0.14em] uppercase text-accent-gold/85";
+  const nameClass =
+    lineClassName != null
+      ? brandNameClass
+      : "font-serif text-2xl sm:text-3xl leading-none font-semibold italic text-accent-gold";
 
   return (
     <div
-      className={`flex flex-wrap items-baseline ${styles.gap} ${className}`}
+      className={`flex flex-wrap items-baseline gap-x-2.5 gap-y-1 ${className}`}
       aria-label={`${siteConfig.descriptor} ${siteConfig.name}`}
     >
       <span className={descriptorClass}>{siteConfig.descriptor}</span>
-      <BrandName className={lineClassName ? brandNameClass : styles.name} />
+      <BrandName className={nameClass} />
     </div>
   );
 }

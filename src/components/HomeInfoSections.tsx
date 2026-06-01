@@ -6,6 +6,7 @@ const tabSections = homeSections.map((section) => ({
   id: section.id,
   title: section.title,
   href: section.href,
+  highlight: "highlight" in section ? section.highlight : undefined,
 }));
 
 export default function HomeInfoSections() {

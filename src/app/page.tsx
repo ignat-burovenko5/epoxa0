@@ -20,7 +20,7 @@ const featured = featuredSlugs.map((slug) => {
 export default function Homepage() {
   return (
     <main className="bg-luxury-base text-museum-light">
-      <section className="relative w-full min-h-[45vh] md:min-h-[55vh] flex flex-col justify-end items-start">
+      <section className="relative w-full min-h-[45vh] md:min-h-[55vh] -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)] flex flex-col justify-end items-start">
         <div className="absolute inset-0 z-0 overflow-hidden bg-luxury-charcoal">
           <Image
             src={siteImages.hero}
@@ -36,7 +36,7 @@ export default function Homepage() {
 
         <PageContainer className="relative z-20 w-full pb-10 md:pb-16 pt-6 md:pt-10 text-left">
           <div className="max-w-3xl mr-auto">
-            <BrandLines className="mb-4" />
+            <BrandLines variant="hero" className="mb-5 md:mb-6" />
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.15] mb-5 text-museum-light">
               Где история
               <br />
