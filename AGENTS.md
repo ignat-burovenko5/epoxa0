@@ -4,12 +4,17 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-## Deploy (levushkin.art)
+## Deploy (levushkin.art + local preview)
 
-After code or asset changes that should appear on the live site, run:
+After every code or asset change that should appear on the site, run:
 
 ```bash
-npm run deploy
+npm run push
 ```
 
-This builds the app and restarts the production server on port 3000 (proxied by Caddy to https://levushkin.art).
+This builds once, then restarts:
+
+- port **3000** — production (Caddy → https://levushkin.art)
+- port **6854** — local preview at http://localhost:6854
+
+To deploy only production: `npm run deploy`

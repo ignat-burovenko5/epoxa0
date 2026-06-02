@@ -22,6 +22,8 @@
 
 # misc
 .DS_Store
+.next-prod.log
+.next-server-*.log
 *.pem
 
 # debug

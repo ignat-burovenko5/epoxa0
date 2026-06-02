@@ -1,6 +1,6 @@
 /**
- * Restart Next.js production server on port 3000 (Caddy → levushkin.art).
- * Usage: node scripts/restart-prod.mjs
+ * Restart Next.js production server. Default port 3000 (Caddy → levushkin.art).
+ * Usage: PORT=6854 node scripts/restart-prod.mjs
  */
 import { execSync, spawn } from "child_process";
 import { appendFileSync } from "fs";
@@ -10,7 +10,7 @@ import { fileURLToPath } from "url";
 
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const LOG = path.join(ROOT, ".next-prod.log");
+const LOG = path.join(ROOT, `.next-server-${PORT}.log`);
 
 function log(msg) {
   const line = `[${new Date().toISOString()}] ${msg}\n`;
