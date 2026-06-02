@@ -1,3 +1,5 @@
+import { blogIndexPath } from "@/lib/blog/urls";
+
 export const siteConfig = {
   locale: "ru",
   name: "Эпоха",
@@ -5,7 +7,7 @@ export const siteConfig = {
   descriptor: "Антиквариат",
   tagline: "Антиквариат",
   description:
-    "Музейные антикварные предметы, винтажная мебель и коллекционные интерьерные объекты. Доставка по России и СНГ. Шоурум в Москве.",
+    "Антикварная мебель на продажу — купить в салоне «Эпоха»: буфеты, комоды, кресла, люстры и предметы интерьера с провенансом. Доставка по России. Шоурум в Московской области.",
   url: "https://levushkin.art",
   phone: "+7 (963) 780-64-30",
   phoneHref: "tel:+79637806430",
@@ -20,21 +22,23 @@ export const siteConfig = {
     country: "RU",
   },
   addressLine:
-    "Московская область, Одинцовский г.о., Одинцово, Внуковская ул., 11с22, ТЦ «Акос», пав. 24",
+    "Московская область, Одинцовский г.о., Одинцово, Внуковская ул., 11с22, ТЦ «Акос», пав. 24, салон «Эпоха»",
+  /** WGS84 — ТЦ «Акос», Внуковская ул., 11 */
+  mapCenter: { lat: 55.654955, lon: 37.281899 },
   addressHref: "/adres",
   currency: "RUB",
   areaServed: ["RU", "BY", "KZ", "AE"],
   workingHours:
     "пн–пт 10:00–18:30, сб 10:00–16:30, вс — выходной (осмотр по договорённости)",
   navLinks: [
-    { label: "О салоне", href: "/o-salone" },
+    { label: "О «Эпохе»", href: "/o-salone" },
+    { label: "Блог", href: blogIndexPath() },
     { label: "Новости", href: "/novosti" },
-    { label: "Скидки", href: "/skidki" },
-    { label: "Доставка и оплата", href: "/dostavka-i-oplata" },
+    { label: "Акции", href: "/skidki" },
     { label: "Услуги", href: "/uslugi" },
-    { label: "Сотрудничество", href: "/sotrudnichestvo" },
+    { label: "Партнёрам", href: "/sotrudnichestvo" },
     { label: "Статьи", href: "/stati" },
-    { label: "Адрес", href: "/adres" },
+    { label: "Как нас найти", href: "/adres" },
   ],
   catalogNavLinks: [
     { label: "Все товары", href: "/collection" },
@@ -84,18 +88,20 @@ export const siteConfig = {
   ],
 } as const;
 
-export {
-  homeSections,
-  getHomeSection,
-  infoSectionSlugs as homeSectionSlugs,
-} from "@/lib/info-sections";
-
 export function categoryHref(slug: string) {
   return `/collection/${slug}`;
 }
 
 export function categoryLabel(slug: string) {
   return siteConfig.categoryLinks.find((item) => item.slug === slug)?.label ?? slug;
+}
+
+export function categorySlugFromLabel(label: string): string | null {
+  const normalized = label.trim().toUpperCase();
+  const match = siteConfig.categoryLinks.find(
+    (item) => item.label.trim().toUpperCase() === normalized,
+  );
+  return match?.slug ?? null;
 }
 
 export function whatsappUrl(message?: string) {
@@ -122,3 +128,26 @@ export function buyInquiryMessage(productName: string, priceLabel?: string) {
 export function tradeInquiryMessage() {
   return "Здравствуйте! Хочу подать заявку в trade‑программу для дизайнеров и архитекторов. Расскажите, пожалуйста, об условиях и следующих шагах.";
 }
+
+/** Open salon location in Yandex Maps (app or web). */
+export function yandexMapsUrl() {
+  const text = encodeURIComponent(siteConfig.addressLine);
+  return `https://yandex.ru/maps/?text=${text}&z=17&l=map`;
+}
+
+/** Static map preview (works without iframe / API key). */
+export function yandexStaticMapSrc(width = 650, height = 400) {
+  const { lon, lat } = siteConfig.mapCenter;
+  const params = new URLSearchParams({
+    lang: "ru_RU",
+    ll: `${lon},${lat}`,
+    size: `${width},${height}`,
+    z: "16",
+    l: "map",
+    pt: `${lon},${lat},pm2rdm`,
+  });
+  return `https://static-maps.yandex.ru/1.x/?${params.toString()}`;
+}
+
+/** Info page that shows the salon map widget. */
+export const salonMapSectionIds = ["adres"] as const;

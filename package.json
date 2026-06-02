@@ -14,18 +14,29 @@
     "dev:6854": "next dev -p 6854",
     "build": "next build",
     "prod": "npm run build && next start -p 3000",
-    "deploy": "npm run build && node scripts/restart-prod.mjs",
+    "deploy": "node scripts/deploy.mjs",
     "push": "node scripts/push.mjs",
+    "push:api": "node scripts/push.mjs --backend",
+    "site:start": "node scripts/start-all.mjs",
+    "site:stop": "node scripts/stop-all.mjs",
+    "site:autostart-install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-autostart.ps1",
+    "site:autostart-uninstall": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/uninstall-autostart.ps1",
+    "backend:install": "pip install -r backend/requirements.txt",
+    "backend:migrate": "cd backend && python manage.py migrate",
+    "backend:import": "cd backend && python manage.py import_legacy_json",
+    "backend:dev": "cd backend && python manage.py runserver 127.0.0.1:8000",
     "start": "next start",
     "lint": "eslint",
     "import:epoxa": "node scripts/import-epoxa.mjs",
     "import:epoxa:resume": "node scripts/import-epoxa.mjs --resume",
-    "scrape:sections": "node scripts/scrape-epoxa-sections.mjs"
+    "scrape:sections": "node scripts/scrape-epoxa-sections.mjs",
+    "qr:generate": "python scripts/generate-site-qr.py"
   },
   "dependencies": {
     "next": "16.2.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

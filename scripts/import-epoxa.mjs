@@ -164,9 +164,6 @@ function buildDescription(product, detail) {
       `${product.title}. ${product.era}. Предмет из коллекции антикварного салона «Эпоха».`,
     );
   }
-  parts.push(
-    "Возможен осмотр в шоуруме и доставка по Москве и регионам России.",
-  );
   return parts.filter(Boolean);
 }
 
@@ -242,6 +239,11 @@ async function main() {
           }
         }
 
+        if (!price || price <= 0) {
+          done.add(item.slug);
+          return null;
+        }
+
         const product = {
           slug: item.slug,
           title: item.title,
@@ -281,9 +283,9 @@ async function main() {
   // dedupe by slug, keep latest
   const bySlug = new Map();
   for (const p of products) bySlug.set(p.slug, p);
-  const catalog = [...bySlug.values()].sort((a, b) =>
-    a.title.localeCompare(b.title, "ru"),
-  );
+  const catalog = [...bySlug.values()]
+    .filter((p) => p.price > 0)
+    .sort((a, b) => a.title.localeCompare(b.title, "ru"));
 
   await fs.writeFile(CATALOG_JSON, JSON.stringify(catalog, null, 2));
   await fs.unlink(CHECKPOINT).catch(() => {});

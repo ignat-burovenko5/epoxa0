@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import LegalDocumentPage from "@/components/LegalDocumentPage";
-import { legalDocuments } from "@/lib/legal";
-import { siteConfig } from "@/lib/site";
+import { getLegalDocument } from "@/lib/legal";
+import { pageMetadata } from "@/lib/seo";
 
-const document = legalDocuments[0];
+const document = getLegalDocument("politika-konfidentsialnosti")!;
 
-export const metadata: Metadata = {
-  title: `${document.title} | ${siteConfig.name}`,
-  description: document.paragraphs[0],
-};
+export const metadata: Metadata = pageMetadata({
+  title: document.title,
+  description: document.intro[0],
+  path: "/politika-konfidentsialnosti",
+});
 
 export default function PrivacyPolicyPage() {
   return <LegalDocumentPage document={document} />;

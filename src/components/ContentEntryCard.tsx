@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
 import type { ContentEntrySummary } from "@/lib/content";
 
 type ContentEntryCardProps = {
@@ -10,7 +11,7 @@ export default function ContentEntryCard({ entry }: ContentEntryCardProps) {
     <article className="border-b border-museum-light/10 pb-8 last:border-0">
       {entry.date ? (
         <time
-          dateTime={entry.date.split(".").reverse().join("-")}
+          dateTime={entry.date.split(/[./]/).reverse().join("-")}
           className="font-sans text-xs tracking-widest uppercase text-accent-gold/80 mb-2 block"
         >
           {entry.date}
@@ -32,7 +33,7 @@ export default function ContentEntryCard({ entry }: ContentEntryCardProps) {
         className="inline-flex items-center gap-2 mt-4 min-h-11 py-2 font-sans text-xs tracking-widest uppercase text-museum-light/50 hover:text-accent-gold transition-colors touch-manipulation"
       >
         <span>Читать</span>
-        <span aria-hidden="true">⟶</span>
+        <ArrowSquareUpRightIcon className="h-4 w-4 shrink-0" />
       </Link>
     </article>
   );

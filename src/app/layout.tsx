@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
-import { connection } from "next/server";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import SeoJsonLd from "@/components/SeoJsonLd";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { siteConfig } from "@/lib/site";
@@ -19,38 +19,26 @@ const inter = Inter({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0C0C0C" },
+    { media: "(prefers-color-scheme: dark)", color: "#0C0C0C" },
+  ],
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: {
-    default: `${siteConfig.name} — антикварная мебель и предметы интерьера`,
-    template: `%s | ${siteConfig.name}`,
-  },
   description: siteConfig.description,
-  keywords: [
-    "антикварная мебель",
-    "винтажная мебель",
-    "антиквариат Москва",
-    "редкая мебель",
-    "люстра Baccarat",
-    "комод Louis XVI",
-    "доставка антиквариата по России",
-  ],
-  openGraph: {
-    locale: "ru_RU",
-    type: "website",
-    siteName: siteConfig.name,
-    title: `${siteConfig.name} — антикварная галерея`,
-    description: siteConfig.description,
-  },
-  alternates: {
-    canonical: siteConfig.url,
-  },
-  robots: {
-    index: true,
-    follow: true,
+  title: {
+    default: `${siteConfig.name} — антикварная мебель на продажу, купить`,
+    template: `%s | ${siteConfig.name}`,
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
       {
         url: "/favicon.png",
         type: "image/png",
@@ -68,13 +56,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await connection();
-
   return (
     <html
       lang="ru"
@@ -82,11 +68,14 @@ export default async function RootLayout({
     >
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <SeoJsonLd />
       </head>
-      <body className="min-h-full flex flex-col selection:bg-accent-brass selection:text-luxury-base">
+      <body className="min-h-full min-h-[100dvh] flex flex-col selection:bg-accent-brass selection:text-luxury-base">
         {/* analytics: Yandex.Metrika counter ID — подключить при деплое */}
         <SiteHeader />
-        <div className="relative z-0 flex-1 pt-[var(--site-header-offset)]">{children}</div>
+        <div className="site-main relative z-0 flex-1 min-h-0 min-w-0 w-full pt-[var(--site-header-offset)]">
+          {children}
+        </div>
         <SiteFooter />
       </body>
     </html>

@@ -48,5 +48,5 @@ export function getProductGallery(slug: string): [string, string, string] {
 }
 
 export const siteImages = {
-  hero: "/images/hero-salon.jpg",
+  hero: "/icons/epoxa-back.jpg",
 } as const;

@@ -1,0 +1,50 @@
+---
+description: Deploy site changes immediately after editing code (zero-downtime push)
+alwaysApply: true
+---
+
+# Deploy immediately — do not wait for the user
+
+When you change anything that affects the live site, **deploy in the same turn** before finishing your reply. Do not ask “should I deploy?” or “run push?” — just run it.
+
+## When to deploy
+
+Run deploy after edits under:
+
+- `src/` (pages, components, styles, lib)
+- `public/` (images, favicon, static files)
+- `data/` (catalog, content, blog JSON consumed by the site)
+- `next.config.ts`, `tailwind.config.ts`, root CSS
+- `backend/` — use `npm run push:api` (restarts Django)
+
+Skip deploy only for: docs-only (`*.md`), git-only work, scripts the user did not ask to run, or the user explicitly said not to deploy.
+
+## Commands
+
+```bash
+npm run push
+```
+
+Frontend + Next (ports 3000, 6854). Zero-downtime: builds to `.next-staging` while the site stays up.
+
+```bash
+npm run push:api
+```
+
+Same, plus Django (8000) — required when `backend/` changed.
+
+```bash
+npm run deploy
+```
+
+Production only (3000) if the user asked for prod-only.
+
+## Agent workflow
+
+1. Make the code change.
+2. Run `npm run push` or `npm run push:api` (allow several minutes; do not skip on timeout fear).
+3. Confirm success briefly (ports up / “Push complete”) in your reply.
+
+Never stop servers before `push` — the script handles cutover.
+
+Do not use `npm run site:stop` unless the user asked to stop services.

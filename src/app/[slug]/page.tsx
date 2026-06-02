@@ -1,15 +1,25 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import ContentEntryPage from "@/components/ContentEntryPage";
 import FloatingConcierge from "@/components/FloatingConcierge";
 import InfoSectionPage from "@/components/InfoSectionPage";
+import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductPrice from "@/components/ProductPrice";
-import ProductPurchaseCtas from "@/components/ProductPurchaseCtas";
+import ProductGetContacts from "@/components/ProductGetContacts";
 import StickyInquiryBar from "@/components/StickyInquiryBar";
+import YandexSalonMap from "@/components/YandexSalonMap";
 import { catalogProducts, getCatalogProduct } from "@/lib/catalog";
 import { getContentEntryBySlug } from "@/lib/content";
-import { getHomeSection, siteConfig } from "@/lib/site";
+import { getHomeSection } from "@/lib/info-sections";
+import {
+  absoluteUrl,
+  breadcrumbJsonLd,
+  pageMetadata,
+  productPageDescription,
+  productPageTitle,
+} from "@/lib/seo";
+import { categoryHref, categorySlugFromLabel, siteConfig } from "@/lib/site";
 import { getProductGallery } from "@/lib/site-images";
 
 const RESERVED_SLUGS = new Set([
@@ -29,43 +39,41 @@ export async function generateMetadata({
 
   const contentEntry = getContentEntryBySlug(slug);
   if (contentEntry) {
-    const description = contentEntry.excerpt.slice(0, 160);
-    return {
-      title: `${contentEntry.title} | ${siteConfig.name}`,
-      description,
-      openGraph: {
-        locale: "ru_RU",
-        title: contentEntry.title,
-        description,
-      },
-    };
+    return pageMetadata({
+      title: contentEntry.title,
+      description: contentEntry.excerpt,
+      path: `/${slug}`,
+    });
   }
 
   const infoSection = getHomeSection(slug);
   if (infoSection) {
-    return {
-      title: `${infoSection.title} | ${siteConfig.name}`,
-      description: infoSection.paragraphs[0],
-      openGraph: {
-        locale: "ru_RU",
-        title: `${infoSection.title} | ${siteConfig.name}`,
-        description: infoSection.paragraphs[0],
-      },
-    };
+    const description =
+      infoSection.description ?? infoSection.paragraphs[0] ?? siteConfig.description;
+    return pageMetadata({
+      title: infoSection.title,
+      description,
+      path: `/${slug}`,
+    });
   }
 
   const product = getCatalogProduct(slug);
-  const title = product?.title ?? slug.replace(/-/g, " ");
+  if (!product) {
+    return pageMetadata({
+      title: "Страница не найдена",
+      description: "Запрашиваемая страница не найдена.",
+      noIndex: true,
+      enrichDescription: false,
+    });
+  }
 
-  return {
-    title: `${title} — купить антиквариат`,
-    description: `${title}. Провенанс, экспертиза, доставка по России. Шоурум ${siteConfig.name}, Москва.`,
-    openGraph: {
-      locale: "ru_RU",
-      title,
-      description: `Редкий предмет коллекции ${siteConfig.name}. Консультация куратора и доставка по РФ.`,
-    },
-  };
+  const title = product.title;
+
+  return pageMetadata({
+    title: productPageTitle(title),
+    description: productPageDescription(title, product.category),
+    path: `/${slug}`,
+  });
 }
 
 export default async function ProductDossier({
@@ -88,70 +96,52 @@ export default async function ProductDossier({
   if (product) {
     const title = product.title;
     const [galleryMain, galleryDetail, galleryInterior] = getProductGallery(slug);
+    const gallerySlides = [
+      { src: galleryMain, alt: `${title} — общий вид`, priority: true },
+      { src: galleryDetail, alt: `${title} — детали и фактура`, priority: false },
+      { src: galleryInterior, alt: `${title} — в современном интерьере`, priority: false },
+    ] as const;
+    const descriptionParagraphs = product.description.filter(
+      (paragraph) => paragraph !== product.era,
+    );
+    const categorySlug = categorySlugFromLabel(product.category);
 
     return (
-    <main className="bg-museum-light text-luxury-charcoal min-h-screen relative pb-40 lg:pb-0">
-      <div className="flex flex-col lg:flex-row min-h-screen">
-        <div className="w-full lg:w-3/5 lg:sticky lg:top-0 lg:h-screen overflow-y-auto hidden-scrollbar bg-museum-warm">
-          <div className="flex flex-col gap-1">
-            <div className="relative w-full h-[70vh] lg:h-screen bg-luxury-base">
-              <Image
-                src={galleryMain}
-                alt={`${title} — общий вид`}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover opacity-80"
-              />
-            </div>
-            <div className="relative w-full h-[70vh] lg:h-screen bg-luxury-base">
-              <Image
-                src={galleryDetail}
-                alt={`${title} — детали и фактура`}
-                fill
-                loading="lazy"
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover opacity-80"
-              />
-            </div>
-            <div className="relative w-full h-[70vh] lg:h-screen bg-luxury-base">
-              <Image
-                src={galleryInterior}
-                alt={`${title} — в современном интерьере`}
-                fill
-                loading="lazy"
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover opacity-80"
-              />
-            </div>
-          </div>
+    <main className="bg-museum-light text-luxury-charcoal min-h-screen relative pb-mobile-chrome lg:pb-0">
+      <div className="flex flex-col lg:flex-row lg:items-start">
+        <div className="w-full lg:w-[68%] xl:w-[70%] lg:shrink-0">
+          <ProductImageGallery slides={gallerySlides} />
         </div>
 
-        <div className="w-full lg:w-2/5 px-4 sm:px-6 lg:px-10 py-10 md:py-16 lg:py-20 flex flex-col justify-start">
+        <div className="w-full lg:w-[32%] xl:w-[30%] px-4 sm:px-6 lg:px-8 xl:px-10 pt-10 pb-2 md:pt-16 md:pb-8 lg:pt-8 lg:pb-12 flex flex-col justify-start">
           <div className="max-w-md w-full">
-            <p className="font-sans text-xs tracking-widest uppercase text-accent-brass mb-3">
-              {product.category}
-            </p>
+            {categorySlug ? (
+              <Link
+                href={categoryHref(categorySlug)}
+                className="inline-block font-sans text-xs tracking-widest uppercase text-accent-brass mb-3 transition-colors hover:text-luxury-charcoal underline-offset-4 hover:underline"
+              >
+                {product.category}
+              </Link>
+            ) : (
+              <p className="font-sans text-xs tracking-widest uppercase text-accent-brass mb-3">
+                {product.category}
+              </p>
+            )}
             <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl leading-tight mb-4">
               {title}
             </h1>
+            {product.era ? (
+              <p className="font-sans text-sm text-luxury-charcoal/60 mb-4 tracking-wide leading-relaxed">
+                {product.era}
+              </p>
+            ) : null}
             <ProductPrice
               price={product.price}
               compareAtPrice={product.compareAtPrice}
               size="lg"
-              className="mb-3"
+              className="mb-4"
             />
-            <p className="font-sans text-sm text-luxury-charcoal/60 mb-5 tracking-wide">
-              Доставка по России • Осмотр в шоуруме
-            </p>
-
-            <ProductPurchaseCtas
-              productName={title}
-              price={product.price}
-              className="mb-8 lg:mb-10"
-            />
-
-            <div className="flex flex-wrap gap-2 mb-8">
+            <div className="flex flex-wrap gap-2 mb-4">
               <span className="text-xs font-sans uppercase tracking-widest border border-accent-brass/40 px-3 py-1">
                 Экспертиза
               </span>
@@ -159,54 +149,85 @@ export default async function ProductDossier({
                 Белые перчатки
               </span>
             </div>
+            <ProductGetContacts
+              productName={title}
+              className="mb-8 lg:mb-10 hidden lg:block"
+            />
 
-            <div className="space-y-4 text-sm font-sans leading-relaxed text-luxury-charcoal/80 mb-10">
-              {product.description.map((paragraph) => (
+            <div className="space-y-4 text-sm font-sans leading-relaxed text-luxury-charcoal/80 mb-8">
+              {descriptionParagraphs.map((paragraph) => (
                 <p key={paragraph.slice(0, 24)}>{paragraph}</p>
               ))}
             </div>
+
+            <YandexSalonMap
+              variant="light"
+              compact
+              heading="Шоурум — осмотр и самовывоз"
+              className="mb-6 pt-8 border-t border-luxury-charcoal/10"
+            />
+            <p className="font-sans text-xs text-luxury-charcoal/55 leading-relaxed mb-0 lg:mb-10">
+              {siteConfig.workingHours}
+              {" · "}
+              <Link
+                href={siteConfig.addressHref}
+                className="text-accent-brass underline underline-offset-2 hover:text-luxury-charcoal"
+              >
+                как добраться
+              </Link>
+            </p>
 
           </div>
         </div>
       </div>
 
-      <StickyInquiryBar productName={title} price={product.price} />
+      <StickyInquiryBar productName={title} />
 
       <script type="application/ld+json" suppressHydrationWarning>
-        {JSON.stringify({
-          "@context": "https://schema.org/",
-          "@type": "Product",
-          name: title,
-          inLanguage: "ru",
-          image: [galleryMain, galleryDetail, galleryInterior],
-          description: product.description[0],
-          brand: {
-            "@type": "Brand",
-            name: siteConfig.name,
-          },
-          itemCondition: "https://schema.org/UsedCondition",
-          offers: {
-            "@type": "Offer",
-            availability: "https://schema.org/InStock",
-            priceCurrency: siteConfig.currency,
-            price: String(product.price),
-            priceValidUntil: "2027-12-31",
-            url: `${siteConfig.url}/${slug}`,
-            areaServed: {
-              "@type": "Country",
-              name: "Russia",
-            },
-            seller: {
-              "@type": "Organization",
+        {JSON.stringify([
+          {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "@id": `${absoluteUrl(`/${slug}`)}#product`,
+            name: title,
+            inLanguage: "ru-RU",
+            category: product.category,
+            sku: slug,
+            image: [galleryMain, galleryDetail, galleryInterior].map((src) =>
+              src.startsWith("http") ? src : absoluteUrl(src),
+            ),
+            description: product.description[0],
+            brand: {
+              "@type": "Brand",
               name: siteConfig.name,
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: siteConfig.address.city,
-                addressCountry: siteConfig.address.country,
+            },
+            itemCondition: "https://schema.org/UsedCondition",
+            offers: {
+              "@type": "Offer",
+              availability: "https://schema.org/InStock",
+              priceCurrency: siteConfig.currency,
+              price: String(product.price),
+              priceValidUntil: "2027-12-31",
+              url: absoluteUrl(`/${slug}`),
+              itemCondition: "https://schema.org/UsedCondition",
+              areaServed: {
+                "@type": "Country",
+                name: "Russia",
+              },
+              seller: {
+                "@id": `${siteConfig.url}/#organization`,
               },
             },
           },
-        })}
+          breadcrumbJsonLd([
+            { name: "Главная", path: "/" },
+            { name: "Коллекция", path: "/collection" },
+            ...(categorySlug
+              ? [{ name: product.category, path: categoryHref(categorySlug) }]
+              : []),
+            { name: title, path: `/${slug}` },
+          ]),
+        ])}
       </script>
       <FloatingConcierge />
     </main>

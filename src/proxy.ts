@@ -1,29 +1,30 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export function proxy(_request: NextRequest) {
-  // HTML only — never run CSP on /_next/static (CSS, JS, fonts)
+const INTERNAL_API_PATTERN =
+  /^\/api\/(blog|analytics|shop)\/internal(?:\/|$)/;
+const DEV_ONLY_PATTERN = /^\/(asdoifj1oi|api\/image-lab)(?:\/|$)/;
+
+function applySecurityHeaders(response: NextResponse): NextResponse {
   if (process.env.NODE_ENV === "development") {
-    return NextResponse.next();
+    return response;
   }
 
-  const cspHeader = `
-    default-src 'self';
-    script-src 'self' 'unsafe-inline';
-    style-src 'self' 'unsafe-inline';
-    style-src-attr 'unsafe-inline';
-    img-src 'self' blob: data: https://images.unsplash.com;
-    font-src 'self';
-    connect-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    frame-ancestors 'self';
-  `
-    .replace(/\s{2,}/g, " ")
-    .trim();
+  const cspHeader = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline'",
+    "style-src-attr 'unsafe-inline'",
+    "img-src 'self' blob: data: https://images.unsplash.com https://static-maps.yandex.ru https://*.maps.yandex.net",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "frame-src 'self' https://yandex.ru https://yandex.com https://api-maps.yandex.ru",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+  ].join("; ");
 
-  const response = NextResponse.next();
   response.headers.set("Content-Security-Policy", cspHeader);
   response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
   response.headers.set("X-Content-Type-Options", "nosniff");
@@ -32,18 +33,27 @@ export function proxy(_request: NextRequest) {
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=()",
   );
-
+  response.headers.set("X-Frame-Options", "SAMEORIGIN");
   return response;
+}
+
+export function proxy(request: NextRequest) {
+  if (INTERNAL_API_PATTERN.test(request.nextUrl.pathname)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (
+    process.env.NODE_ENV === "production" &&
+    DEV_ONLY_PATTERN.test(request.nextUrl.pathname)
+  ) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  return applySecurityHeaders(NextResponse.next());
 }
 
 export const config = {
   matcher: [
-    {
-      source: "/((?!_next|api|favicon.ico|.*\\..*).*)",
-      missing: [
-        { type: "header", key: "next-router-prefetch" },
-        { type: "header", key: "purpose", value: "prefetch" },
-      ],
-    },
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

@@ -83,24 +83,33 @@ export default function PaymentBadges({
   className = "",
   variant = "dark",
 }: PaymentBadgesProps) {
-  const cardClass =
-    variant === "dark" ? "text-museum-light/85" : "text-luxury-charcoal/75";
+  const onLight = variant === "light";
+  const cardClass = onLight
+    ? "text-luxury-charcoal/75"
+    : "text-museum-light/85";
+  const imageClass = onLight
+    ? "payment-badge-on-light h-7 w-auto object-contain object-center"
+    : "h-7 w-auto object-contain object-center";
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-3 mt-5 ${className}`}
+      className={`payment-badges flex flex-wrap items-center gap-3 mt-5 ${onLight ? "payment-badges--light" : ""} ${className}`}
       aria-label="Способы оплаты"
     >
       {paymentBadges.map((badge) => (
-        <Image
+        <span
           key={badge.src}
-          className={`h-7 w-auto ${badge.maxWidthClass} object-contain object-center`}
-          src={badge.src}
-          alt={badge.alt}
-          width={badge.width}
-          height={badge.height}
-          sizes="140px"
-        />
+          className={`inline-flex items-center bg-transparent ${badge.maxWidthClass}`}
+        >
+          <Image
+            className={`${imageClass} ${!onLight ? badge.maxWidthClass : ""}`}
+            src={badge.src}
+            alt={badge.alt}
+            width={badge.width}
+            height={badge.height}
+            sizes="140px"
+          />
+        </span>
       ))}
       <BankCardIcon className={`h-7 w-auto max-w-[44px] ${cardClass}`} />
     </div>

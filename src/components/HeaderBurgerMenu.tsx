@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
@@ -66,6 +67,11 @@ export default function HeaderBurgerMenu() {
   const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
+    document.body.classList.toggle("catalog-nav-open", open);
+    return () => document.body.classList.remove("catalog-nav-open");
+  }, [open]);
+
+  useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -86,18 +92,11 @@ export default function HeaderBurgerMenu() {
   const menuOverlay =
     open && typeof document !== "undefined"
       ? createPortal(
-          <div
-            className="fixed inset-0 z-[55] flex"
-            role="presentation"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) close();
-            }}
-          >
+          <div className="catalog-nav-overlay" role="presentation">
             <button
               type="button"
-              className="absolute inset-0 cursor-pointer bg-luxury-base/80 backdrop-blur-[2px]"
+              className="catalog-sidenav-backdrop pointer-events-auto fixed inset-0 cursor-pointer border-0 bg-luxury-base/80 backdrop-blur-[2px] touch-manipulation"
               aria-label="Закрыть меню"
-              tabIndex={-1}
               onClick={close}
             />
 
@@ -106,28 +105,10 @@ export default function HeaderBurgerMenu() {
               role="dialog"
               aria-modal="true"
               aria-label="Навигация по сайту"
-              className="relative z-[1] flex h-full w-full max-w-[min(100vw,22rem)] flex-col border-r border-museum-light/10 bg-luxury-base shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+              className="catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col border-r border-museum-light/10 bg-luxury-base shadow-2xl pb-[env(safe-area-inset-bottom,0px)]"
             >
-              <div className="flex items-center justify-between gap-4 border-b border-museum-light/10 px-5 py-4">
-                <div>
-                  <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-accent-gold/90">
-                    Каталог
-                  </p>
-                  <p className="font-serif text-lg text-museum-light mt-0.5">Категории</p>
-                </div>
-                <button
-                  type="button"
-                  className="cursor-pointer flex h-12 w-12 items-center justify-center text-museum-light/70 transition-colors hover:text-museum-light"
-                  aria-label="Закрыть"
-                  onClick={close}
-                >
-                  <CloseIcon className="h-5 w-5" />
-                </button>
-              </div>
-
               <nav
-                className="flex-1 overflow-y-auto hidden-scrollbar px-3 py-4 space-y-8"
+                className="catalog-sidenav-panel__nav flex-1 overflow-y-auto hidden-scrollbar px-3 py-4 space-y-8"
                 aria-label="Навигация по сайту"
               >
                 <div>
@@ -215,13 +196,14 @@ export default function HeaderBurgerMenu() {
                 </div>
               </nav>
 
-              <div className="border-t border-museum-light/10 px-5 py-4">
+              <div className="border-t border-museum-light/10 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
                 <Link
                   href="/collection"
                   onClick={close}
-                  className="font-sans text-xs tracking-widest uppercase text-accent-gold hover:text-museum-light transition-colors"
+                  className="inline-flex items-center gap-2 font-sans text-xs tracking-widest uppercase text-accent-gold hover:text-museum-light transition-colors"
                 >
-                  Смотреть весь каталог ⟶
+                  <span>Смотреть весь каталог</span>
+                  <ArrowSquareUpRightIcon className="h-4 w-4 shrink-0" />
                 </Link>
               </div>
             </aside>
@@ -234,7 +216,7 @@ export default function HeaderBurgerMenu() {
     <>
       <button
         type="button"
-        className="relative z-[110] isolate cursor-pointer flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
+        className="site-header-burger relative isolate cursor-pointer flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
         aria-label={open ? "Закрыть каталог" : "Открыть каталог категорий"}

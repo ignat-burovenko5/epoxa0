@@ -14,7 +14,7 @@ export type CatalogProduct = {
   sourceUrl?: string;
 };
 
-const products = catalogData as CatalogProduct[];
+const products = (catalogData as CatalogProduct[]).filter((p) => p.price > 0);
 
 export const catalogProducts: Record<string, CatalogProduct> = Object.fromEntries(
   products.map((p) => [p.slug, p]),
@@ -24,10 +24,21 @@ export const catalogItems = products;
 
 export const CATALOG_PAGE_SIZE = 9;
 
-export const featuredSlugs = products
-  .filter((p) => p.price > 0)
-  .slice(0, 3)
-  .map((p) => p.slug);
+export const HOMEPAGE_FEATURED_COUNT = 9;
+
+function shuffleArray<T>(items: T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+export function getRandomFeaturedSlugs(count: number = HOMEPAGE_FEATURED_COUNT): string[] {
+  const shuffled = shuffleArray(products);
+  return shuffled.slice(0, Math.min(count, shuffled.length)).map((p) => p.slug);
+}
 
 export function getCatalogProduct(slug: string) {
   return catalogProducts[slug];

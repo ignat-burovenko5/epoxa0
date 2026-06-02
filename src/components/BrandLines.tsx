@@ -35,8 +35,13 @@ export default function BrandLines({
         <p className="brand-hero__descriptor font-sans text-[0.6875rem] sm:text-xs tracking-[0.32em] uppercase text-accent-gold/75">
           {siteConfig.descriptor}
         </p>
-        <p className="brand-hero__name font-serif font-semibold italic text-museum-light leading-[0.88] tracking-[-0.02em]">
-          {siteConfig.name}
+        <p className="brand-hero__name font-serif font-semibold italic leading-[0.88] tracking-[-0.01em]">
+          <span className="brand-hero__name-under" aria-hidden="true">
+            {siteConfig.name}
+          </span>
+          <span className="brand-hero__name-face" aria-hidden="true">
+            {siteConfig.name}
+          </span>
         </p>
         <span className="brand-hero__rule" aria-hidden="true" />
       </div>

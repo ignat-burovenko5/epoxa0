@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "daily": {
+    "2026-06-02": {
+      "pageViews": 18,
+      "cartAdds": 1,
+      "cartViews": 0,
+      "checkoutStarts": 2,
+      "checkoutSubmits": 0,
+      "topPaths": {
+        "/": 4,
+        "/antikvarnaya-pech-kamin-la-radiante-2": 1,
+        "/o-salone": 1,
+        "/dostavka-i-oplata": 2,
+        "/aktsionnye-tovary": 1,
+        "/collection/antikvarnye-lyustry": 1,
+        "/checkout": 2,
+        "/blog": 1,
+        "/collection": 2,
+        "/1209u1lkjea/blog": 1,
+        "/1209u1lkjea/blog/dobro-pozhalovat-v-blog/87306zighr": 1,
+        "/adres": 1
+      }
+    }
+  },
+  "recent": [
+    {
+      "type": "page_view",
+      "path": "/adres",
+      "at": "2026-06-02T13:11:31.590Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/dostavka-i-oplata",
+      "at": "2026-06-02T13:10:12.530Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/1209u1lkjea/blog/dobro-pozhalovat-v-blog/87306zighr",
+      "at": "2026-06-02T13:08:51.193Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/1209u1lkjea/blog",
+      "at": "2026-06-02T13:08:47.065Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/collection",
+      "at": "2026-06-02T13:07:39.869Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/",
+      "at": "2026-06-02T13:04:32.190Z"
+    },
+    {
+      "type": "checkout_start",
+      "path": "/checkout",
+      "at": "2026-06-02T13:02:50.964Z",
+      "meta": {
+        "itemCount": 2
+      }
+    },
+    {
+      "type": "page_view",
+      "path": "/checkout",
+      "at": "2026-06-02T13:02:50.938Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/collection",
+      "at": "2026-06-02T12:45:15.701Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/",
+      "at": "2026-06-02T12:45:13.377Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/blog",
+      "at": "2026-06-02T12:44:31.326Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/",
+      "at": "2026-06-02T12:41:18.802Z"
+    },
+    {
+      "type": "checkout_start",
+      "path": "/checkout",
+      "at": "2026-06-02T12:08:32.900Z",
+      "meta": {
+        "itemCount": 1
+      }
+    },
+    {
+      "type": "page_view",
+      "path": "/checkout",
+      "at": "2026-06-02T12:08:32.874Z"
+    },
+    {
+      "type": "cart_add",
+      "path": "/collection/antikvarnye-lyustry",
+      "at": "2026-06-02T12:07:31.760Z",
+      "meta": {
+        "slug": "lyustra-na-5-lamp-f20",
+        "title": "Люстра на 5 ламп",
+        "price": 32000
+      }
+    },
+    {
+      "type": "page_view",
+      "path": "/collection/antikvarnye-lyustry",
+      "at": "2026-06-02T12:06:23.611Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/aktsionnye-tovary",
+      "at": "2026-06-02T12:06:05.412Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/dostavka-i-oplata",
+      "at": "2026-06-02T12:04:16.451Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/o-salone",
+      "at": "2026-06-02T12:03:10.858Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/antikvarnaya-pech-kamin-la-radiante-2",
+      "at": "2026-06-02T12:01:43.208Z"
+    },
+    {
+      "type": "page_view",
+      "path": "/",
+      "at": "2026-06-02T12:01:28.578Z"
+    }
+  ],
+  "updatedAt": "2026-06-02T13:11:31.590Z"
+}

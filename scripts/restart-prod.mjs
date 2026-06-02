@@ -2,15 +2,21 @@
  * Restart Next.js production server. Default port 3000 (Caddy → levushkin.art).
  * Usage: PORT=6854 node scripts/restart-prod.mjs
  */
-import { execSync, spawn } from "child_process";
-import { appendFileSync } from "fs";
+import { execSync } from "child_process";
+import { appendFileSync, existsSync } from "fs";
 import net from "net";
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
+import { loadEnvLocal } from "./load-env-local.mjs";
+import { spawnDetached } from "./spawn-detached.mjs";
+import { systemNodeExe } from "./system-node.mjs";
 
 const PORT = Number(process.env.PORT || 3000);
+const STOP_ONLY = process.env.STOP_ONLY === "1";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const LOG = path.join(ROOT, `.next-server-${PORT}.log`);
+const PROCESS_LOG = path.join(ROOT, `.next-server-${PORT}.out.log`);
 
 function log(msg) {
   const line = `[${new Date().toISOString()}] ${msg}\n`;
@@ -76,7 +82,7 @@ async function waitForHttp(maxMs = 90000) {
       const res = await fetch(`http://127.0.0.1:${PORT}/`, {
         signal: AbortSignal.timeout(5000),
       });
-      if (res.status < 500) return;
+      if (res.ok) return;
     } catch {
       /* not ready */
     }
@@ -89,19 +95,54 @@ async function main() {
   stopListener();
   await waitForPortFree();
 
-  const cmd = `npx next start -p ${PORT}`;
-  const child = spawn(cmd, [], {
+  if (STOP_ONLY) {
+    log(`Port ${PORT} is free (stop only)`);
+    return;
+  }
+
+  const localEnv = loadEnvLocal(ROOT);
+  const envFile = path.join(ROOT, ".env.local");
+  const nextBin = path.join(ROOT, "node_modules", "next", "dist", "bin", "next");
+  const node = systemNodeExe();
+  const args = existsSync(envFile)
+    ? ["--env-file", envFile, nextBin, "start", "-p", String(PORT), "-H", "0.0.0.0"]
+    : [nextBin, "start", "-p", String(PORT), "-H", "0.0.0.0"];
+
+  spawnDetached({
+    executable: node,
+    args,
     cwd: ROOT,
-    detached: true,
-    stdio: "ignore",
-    shell: true,
-    windowsHide: true,
+    logPath: PROCESS_LOG,
+    env: {
+      ...process.env,
+      ...localEnv,
+      PORT: String(PORT),
+      NODE_ENV: "production",
+      NEXT_BUILD_STAGING: undefined,
+      NEXT_DIST_DIR: undefined,
+    },
   });
-  child.unref();
-  log(`Started: ${cmd}`);
+  log(`Started: ${node} ${args.join(" ")} (output: ${PROCESS_LOG})`);
 
   await waitForHttp();
   log(`Production server ready at http://localhost:${PORT}`);
+  const lan = lanPreviewUrl();
+  if (lan) {
+    log(`On your phone (same Wi‑Fi): ${lan}`);
+  }
+}
+
+function lanPreviewUrl() {
+  const nets = os.networkInterfaces();
+  for (const ifaces of Object.values(nets)) {
+    if (!ifaces) continue;
+    for (const iface of ifaces) {
+      if (iface.family === "IPv4" && !iface.internal) {
+        return `http://${iface.address}:${PORT}`;
+      }
+    }
+  }
+  return null;
 }
 
 main().catch((err) => {

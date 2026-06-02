@@ -1,7 +1,6 @@
 import Link from "next/link";
 import PageContainer from "@/components/PageContainer";
 import type { ContentEntry } from "@/lib/content";
-import { siteConfig } from "@/lib/site";
 
 type ContentEntryPageProps = {
   entry: ContentEntry;
@@ -34,7 +33,7 @@ export default function ContentEntryPage({ entry }: ContentEntryPageProps) {
 
         {entry.date ? (
           <time
-            dateTime={entry.date.split(".").reverse().join("-")}
+            dateTime={entry.date.split(/[./]/).reverse().join("-")}
             className="font-sans text-xs tracking-widest uppercase text-accent-gold/80 mb-3 block"
           >
             {entry.date}
@@ -58,10 +57,6 @@ export default function ContentEntryPage({ entry }: ContentEntryPageProps) {
           >
             <span>← Все {entry.sectionTitle.toLowerCase()}</span>
           </Link>
-        </p>
-
-        <p className="font-sans text-sm text-museum-light/55">
-          {siteConfig.name} · {siteConfig.addressLine}
         </p>
       </PageContainer>
     </main>

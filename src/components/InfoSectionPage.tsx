@@ -1,36 +1,18 @@
 import Link from "next/link";
+import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
 import ContentSectionCatalog from "@/components/ContentSectionCatalog";
+import InfoBlocks from "@/components/InfoBlocks";
 import PageContainer from "@/components/PageContainer";
+import YandexSalonMap from "@/components/YandexSalonMap";
 import PaymentBadges from "@/components/PaymentBadges";
 import TradeApplyButton from "@/components/TradeApplyButton";
 import { isContentListSection } from "@/lib/content";
 import type { InfoSection } from "@/lib/info-sections";
-import { siteConfig } from "@/lib/site";
+import { salonMapSectionIds, siteConfig } from "@/lib/site";
 
 type InfoSectionPageProps = {
   section: InfoSection;
 };
-
-function BlockContent({ blocks }: { blocks: NonNullable<InfoSection["blocks"]> }) {
-  return (
-    <div className="space-y-8 mb-8">
-      {blocks.map((block) => (
-        <div key={(block.heading ?? "") + block.paragraphs[0]?.slice(0, 24)}>
-          {block.heading ? (
-            <h2 className="font-serif text-xl md:text-2xl text-museum-light mb-3">
-              {block.heading}
-            </h2>
-          ) : null}
-          <div className="space-y-3 font-sans text-sm md:text-base leading-relaxed text-museum-light/75">
-            {block.paragraphs.map((paragraph) => (
-              <p key={paragraph.slice(0, 32)}>{paragraph}</p>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function ContactDetails({ contact }: { contact: NonNullable<InfoSection["contact"]> }) {
   const rows = [
@@ -88,7 +70,13 @@ export default function InfoSectionPage({ section }: InfoSectionPageProps) {
           </p>
         ) : null}
 
-        {section.contact ? <ContactDetails contact={section.contact} /> : null}
+        {salonMapSectionIds.includes(
+          section.id as (typeof salonMapSectionIds)[number],
+        ) ? (
+          <YandexSalonMap className="mb-8" heading="Как добраться" />
+        ) : section.contact ? (
+          <ContactDetails contact={section.contact} />
+        ) : null}
 
         {useContentCatalog ? (
           <ContentSectionCatalog
@@ -96,7 +84,24 @@ export default function InfoSectionPage({ section }: InfoSectionPageProps) {
             itemLabel={CONTENT_ITEM_LABELS[section.id] ?? "материалов"}
           />
         ) : hasBlocks ? (
-          <BlockContent blocks={section.blocks!} />
+          <InfoBlocks
+            blocks={section.blocks!}
+            linkifyPhones={section.id === "dostavka-i-oplata"}
+          />
+        ) : section.id === "adres" ? (
+          <div className="space-y-4 font-sans text-sm md:text-base leading-relaxed text-museum-light/75 mb-8">
+            <p>
+              Салон «{siteConfig.name}» — антикварная мебель и предметы интерьера. Осмотр
+              по предварительной договорённости в нерабочие часы.
+            </p>
+            <p>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-accent-gold/80">
+                Часы работы
+              </span>
+              <br />
+              {siteConfig.workingHours}
+            </p>
+          </div>
         ) : (
           <div className="space-y-4 font-sans text-sm md:text-base leading-relaxed text-museum-light/75 mb-8">
             {section.paragraphs.map((paragraph) => (
@@ -106,7 +111,33 @@ export default function InfoSectionPage({ section }: InfoSectionPageProps) {
         )}
 
         {section.id === "dostavka-i-oplata" ? (
-          <PaymentBadges variant="dark" className="mb-8" />
+          <>
+            <PaymentBadges variant="dark" className="mb-6 mt-0" />
+            <p className="mb-8 font-sans text-sm md:text-base leading-relaxed text-museum-light/75">
+              Подробные правила резерва и оферта —{" "}
+              <Link
+                href="/usloviya-rezervirovaniya"
+                className="text-accent-gold hover:text-museum-light underline underline-offset-2"
+              >
+                договор оферты
+              </Link>
+              . Вопросы по оплате и доставке:{" "}
+              <a
+                href={siteConfig.phoneHref}
+                className="text-accent-gold hover:text-museum-light underline underline-offset-2"
+              >
+                {siteConfig.phone}
+              </a>
+              ,{" "}
+              <a
+                href={siteConfig.salonEmailHref}
+                className="text-accent-gold hover:text-museum-light underline underline-offset-2"
+              >
+                {siteConfig.salonEmail}
+              </a>
+              .
+            </p>
+          </>
         ) : null}
 
         {section.id === "sotrudnichestvo" ? (
@@ -131,22 +162,7 @@ export default function InfoSectionPage({ section }: InfoSectionPageProps) {
               className="inline-flex items-center gap-2 min-h-12 py-2 font-sans text-xs tracking-widest uppercase text-accent-gold hover:text-museum-light transition-colors"
             >
               <span>Открыть каталог</span>
-              <span aria-hidden="true">⟶</span>
-            </Link>
-          </p>
-        ) : null}
-
-        <p className="font-sans text-sm text-museum-light/55">
-          {siteConfig.name} · {siteConfig.addressLine}
-        </p>
-        {!section.catalogHref ? (
-          <p className="mt-6">
-            <Link
-              href="/collection"
-              className="inline-flex items-center gap-2 font-sans text-xs tracking-widest uppercase text-accent-gold hover:text-museum-light transition-colors"
-            >
-              <span>Смотреть коллекцию</span>
-              <span aria-hidden="true">⟶</span>
+              <ArrowSquareUpRightIcon className="h-4 w-4 shrink-0" />
             </Link>
           </p>
         ) : null}

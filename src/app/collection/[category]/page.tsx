@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import CollectionCatalog from "@/components/CollectionCatalog";
 import FloatingConcierge from "@/components/FloatingConcierge";
 import { getCategoryProductCount } from "@/lib/catalog";
+import { categoryPageDescription, categoryPageTitle, pageMetadata } from "@/lib/seo";
 import { categoryLabel, siteConfig } from "@/lib/site";
 
 export async function generateMetadata({
@@ -13,10 +14,12 @@ export async function generateMetadata({
   const { category } = await params;
   const label = categoryLabel(category);
 
-  return {
-    title: `${label} — каталог антиквариата`,
-    description: `Антикварные предметы: ${label.toLowerCase()}. Доставка по России.`,
-  };
+  return pageMetadata({
+    title: categoryPageTitle(label),
+    description: categoryPageDescription(label),
+    path: `/collection/${category}`,
+    enrichDescription: false,
+  });
 }
 
 function formatCategoryIntro(label: string) {
@@ -51,7 +54,7 @@ export default async function CategoryListing({
           {label}
         </h1>
         <p className="font-sans text-sm md:text-base text-luxury-charcoal/70 max-w-xl leading-relaxed">
-          Подборка предметов из раздела «{formatCategoryIntro(label)}».{" "}
+          Антикварная мебель и предметы — раздел «{formatCategoryIntro(label)}». Купить с доставкой по России.{" "}
           <span className="text-luxury-charcoal/50">{total} предметов</span>
         </p>
       </header>

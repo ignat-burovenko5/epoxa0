@@ -2,24 +2,26 @@ import type { Metadata } from "next";
 import CollectionCatalog from "@/components/CollectionCatalog";
 import FloatingConcierge from "@/components/FloatingConcierge";
 import { getCategoryProductCount } from "@/lib/catalog";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Коллекция — антикварная мебель и предметы интерьера",
+export const metadata: Metadata = pageMetadata({
+  title: "Архив коллекции — антикварная мебель на продажу",
   description:
-    "Каталог музейных антикварных предметов: мебель, освещение, зеркала, часы. Фильтр по эпохе, материалу и мастерской. Доставка по России.",
-};
+    "Полный каталог антикварной мебели и предметов интерьера: буфеты, комоды, кресла, люстры, зеркала. Купить с доставкой по России.",
+  path: "/collection",
+});
 
 export default function CollectionListing() {
   const total = getCategoryProductCount(null);
 
   return (
-    <div className="pb-16 md:pb-20">
+    <div className="pb-24 md:pb-20">
       <header className="mb-8 md:mb-10">
         <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-luxury-base mb-3">
           Архив коллекции
         </h1>
         <p className="font-sans text-sm md:text-base text-luxury-charcoal/70 max-w-xl leading-relaxed">
-          Живая подборка исторически значимых предметов — для современных резиденций, загородных домов и проектов дизайнеров.
+          Антикварная мебель на продажу — живая подборка для резиденций, загородных домов и проектов дизайнеров. Купить с доставкой по России.
         </p>
       </header>
 
