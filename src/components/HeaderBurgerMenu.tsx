@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
+import { siteChromeSurfaceClass } from "@/components/site-chrome";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
@@ -89,7 +90,7 @@ export default function HeaderBurgerMenu() {
           >
             <button
               type="button"
-              className="catalog-sidenav-backdrop pointer-events-auto fixed inset-0 cursor-pointer border-0 bg-luxury-base/80 touch-manipulation"
+              className="catalog-sidenav-backdrop pointer-events-auto fixed inset-0 cursor-pointer border-0 bg-luxury-base/40 max-md:backdrop-blur-none md:bg-luxury-base/35 md:backdrop-blur-sm md:supports-[backdrop-filter]:bg-luxury-base/30 touch-manipulation"
               aria-label="Закрыть меню"
               onClick={close}
             />
@@ -99,7 +100,7 @@ export default function HeaderBurgerMenu() {
               role="dialog"
               aria-modal="true"
               aria-label="Навигация по сайту"
-              className="catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col bg-luxury-base max-md:backdrop-blur-none md:bg-luxury-base/95 md:backdrop-blur-md md:supports-[backdrop-filter]:bg-luxury-base/90 pb-[env(safe-area-inset-bottom,0px)]"
+              className={`catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col border-r ${siteChromeSurfaceClass} pb-[env(safe-area-inset-bottom,0px)]`}
             >
               <nav
                 className="catalog-sidenav-panel__nav flex-1 overflow-y-auto hidden-scrollbar px-3 py-4 space-y-8"

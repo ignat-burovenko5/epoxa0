@@ -290,22 +290,17 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
   will-change: transform;
 }
 
-/* A soft, layered edge shadow visually joins the drawer to the dimmed page. */
+/* Soft edge — same light border language as topnav, not a heavy cast shadow. */
 .catalog-sidenav-panel::after {
   content: "";
   position: absolute;
-  top: 1rem;
-  bottom: 1rem;
+  top: 0;
+  bottom: 0;
   left: 100%;
-  width: clamp(2.75rem, 7vw, 4.5rem);
+  width: 1px;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse at left center, rgb(0 0 0 / 42%) 0%, rgb(0 0 0 / 20%) 36%, transparent 74%),
-    linear-gradient(to right, rgb(12 12 12 / 28%), transparent 55%);
-  filter: blur(0.75px);
-  mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+  background: rgb(245 240 232 / 5%);
   opacity: 0;
-  transform: translateX(-1px);
   transition: opacity 0.42s var(--ease-luxury-ease);
 }
 
@@ -318,7 +313,7 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
 }
 
 .catalog-nav-overlay[data-state="open"] .catalog-sidenav-panel::after {
-  opacity: 0.82;
+  opacity: 1;
 }
 
 .catalog-sidenav-panel__nav {
