@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-prod/
 /.next-staging/
 /.next-prev/
 /.push-lock/

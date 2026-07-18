@@ -1,13 +1,14 @@
 /**
- * Atomically promote a staging Next build (.next-staging → .next).
+ * Atomically promote a staging Next build (.next-staging → .next-prod).
  * Keeps the previous build in .next-prev for rollback.
+ * Dev/Turbopack cache stays in `.next` and is never swapped.
  */
 import { existsSync, renameSync, rmSync } from "fs";
 import path from "path";
 
 export const STAGING_DIR = ".next-staging";
 export const PREV_DIR = ".next-prev";
-export const LIVE_DIR = ".next";
+export const LIVE_DIR = ".next-prod";
 
 export function stagingBuildReady(root) {
   return existsSync(path.join(root, STAGING_DIR, "BUILD_ID"));

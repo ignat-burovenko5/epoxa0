@@ -26,8 +26,18 @@ function blogSlugRedirects(): { source: string; destination: string; permanent: 
 const backendUrl = process.env.BACKEND_URL ?? "http://127.0.0.1:8000";
 
 const nextConfig: NextConfig = {
-  /** Staging dir only during `npm run push` build (never set when running `next start`). */
-  distDir: process.env.NEXT_BUILD_STAGING === "1" ? ".next-staging" : ".next",
+  /**
+   * Keep Turbopack (`.next`) out of production swaps.
+   * - `next dev` → `.next`
+   * - `npm run push` build → `.next-staging` → promoted to `.next-prod`
+   * - `next start` → `.next-prod`
+   */
+  distDir:
+    process.env.NEXT_BUILD_STAGING === "1"
+      ? ".next-staging"
+      : process.env.NODE_ENV === "development"
+        ? ".next"
+        : ".next-prod",
   poweredByHeader: false,
   async rewrites() {
     return [
