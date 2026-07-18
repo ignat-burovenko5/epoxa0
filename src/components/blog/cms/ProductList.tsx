@@ -232,10 +232,14 @@ export default function ProductList({
   useEffect(() => {
     if (skipFirstReload.current) {
       skipFirstReload.current = false;
+      // Facets may be missing after a backend glitch — pull a fresh first page.
+      if (!(initialPage.categoryCounts?.length)) {
+        void reload();
+      }
       return;
     }
     void reload();
-  }, [reload]);
+  }, [reload, initialPage.categoryCounts?.length]);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore || refreshing) return;
