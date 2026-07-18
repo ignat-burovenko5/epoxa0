@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import BrandLines from "@/components/BrandLines";
-import ProductPrice from "@/components/ProductPrice";
 import Image from "next/image";
 import Link from "next/link";
 import FloatingConciergeLazy from "@/components/FloatingConciergeLazy";
 import PageContainer from "@/components/PageContainer";
-import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
-import {
-  getCatalogItems,
-  getCatalogProduct,
-  getDiscountPercent,
-  getRandomFeaturedSlugs,
-} from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
-import { getCatalogImage, siteImages } from "@/lib/site-images";
+import { siteImages } from "@/lib/site-images";
 
 export const metadata: Metadata = pageMetadata({
   title: `${siteConfig.name} — антикварная мебель на продажу, купить в салоне`,
@@ -24,23 +16,8 @@ export const metadata: Metadata = pageMetadata({
   path: "/",
 });
 
-function buildFeatured(slugs: string[]) {
-  return slugs.flatMap((slug) => {
-    const product = getCatalogProduct(slug);
-    if (!product) return [];
-    return [
-      {
-        ...product,
-        image: getCatalogImage(slug, 2070),
-        alt: `${product.title}, ${product.era}`,
-      },
-    ];
-  });
-}
-
 export default async function Homepage() {
   await connection();
-  const featured = buildFeatured(getRandomFeaturedSlugs());
   return (
     <main className="bg-luxury-base text-museum-light">
       <section className="relative w-full min-h-[38vh] sm:min-h-[45vh] md:min-h-[55vh] -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)] flex flex-col justify-end items-start">
