@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import ProductList from "@/components/blog/cms/ProductList";
-import type { CatalogProductSummary, ProductListPage } from "@/lib/shop/product-types";
+import type { ProductListPage } from "@/lib/shop/product-types";
 import { blogDashboardProductCreatePath } from "@/lib/blog/urls";
-import { formatPrice } from "@/lib/catalog-shared";
 
 type DashboardProductsPanelProps = {
   initialPage: ProductListPage;
@@ -40,11 +39,7 @@ export default function DashboardProductsPanel({
   initialPage,
   initialStatus = "all",
 }: DashboardProductsPanelProps) {
-  const [products] = useState<CatalogProductSummary[]>(initialPage.items);
   const counts = initialPage.counts;
-  const activeValue = products
-    .filter((p) => p.status === "active")
-    .reduce((sum, p) => sum + p.price, 0);
   const [seeding, setSeeding] = useState(false);
   const [seedMsg, setSeedMsg] = useState<string | null>(null);
 
@@ -86,7 +81,7 @@ export default function DashboardProductsPanel({
         <div className="min-w-0">
           <h2 className="font-serif text-2xl md:text-3xl xl:text-4xl mb-1">Каталог товаров</h2>
           <p className="font-sans text-sm md:text-base text-museum-light/50 max-w-2xl">
-            Крупный обзор коллекции: категории слева, карточки справа. Публикация, архив и цены.
+            Крупный обзор коллекции: категории слева, карточки справа. Подгрузка по прокрутке.
           </p>
         </div>
         <div className="flex flex-wrap gap-2.5 shrink-0">
@@ -117,11 +112,7 @@ export default function DashboardProductsPanel({
         <StatCard label="Всего" value={counts.all} />
         <StatCard label="На сайте" value={counts.active} />
         <StatCard label="Архив" value={counts.archived} />
-        <StatCard
-          label="Сумма на сайте"
-          value={formatPrice(activeValue)}
-          hint={`${counts.draft} черновиков`}
-        />
+        <StatCard label="Черновики" value={counts.draft} />
       </section>
 
       {seedMsg ? (
@@ -129,7 +120,7 @@ export default function DashboardProductsPanel({
       ) : null}
 
       <section>
-        <ProductList products={products} initialStatus={initialStatus} />
+        <ProductList initialPage={initialPage} initialStatus={initialStatus} />
       </section>
     </div>
   );

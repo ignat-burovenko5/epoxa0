@@ -7,6 +7,7 @@ import { getBlogListPage } from "@/lib/blog/posts";
 import { getDashboardOverview } from "@/lib/dashboard/overview";
 import { parseOverviewPeriodDays } from "@/lib/dashboard/period";
 import { getAdminProductList } from "@/lib/shop/products-admin";
+import { ADMIN_PRODUCT_PAGE_SIZE } from "@/lib/shop/product-types";
 
 export const metadata: Metadata = {
   title: "Панель CMS",
@@ -32,10 +33,15 @@ export default async function BlogAdminHubPage({ searchParams }: PageProps) {
       : "all";
   const wide = viewParam === "products";
 
+  // Products: small first page only on products view (infinite scroll loads the rest).
+  // Hub home needs counts only — limit 1.
   const [page, overview, productsPage] = await Promise.all([
     getBlogListPage(0, 100, { includeDrafts: true }),
     getDashboardOverview(periodDays, dateParam),
-    getAdminProductList({ limit: 500 }),
+    getAdminProductList({
+      limit: wide ? ADMIN_PRODUCT_PAGE_SIZE : 1,
+      status: productStatus === "all" ? undefined : productStatus,
+    }),
   ]);
 
   return (
