@@ -124,12 +124,12 @@ export default function ProductEditor({ product }: ProductEditorProps) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-8 max-w-3xl">
+    <form onSubmit={onSubmit} className="space-y-8 max-w-5xl">
       <div>
-        <h1 className="font-serif text-2xl md:text-3xl text-museum-light mb-2">
+        <h1 className="font-serif text-2xl md:text-3xl xl:text-4xl text-museum-light mb-2">
           {isNew ? "Новый товар" : "Редактирование товара"}
         </h1>
-        <p className="font-sans text-sm text-museum-light/50">
+        <p className="font-sans text-sm md:text-base text-museum-light/50 max-w-2xl">
           Активные товары с ценой &gt; 0 появляются в каталоге на сайте.
         </p>
       </div>

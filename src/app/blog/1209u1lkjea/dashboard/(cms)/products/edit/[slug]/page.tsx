@@ -21,7 +21,7 @@ export default async function ProductEditPage({ params }: PageProps) {
   if (!product) notFound();
 
   return (
-    <BlogCmsShell>
+    <BlogCmsShell size="wide">
       <ProductEditor product={product} />
     </BlogCmsShell>
   );

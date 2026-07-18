@@ -12,7 +12,7 @@ export default async function ProductCreatePage() {
   await requireDashboardAuth();
 
   return (
-    <BlogCmsShell>
+    <BlogCmsShell size="wide">
       <ProductEditor />
     </BlogCmsShell>
   );
