@@ -195,7 +195,7 @@ export default function ProductList({
       const key = productCategoryKey(p);
       map.set(key, (map.get(key) ?? 0) + 1);
     }
-    const known = siteConfig.categoryLinks
+    const known: string[] = siteConfig.categoryLinks
       .map((c) => c.label)
       .filter((label) => map.has(label));
     const extras = [...map.keys()]
