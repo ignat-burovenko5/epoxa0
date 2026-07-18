@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import BrandLines from "@/components/BrandLines";
+import HomeCategoriesNav from "@/components/HomeCategoriesNav";
 import ProductPrice from "@/components/ProductPrice";
 import Image from "next/image";
 import Link from "next/link";
@@ -86,9 +87,11 @@ export default async function Homepage() {
 
       <section className="section-y bg-museum-light text-luxury-charcoal">
         <PageContainer>
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl max-w-2xl leading-snug mb-12 md:mb-16">
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl max-w-2xl leading-snug mb-8 md:mb-10">
             Редкие предметы для вашего интерьера
           </h2>
+
+          <HomeCategoriesNav />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 md:gap-12">
             {featured.map((item, index) => {
