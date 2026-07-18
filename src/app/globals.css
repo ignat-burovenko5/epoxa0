@@ -157,12 +157,12 @@
   }
 }
 
-/* ── Antique quill cursor ─────────────────────────────────────────
-   Brass minimalist quill (feather pen) cursor for pointer devices.
-   Adapted from "Used Quill" by Solar_Granulation (Openclipart, public
-   domain / CC0), recoloured to the brass palette. The writing nib sits
-   at the top-left so the hotspot (0 0) is the click point; the feather
-   sweeps down-right. Touch / coarse pointers keep the native cursor. */
+/* ── Antique pen-tool cursor ─────────────────────────────────────────
+   Brass fountain-pen nib cursor for pointer devices, adapted from
+   the "pen-tool" icon (svgrepo #491685, derived from Lucide, ISC). The
+   nib is stroked in the brass gradient with a transparent fill; the tip
+   points to the top-left so the hotspot (2 2) sits on the nib point.
+   Touch / coarse pointers keep the native cursor. */
 @media (pointer: fine) {
   :root {
     --cursor-antique: url("/cursor-antique.svg") 2 2, url("/cursor-antique.png") 2 2, auto;
