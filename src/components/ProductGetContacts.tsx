@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import {
   inquiryMessage,
+  maxUrl,
   siteConfig,
   telegramUrl,
   whatsappUrl,
@@ -51,6 +52,15 @@ export default function ProductGetContacts({
           role="group"
           aria-label="Контакты куратора"
         >
+          <a
+            href={maxUrl(message)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Написать в MAX"
+            className={`${contactLinkClass} sm:flex-1 sm:min-w-0`}
+          >
+            MAX
+          </a>
           <a
             href={whatsappUrl(message)}
             target="_blank"
