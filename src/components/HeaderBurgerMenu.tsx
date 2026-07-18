@@ -3,10 +3,30 @@
 import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
 import { siteChromeSurfaceClass } from "@/components/site-chrome";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { categoryHref, groupedCategoryLinks, siteConfig } from "@/lib/site";
+
+function navLinkIsActive(
+  pathname: string,
+  searchParams: URLSearchParams,
+  href: string,
+) {
+  const url = new URL(href, "http://local");
+  if (pathname !== url.pathname) return false;
+  if (url.searchParams.get("sale")) {
+    return (
+      searchParams.get("sale") === "1" || searchParams.get("sale") === "true"
+    );
+  }
+  if (pathname === "/collection") {
+    return !(
+      searchParams.get("sale") === "1" || searchParams.get("sale") === "true"
+    );
+  }
+  return true;
+}
 
 const menuTransitionMs = 420;
 
@@ -44,6 +64,7 @@ export default function HeaderBurgerMenu() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const groups = useMemo(() => groupedCategoryLinks(), []);
 
   const close = useCallback(() => setOpen(false), []);
@@ -123,13 +144,19 @@ export default function HeaderBurgerMenu() {
                 <div className="mb-7">
                   <p className={groupLabelClass}>Обзор</p>
                   <ul className="m-0 flex list-none flex-col gap-1 p-0">
-                    {siteConfig.catalogNavLinks.map((item) => (
+                    {siteConfig.catalogNavLinks.map((item) => {
+                      const active = navLinkIsActive(
+                        pathname,
+                        searchParams,
+                        item.href,
+                      );
+                      return (
                       <li key={item.href}>
                         <Link
                           href={item.href}
                           onClick={close}
                           className={`${categoryLinkBase} ${
-                            pathname === item.href
+                            active
                               ? "border-accent-gold bg-accent-gold/10 text-accent-gold"
                               : "border-transparent text-museum-light/60 hover:bg-museum-light/[0.04] hover:text-accent-gold"
                           }`}
@@ -137,7 +164,8 @@ export default function HeaderBurgerMenu() {
                           {item.label}
                         </Link>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </div>
 

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import HeaderBurgerMenu from "@/components/HeaderBurgerMenu";
 import Logo from "@/components/Logo";
 import { EmailIcon, PhoneIcon } from "@/components/NavContactIcons";
