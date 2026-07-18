@@ -1105,7 +1105,8 @@ img.logo-nav-mark--footer {
       transform-origin: center;
     }
 
-    .contact-link-phone:hover .contact-icon-ring svg {
+    .contact-link-phone:hover .contact-icon-ring svg,
+    .site-header:has(.site-header-logo:hover) .contact-link-phone svg {
       animation: phone-icon-hover 0.55s ease-in-out;
     }
 
@@ -1127,17 +1128,38 @@ img.logo-nav-mark--footer {
       opacity: 0;
     }
 
-    .contact-link-email:hover .email-icon__closed {
+    .contact-link-email:hover .email-icon__closed,
+    .site-header:has(.site-header-logo:hover) .contact-link-email .email-icon__closed {
       opacity: 0;
     }
 
-    .contact-link-email:hover .email-icon__open {
+    .contact-link-email:hover .email-icon__open,
+    .site-header:has(.site-header-logo:hover) .contact-link-email .email-icon__open {
       opacity: 1;
     }
 
-    .contact-link-email:hover .contact-icon-ring {
+    .contact-link-email:hover .contact-icon-ring,
+    .site-header:has(.site-header-logo:hover) .contact-link-email .contact-icon-ring {
       overflow: visible;
       contain: none;
+    }
+
+    /* Logo hover also plays contact ring / shine */
+    .site-header:has(.site-header-logo:hover) .contact-link-animated::after {
+      animation: contact-shine 0.75s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .site-header:has(.site-header-logo:hover) .contact-link-animated .contact-icon-ring {
+      transform: scale(1.02);
+      border-color: rgba(184, 154, 112, 0.5);
+      background-color: rgba(166, 124, 82, 0.12);
+      color: var(--color-museum-light);
+    }
+
+    .site-header:has(.site-header-logo:hover) .site-header-contacts-icons-mobile .contact-link-email,
+    .site-header:has(.site-header-logo:hover) .site-header-contacts-icons-mobile .contact-link-phone {
+      border-color: rgba(184, 154, 112, 0.4);
+      color: var(--color-accent-gold, #c4a574);
     }
   }
 }
