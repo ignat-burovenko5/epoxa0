@@ -29,7 +29,7 @@ export default function HomeCategoriesNav() {
         </div>
         <Link
           href="/collection"
-          className="cursor-pointer font-sans text-[11px] tracking-[0.14em] uppercase text-accent-brass transition-colors hover:text-luxury-base underline-offset-4 hover:underline"
+          className="inline-flex cursor-pointer items-center justify-center border border-accent-brass bg-transparent px-4 py-2 font-sans text-[11px] tracking-[0.14em] uppercase text-accent-brass transition-colors hover:border-luxury-base hover:text-luxury-base"
         >
           Все предметы
         </Link>
