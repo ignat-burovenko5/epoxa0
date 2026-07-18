@@ -88,7 +88,8 @@ export default function CatalogInfiniteGrid({
           void loadMore();
         }
       },
-      { rootMargin: "240px 0px" },
+      // Viewport root — products use page scroll; category pane scrolls separately
+      { root: null, rootMargin: "240px 0px", threshold: 0 },
     );
 
     observer.observe(node);
