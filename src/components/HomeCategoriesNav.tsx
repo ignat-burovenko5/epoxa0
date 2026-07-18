@@ -29,7 +29,7 @@ export default function HomeCategoriesNav() {
         </div>
         <Link
           href="/collection"
-          className="inline-flex cursor-pointer items-center justify-center border border-accent-brass bg-transparent px-4 py-2 font-sans text-[11px] tracking-[0.14em] uppercase text-accent-brass transition-colors hover:border-luxury-base hover:text-luxury-base"
+          className="home-cat-btn inline-flex cursor-pointer items-center justify-center border border-accent-brass bg-transparent px-4 py-2 font-sans text-[11px] tracking-[0.14em] uppercase text-accent-brass"
         >
           Все предметы
         </Link>
@@ -50,7 +50,7 @@ export default function HomeCategoriesNav() {
             <li>
               <Link
                 href={COLLECTION_SALE_HREF}
-                className="cursor-pointer font-sans text-[12px] leading-snug tracking-[0.06em] uppercase text-luxury-bordeaux transition-colors hover:text-luxury-bordeaux/80"
+                className="home-cat-link home-cat-link--accent cursor-pointer font-sans text-[12px] leading-snug tracking-[0.06em] uppercase"
               >
                 Акционные товары
               </Link>
@@ -61,10 +61,8 @@ export default function HomeCategoriesNav() {
                 <li key={item.slug}>
                   <Link
                     href={categoryHref(item.slug)}
-                    className={`cursor-pointer font-sans text-[12px] leading-snug tracking-[0.06em] uppercase transition-colors ${
-                      highlighted
-                        ? "text-luxury-bordeaux hover:text-luxury-bordeaux/80"
-                        : "text-luxury-charcoal/70 hover:text-accent-brass"
+                    className={`home-cat-link cursor-pointer font-sans text-[12px] leading-snug tracking-[0.06em] uppercase ${
+                      highlighted ? "home-cat-link--accent" : "home-cat-link--muted"
                     }`}
                   >
                     {item.label}
@@ -90,10 +88,8 @@ export default function HomeCategoriesNav() {
                   <li key={item.slug}>
                     <Link
                       href={categoryHref(item.slug)}
-                      className={`cursor-pointer block font-sans text-[12px] leading-snug tracking-[0.05em] uppercase transition-colors duration-300 ${
-                        highlighted
-                          ? "text-luxury-bordeaux hover:text-luxury-bordeaux/80"
-                          : "text-luxury-charcoal/65 hover:text-accent-brass"
+                      className={`home-cat-link home-cat-link--stack cursor-pointer font-sans text-[12px] leading-snug tracking-[0.05em] uppercase ${
+                        highlighted ? "home-cat-link--accent" : "home-cat-link--muted"
                       }`}
                     >
                       {item.label}
