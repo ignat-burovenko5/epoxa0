@@ -290,30 +290,12 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
   will-change: transform;
 }
 
-/* Soft edge — same light border language as topnav, not a heavy cast shadow. */
-.catalog-sidenav-panel::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 100%;
-  width: 1px;
-  pointer-events: none;
-  background: rgb(245 240 232 / 5%);
-  opacity: 0;
-  transition: opacity 0.42s var(--ease-luxury-ease);
-}
-
 .catalog-nav-overlay[data-state="open"] .catalog-sidenav-backdrop {
   opacity: 1;
 }
 
 .catalog-nav-overlay[data-state="open"] .catalog-sidenav-panel {
   transform: translateX(0);
-}
-
-.catalog-nav-overlay[data-state="open"] .catalog-sidenav-panel::after {
-  opacity: 1;
 }
 
 .catalog-sidenav-panel__nav {
