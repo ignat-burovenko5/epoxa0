@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { CatalogProductSummary, ProductStatus } from "@/lib/shop/product-types";
 import { formatPrice } from "@/lib/catalog";
 import {
@@ -29,10 +29,6 @@ export default function ProductList({
   const [q, setQ] = useState("");
   const [busySlug, setBusySlug] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setProducts(initialProducts);
-  }, [initialProducts]);
 
   const visible = useMemo(() => {
     const query = q.trim().toLowerCase();

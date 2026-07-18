@@ -19,7 +19,7 @@ const PROCESS_LOG = path.join(ROOT, `.django-server-${PORT}.out.log`);
 const VENV_PYTHON = path.join(
   ROOT,
   "backend",
-  process.platform === "win32" ? "Scripts/python.exe" : "bin/python",
+  process.platform === "win32" ? path.join(".venv", "Scripts", "python.exe") : path.join(".venv", "bin", "python"),
 );
 
 function pythonCmd() {

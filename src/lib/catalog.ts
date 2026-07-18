@@ -131,7 +131,7 @@ export function getCatalogPage(
 
 /** @deprecated Use getCatalogItems() — kept for gradual migration. */
 export const catalogItems = new Proxy([] as CatalogProduct[], {
-  get(_t, prop, receiver) {
+  get(_t, prop) {
     const list = getCatalogItems();
     const value = Reflect.get(list, prop, list);
     return typeof value === "function" ? (value as (...a: unknown[]) => unknown).bind(list) : value;

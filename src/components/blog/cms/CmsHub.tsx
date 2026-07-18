@@ -68,6 +68,7 @@ export default function CmsHub({
       <div className="space-y-8">
         <HubToolbar active="products" />
         <DashboardProductsPanel
+          key={`${productsPage.total}-${productStatus}`}
           initialPage={productsPage}
           initialStatus={productStatus}
         />
