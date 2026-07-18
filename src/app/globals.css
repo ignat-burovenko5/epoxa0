@@ -168,8 +168,8 @@
    Hotspot sits on the index fingertip. */
 @media (pointer: fine) {
   :root {
-    --cursor-antique: url("/cursor-antique.svg") 5 2, auto;
-    --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 5 2, pointer;
+    --cursor-antique: url("/cursor-antique.svg") 14 0, url("/cursor-antique.png") 14 0, auto;
+    --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 14 0, url("/cursor-antique-pointer.png") 14 0, pointer;
   }
 
   html {
