@@ -37,10 +37,11 @@ export async function optimizeCmsImage(input: Buffer): Promise<OptimizedImage> {
     });
   }
 
+  // effort 6 ≈ near-max compression without multi‑tens‑of‑seconds encodes
   const [avif, webp] = await Promise.all([
     pipeline
       .clone()
-      .avif({ quality: 40, effort: 9, chromaSubsampling: "4:2:0" })
+      .avif({ quality: 40, effort: 6, chromaSubsampling: "4:2:0" })
       .toBuffer({ resolveWithObject: true }),
     pipeline
       .clone()
