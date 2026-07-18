@@ -14,6 +14,10 @@ type ProductImageGalleryProps = {
   slides: readonly GallerySlide[];
 };
 
+const ZOOM_STEPS = [25, 50, 75, 100] as const;
+type ZoomStep = (typeof ZOOM_STEPS)[number];
+const DEFAULT_ZOOM: ZoomStep = 25;
+
 const mainImageClass =
   "left-0 right-0 top-1/2 mx-auto h-auto w-full max-w-full -translate-y-1/2 max-h-[calc(100dvh-var(--site-header-offset)-6rem)] object-contain transition-[opacity,transform] duration-500 ease-luxury-ease motion-reduce:transition-none";
 
@@ -22,6 +26,9 @@ const arrowButtonClass =
 
 const lightboxArrowClass =
   "absolute top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center border border-museum-light/25 bg-luxury-base/70 text-museum-light backdrop-blur-sm transition-colors hover:border-accent-gold/50 hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation";
+
+const zoomControlBtnClass =
+  "flex h-9 min-w-9 items-center justify-center border border-museum-light/20 px-2 font-sans text-[10px] tracking-[0.14em] uppercase text-museum-light/75 transition-colors hover:border-accent-gold/50 hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-museum-light/20 disabled:hover:text-museum-light/75";
 
 function GalleryArrow({
   direction,
@@ -59,35 +66,60 @@ function GalleryArrow({
   );
 }
 
+function stepIndex(zoom: ZoomStep) {
+  return ZOOM_STEPS.indexOf(zoom);
+}
+
 export default function ProductImageGallery({ slides }: ProductImageGalleryProps) {
   const lightboxTitleId = useId();
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [zoomed, setZoomed] = useState(false);
+  const [zoom, setZoom] = useState<ZoomStep>(DEFAULT_ZOOM);
   const touchStartX = useRef(0);
   const lightboxTouchStartX = useRef(0);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const hasMultiple = slides.length > 1;
   const activeSlide = slides[activeIndex] ?? slides[0];
+  const zoomIdx = stepIndex(zoom);
+  const canZoomOut = zoomIdx > 0;
+  const canZoomIn = zoomIdx < ZOOM_STEPS.length - 1;
+  const scale = zoom / DEFAULT_ZOOM;
+
+  const resetZoom = useCallback(() => setZoom(DEFAULT_ZOOM), []);
+
+  const zoomIn = useCallback(() => {
+    setZoom((current) => {
+      const index = stepIndex(current);
+      return ZOOM_STEPS[Math.min(index + 1, ZOOM_STEPS.length - 1)] ?? current;
+    });
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setZoom((current) => {
+      const index = stepIndex(current);
+      return ZOOM_STEPS[Math.max(index - 1, 0)] ?? current;
+    });
+  }, []);
 
   const goPrev = useCallback(() => {
     setActiveIndex((index) => (index - 1 + slides.length) % slides.length);
-    setZoomed(false);
-  }, [slides.length]);
+    resetZoom();
+  }, [slides.length, resetZoom]);
 
   const goNext = useCallback(() => {
     setActiveIndex((index) => (index + 1) % slides.length);
-    setZoomed(false);
-  }, [slides.length]);
+    resetZoom();
+  }, [slides.length, resetZoom]);
 
   const openLightbox = useCallback(() => {
-    setZoomed(false);
+    resetZoom();
     setLightboxOpen(true);
-  }, []);
+  }, [resetZoom]);
 
   const closeLightbox = useCallback(() => {
     setLightboxOpen(false);
-    setZoomed(false);
-  }, []);
+    resetZoom();
+  }, [resetZoom]);
 
   useEffect(() => {
     for (const slide of slides) {
@@ -106,10 +138,16 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
       if (event.key === "Escape") {
         event.preventDefault();
         closeLightbox();
-      } else if (hasMultiple && event.key === "ArrowLeft") {
+      } else if (event.key === "+" || event.key === "=") {
+        event.preventDefault();
+        zoomIn();
+      } else if (event.key === "-" || event.key === "_") {
+        event.preventDefault();
+        zoomOut();
+      } else if (hasMultiple && event.key === "ArrowLeft" && zoom === DEFAULT_ZOOM) {
         event.preventDefault();
         goPrev();
-      } else if (hasMultiple && event.key === "ArrowRight") {
+      } else if (hasMultiple && event.key === "ArrowRight" && zoom === DEFAULT_ZOOM) {
         event.preventDefault();
         goNext();
       }
@@ -120,7 +158,16 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [lightboxOpen, hasMultiple, closeLightbox, goPrev, goNext]);
+  }, [
+    lightboxOpen,
+    hasMultiple,
+    zoom,
+    closeLightbox,
+    goPrev,
+    goNext,
+    zoomIn,
+    zoomOut,
+  ]);
 
   useEffect(() => {
     if (lightboxOpen || !hasMultiple) return;
@@ -138,6 +185,22 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [lightboxOpen, hasMultiple, goPrev, goNext]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const onWheel = (event: WheelEvent) => {
+      if (!(event.ctrlKey || event.metaKey || Math.abs(event.deltaY) > 0)) return;
+      event.preventDefault();
+      if (event.deltaY < 0) zoomIn();
+      else zoomOut();
+    };
+
+    stage.addEventListener("wheel", onWheel, { passive: false });
+    return () => stage.removeEventListener("wheel", onWheel);
+  }, [lightboxOpen, zoomIn, zoomOut]);
 
   const onTouchStart = (event: React.TouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? 0;
@@ -157,7 +220,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   };
 
   const onLightboxTouchEnd = (event: React.TouchEvent) => {
-    if (!hasMultiple || zoomed) return;
+    if (!hasMultiple || zoom !== DEFAULT_ZOOM) return;
     const endX = event.changedTouches[0]?.clientX ?? 0;
     const delta = lightboxTouchStartX.current - endX;
     if (Math.abs(delta) < 48) return;
@@ -195,7 +258,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
               </svg>
             </button>
 
-            {hasMultiple ? (
+            {hasMultiple && zoom === DEFAULT_ZOOM ? (
               <GalleryArrow
                 direction="prev"
                 onClick={(e) => {
@@ -207,8 +270,9 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
             ) : null}
 
             <div
-              className={`relative flex h-full w-full items-center justify-center px-4 py-16 sm:px-16 ${
-                zoomed ? "overflow-auto" : "overflow-hidden"
+              ref={stageRef}
+              className={`relative flex h-full w-full items-center justify-center px-4 py-20 sm:px-16 ${
+                zoom > DEFAULT_ZOOM ? "overflow-auto" : "overflow-hidden"
               }`}
               onClick={(e) => e.stopPropagation()}
               onTouchStart={onLightboxTouchStart}
@@ -216,32 +280,43 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
             >
               <button
                 type="button"
-                onClick={() => setZoomed((value) => !value)}
-                aria-label={zoomed ? "Уменьшить изображение" : "Увеличить изображение"}
-                className={`relative block max-h-full max-w-full cursor-zoom-in border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 ${
-                  zoomed ? "cursor-zoom-out" : ""
+                onClick={() => {
+                  if (canZoomIn) zoomIn();
+                  else resetZoom();
+                }}
+                aria-label={
+                  canZoomIn
+                    ? `Увеличить до ${ZOOM_STEPS[zoomIdx + 1]}%`
+                    : "Сбросить масштаб"
+                }
+                className={`relative mx-auto block border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 ${
+                  canZoomIn ? "cursor-zoom-in" : "cursor-zoom-out"
                 }`}
+                style={{
+                  width: zoom > DEFAULT_ZOOM ? `${scale * 100}%` : "auto",
+                  maxWidth: zoom > DEFAULT_ZOOM ? "none" : "min(100%, 1100px)",
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- full-res lightbox zoom */}
                 <img
                   src={activeSlide.src}
                   alt={activeSlide.alt}
                   draggable={false}
-                  className={`mx-auto select-none transition-transform duration-300 ease-luxury-ease motion-reduce:transition-none ${
-                    zoomed
-                      ? "h-auto w-auto max-w-none scale-100"
-                      : "max-h-[min(88dvh,900px)] max-w-[min(100%,1100px)] object-contain"
-                  }`}
+                  className="mx-auto h-auto w-full max-h-[min(78dvh,860px)] select-none object-contain transition-[max-height,transform] duration-300 ease-luxury-ease motion-reduce:transition-none"
                   style={
-                    zoomed
-                      ? { width: "min(220vw, 2400px)", maxWidth: "none" }
+                    zoom > DEFAULT_ZOOM
+                      ? {
+                          maxHeight: "none",
+                          width: "100%",
+                          transform: "none",
+                        }
                       : undefined
                   }
                 />
               </button>
             </div>
 
-            {hasMultiple ? (
+            {hasMultiple && zoom === DEFAULT_ZOOM ? (
               <GalleryArrow
                 direction="next"
                 onClick={(e) => {
@@ -252,14 +327,64 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
               />
             ) : null}
 
-            <div className="pointer-events-none absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-0 right-0 z-30 flex flex-col items-center gap-1 px-4 text-center">
+            <div
+              className="pointer-events-auto absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-30 flex w-[min(100%-1.5rem,28rem)] -translate-x-1/2 flex-col items-center gap-2 px-2"
+              onClick={(e) => e.stopPropagation()}
+            >
               {hasMultiple ? (
                 <p className="font-sans text-[10px] tabular-nums tracking-widest text-museum-light/55">
                   {activeIndex + 1} / {slides.length}
                 </p>
               ) : null}
+
+              <div
+                className="flex w-full flex-wrap items-center justify-center gap-1.5 rounded-sm border border-museum-light/15 bg-luxury-base/80 px-2 py-2 backdrop-blur-sm"
+                role="toolbar"
+                aria-label="Масштаб изображения"
+              >
+                <button
+                  type="button"
+                  className={zoomControlBtnClass}
+                  onClick={zoomOut}
+                  disabled={!canZoomOut}
+                  aria-label="Уменьшить"
+                >
+                  −
+                </button>
+
+                {ZOOM_STEPS.map((step) => {
+                  const active = step === zoom;
+                  return (
+                    <button
+                      key={step}
+                      type="button"
+                      className={`${zoomControlBtnClass} ${
+                        active
+                          ? "border-accent-gold/70 bg-accent-brass/15 text-accent-gold"
+                          : ""
+                      }`}
+                      aria-pressed={active}
+                      aria-label={`Масштаб ${step}%`}
+                      onClick={() => setZoom(step)}
+                    >
+                      {step}%
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  className={zoomControlBtnClass}
+                  onClick={zoomIn}
+                  disabled={!canZoomIn}
+                  aria-label="Увеличить"
+                >
+                  +
+                </button>
+              </div>
+
               <p className="font-sans text-[10px] tracking-[0.14em] uppercase text-museum-light/40">
-                {zoomed ? "Нажмите, чтобы уменьшить" : "Нажмите, чтобы увеличить"}
+                {zoom}% · колесо / + − для масштаба
               </p>
             </div>
           </div>,
@@ -343,7 +468,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
                 aria-label={slide.alt}
                 onClick={() => {
                   setActiveIndex(index);
-                  setZoomed(false);
+                  resetZoom();
                 }}
                 className={`relative h-14 w-full overflow-hidden touch-manipulation transition-opacity duration-300 ease-luxury-ease focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 motion-reduce:transition-none sm:h-16 ${
                   isActive ? "opacity-100" : "opacity-45 hover:opacity-70"
