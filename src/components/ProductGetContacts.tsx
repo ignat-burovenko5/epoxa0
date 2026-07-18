@@ -65,8 +65,8 @@ export default function ProductGetContacts({
             aria-label="Написать в MAX"
             className={contactLinkClass}
           >
-            <span className={`${contactIconClass} overflow-hidden p-0`}>
-              <MaxIcon className="h-8 w-8 rounded-full" />
+            <span className={contactIconClass}>
+              <MaxIcon className="h-4 w-4" />
             </span>
             <span>MAX</span>
           </a>
