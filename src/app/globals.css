@@ -262,15 +262,6 @@
     user-select: text;
   }
 
-  /* Category / catalog nav links stay clickable (pointer), not I-beam */
-  .catalog-sidenav-panel a,
-  .collection-sidenav-panel a,
-  .collection-category-scroll a,
-  nav[aria-label="Категории каталога"] a,
-  nav[aria-label="Категории"] a {
-    cursor: var(--cursor-antique-pointer);
-  }
-
   input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="range"]):not([type="color"]),
   textarea,
   [contenteditable="true"] {
@@ -283,6 +274,15 @@
   [type="reset"]:disabled,
   [aria-disabled="true"] {
     cursor: not-allowed;
+  }
+
+  /*
+   * Links always win over I-beam rules (homepage categories, burger, collection).
+   * mailto/tel keep text cursor for copy/aim.
+   */
+  a:any-link:not([href^="mailto:"]):not([href^="tel:"]),
+  a:any-link:not([href^="mailto:"]):not([href^="tel:"]) * {
+    cursor: var(--cursor-antique-pointer) !important;
   }
 }
 
