@@ -207,7 +207,7 @@ export default function ProductList({
             </Link>
           </p>
         ) : (
-          <ul className="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-5">
+          <ul className="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 md:gap-6">
             {visible.map((product) => (
               <li
                 key={product.slug}
@@ -225,42 +225,42 @@ export default function ProductList({
                       className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.03]"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center font-sans text-[10px] uppercase tracking-widest text-museum-light/30">
+                    <div className="flex h-full w-full items-center justify-center font-sans text-xs uppercase tracking-widest text-museum-light/30">
                       Нет фото
                     </div>
                   )}
-                  <span className="absolute left-2 top-2 font-sans text-[9px] tracking-widest uppercase px-2 py-1 bg-luxury-base/85 text-museum-light/80 border border-museum-light/15">
+                  <span className="absolute left-2.5 top-2.5 font-sans text-[10px] tracking-widest uppercase px-2.5 py-1.5 bg-luxury-base/85 text-museum-light/85 border border-museum-light/15">
                     {STATUS_LABEL[product.status]}
                     {product.featured ? " · ★" : ""}
                   </span>
                 </Link>
 
-                <div className="flex flex-1 flex-col gap-2 p-3.5 md:p-4">
-                  <p className="font-sans text-[10px] tracking-widest uppercase text-accent-gold/70 line-clamp-2">
+                <div className="flex flex-1 flex-col gap-2.5 p-4 md:p-5">
+                  <p className="font-sans text-[11px] tracking-widest uppercase text-accent-gold/75 line-clamp-2">
                     {product.category || "Без категории"}
                   </p>
-                  <h2 className="font-serif text-lg md:text-xl text-museum-light leading-snug line-clamp-2">
+                  <h2 className="font-serif text-xl md:text-2xl text-museum-light leading-snug line-clamp-2">
                     {product.title}
                   </h2>
-                  <p className="font-sans text-xs text-museum-light/45 line-clamp-1">
+                  <p className="font-sans text-sm text-museum-light/45 line-clamp-1">
                     {product.era || "—"}
                   </p>
-                  <p className="font-serif text-xl text-museum-light mt-auto pt-1">
+                  <p className="font-serif text-2xl text-museum-light mt-auto pt-1">
                     {formatPrice(product.price)}
                     {product.compareAtPrice && product.compareAtPrice > product.price ? (
-                      <span className="ml-2 font-sans text-xs text-museum-light/35 line-through">
+                      <span className="ml-2 font-sans text-sm text-museum-light/35 line-through">
                         {formatPrice(product.compareAtPrice)}
                       </span>
                     ) : null}
                   </p>
-                  <p className="font-sans text-[10px] text-museum-light/30 truncate">
+                  <p className="font-sans text-xs text-museum-light/30 truncate">
                     /{product.slug}
                   </p>
 
-                  <div className="mt-1 flex flex-wrap gap-1.5 border-t border-museum-light/10 pt-3">
+                  <div className="mt-1 flex flex-wrap gap-2 border-t border-museum-light/10 pt-3.5">
                     <Link
                       href={blogDashboardProductEditPath(product.slug)}
-                      className="min-h-10 px-2.5 inline-flex items-center font-sans text-[10px] tracking-widest uppercase border border-museum-light/25 hover:border-accent-gold/50"
+                      className="min-h-11 px-3 inline-flex items-center font-sans text-[11px] tracking-widest uppercase border border-museum-light/25 hover:border-accent-gold/50"
                     >
                       Изменить
                     </Link>
@@ -268,7 +268,7 @@ export default function ProductList({
                       href={`/${product.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="min-h-10 px-2.5 inline-flex items-center font-sans text-[10px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold"
+                      className="min-h-11 px-3 inline-flex items-center font-sans text-[11px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold"
                     >
                       Сайт
                     </a>
@@ -277,7 +277,7 @@ export default function ProductList({
                         type="button"
                         disabled={busySlug === product.slug}
                         onClick={() => void setStatus(product.slug, "active")}
-                        className="min-h-10 px-2.5 font-sans text-[10px] tracking-widest uppercase text-emerald-300/80 hover:text-emerald-200 disabled:opacity-50"
+                        className="min-h-11 px-3 font-sans text-[11px] tracking-widest uppercase text-emerald-300/80 hover:text-emerald-200 disabled:opacity-50"
                       >
                         В каталог
                       </button>
@@ -286,7 +286,7 @@ export default function ProductList({
                         type="button"
                         disabled={busySlug === product.slug}
                         onClick={() => void setStatus(product.slug, "archived")}
-                        className="min-h-10 px-2.5 font-sans text-[10px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold disabled:opacity-50"
+                        className="min-h-11 px-3 font-sans text-[11px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold disabled:opacity-50"
                       >
                         В архив
                       </button>
@@ -295,7 +295,7 @@ export default function ProductList({
                       type="button"
                       disabled={busySlug === product.slug}
                       onClick={() => void remove(product.slug, product.title)}
-                      className="min-h-10 px-2.5 ml-auto font-sans text-[10px] tracking-widest uppercase text-red-300/70 hover:text-red-200 disabled:opacity-50"
+                      className="min-h-11 px-3 ml-auto font-sans text-[11px] tracking-widest uppercase text-red-300/70 hover:text-red-200 disabled:opacity-50"
                     >
                       Удал.
                     </button>

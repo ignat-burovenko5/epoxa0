@@ -13,7 +13,7 @@ export default function BlogCmsShell({
 }: BlogCmsShellProps) {
   const widthClass =
     size === "wide"
-      ? "py-6 md:py-8 max-w-[100rem] w-full"
+      ? "py-6 md:py-8 max-w-[100rem] w-full px-4 sm:px-6 lg:px-8"
       : "py-8 md:py-12 max-w-5xl";
 
   return (
