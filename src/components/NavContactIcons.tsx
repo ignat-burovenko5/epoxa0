@@ -21,25 +21,6 @@ export function MaxIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
-/** Yandex Maps pin — red marker with inner dot */
-export function YandexMapsIcon({ className = "h-5 w-5" }: IconProps) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M12 2c4.4 0 8 3.5 8 7.9 0 5.6-6.2 11.4-7.5 12.5a.8.8 0 0 1-1 0C10.2 21.3 4 15.5 4 9.9 4 5.5 7.6 2 12 2Z"
-        fill="#F33"
-      />
-      <circle cx="12" cy="9.5" r="2.6" fill="#fff" />
-    </svg>
-  );
-}
-
 /** SVG Repo: email-1 — https://www.svgrepo.com/svg/521128/email-1 */
 export function EmailIcon({ className = "h-5 w-5" }: IconProps) {
   return (
