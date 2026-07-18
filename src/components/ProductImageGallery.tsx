@@ -83,7 +83,15 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   const zoomIdx = stepIndex(zoom);
   const canZoomOut = zoomIdx > 0;
   const canZoomIn = zoomIdx < ZOOM_STEPS.length - 1;
-  const scale = zoom / DEFAULT_ZOOM;
+  const zoomedIn = zoom > DEFAULT_ZOOM;
+  const zoomWidth =
+    zoom === 25
+      ? undefined
+      : zoom === 50
+        ? "min(160vw, 1600px)"
+        : zoom === 75
+          ? "min(240vw, 2400px)"
+          : "min(320vw, 3200px)";
 
   const resetZoom = useCallback(() => setZoom(DEFAULT_ZOOM), []);
 
@@ -271,8 +279,10 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
 
             <div
               ref={stageRef}
-              className={`relative flex h-full w-full items-center justify-center px-4 py-20 sm:px-16 ${
-                zoom > DEFAULT_ZOOM ? "overflow-auto" : "overflow-hidden"
+              className={`relative flex h-full w-full px-4 py-20 sm:px-16 ${
+                zoomedIn
+                  ? "items-start justify-start overflow-auto"
+                  : "items-center justify-center overflow-hidden"
               }`}
               onClick={(e) => e.stopPropagation()}
               onTouchStart={onLightboxTouchStart}
@@ -287,14 +297,14 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
                 aria-label={
                   canZoomIn
                     ? `Увеличить до ${ZOOM_STEPS[zoomIdx + 1]}%`
-                    : "Сбросить масштаб"
+                    : "Сбросить масштаб до 25%"
                 }
                 className={`relative mx-auto block border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 ${
                   canZoomIn ? "cursor-zoom-in" : "cursor-zoom-out"
                 }`}
                 style={{
-                  width: zoom > DEFAULT_ZOOM ? `${scale * 100}%` : "auto",
-                  maxWidth: zoom > DEFAULT_ZOOM ? "none" : "min(100%, 1100px)",
+                  width: zoomWidth,
+                  maxWidth: zoomedIn ? "none" : "min(100%, 1100px)",
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- full-res lightbox zoom */}
@@ -302,16 +312,10 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
                   src={activeSlide.src}
                   alt={activeSlide.alt}
                   draggable={false}
-                  className="mx-auto h-auto w-full max-h-[min(78dvh,860px)] select-none object-contain transition-[max-height,transform] duration-300 ease-luxury-ease motion-reduce:transition-none"
-                  style={
-                    zoom > DEFAULT_ZOOM
-                      ? {
-                          maxHeight: "none",
-                          width: "100%",
-                          transform: "none",
-                        }
-                      : undefined
-                  }
+                  className="mx-auto h-auto w-full select-none object-contain transition-[max-height,width] duration-300 ease-luxury-ease motion-reduce:transition-none"
+                  style={{
+                    maxHeight: zoomedIn ? "none" : "min(78dvh, 860px)",
+                  }}
                 />
               </button>
             </div>
