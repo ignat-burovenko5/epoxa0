@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   cmsLabelClass,
   cmsTextareaClass,
@@ -11,6 +11,14 @@ type ProductImagesFieldProps = {
   value: string;
   onChange: (urlsText: string) => void;
   slug: string;
+};
+
+type PendingUpload = {
+  id: string;
+  name: string;
+  previewUrl: string;
+  status: "uploading" | "done" | "error";
+  error?: string;
 };
 
 function parseUrls(value: string): string[] {
@@ -24,6 +32,55 @@ function joinUrls(urls: string[]): string {
   return urls.join("\n");
 }
 
+/** Circular status: spinner / success check / error. */
+function StatusCircle({
+  status,
+  className = "",
+}: {
+  status: "uploading" | "done" | "error" | "idle";
+  className?: string;
+}) {
+  if (status === "idle") return null;
+
+  const ring =
+    status === "uploading"
+      ? "border-accent-gold/35 border-t-accent-gold"
+      : status === "done"
+        ? "border-emerald-400/80 bg-emerald-500/15 text-emerald-300"
+        : "border-red-400/70 bg-red-500/15 text-red-300";
+
+  return (
+    <span
+      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 ${ring} ${
+        status === "uploading" ? "animate-spin" : ""
+      } ${className}`.trim()}
+      aria-hidden="true"
+    >
+      {status === "done" ? (
+        <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none">
+          <path
+            d="M3.5 8.2 6.6 11.2 12.5 4.8"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ) : null}
+      {status === "error" ? (
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none">
+          <path
+            d="M4 4l8 8M12 4l-8 8"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+        </svg>
+      ) : null}
+    </span>
+  );
+}
+
 export default function ProductImagesField({
   value,
   onChange,
@@ -35,8 +92,23 @@ export default function ProductImagesField({
   const [lastInfo, setLastInfo] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [showManual, setShowManual] = useState(false);
+  const [pending, setPending] = useState<PendingUpload[]>([]);
+  /** URLs uploaded in this session — show success circle on their cards. */
+  const [justUploaded, setJustUploaded] = useState<Set<string>>(() => new Set());
+  const [batchStatus, setBatchStatus] = useState<"idle" | "uploading" | "done" | "error">(
+    "idle",
+  );
 
   const urls = useMemo(() => parseUrls(value), [value]);
+
+  useEffect(() => {
+    return () => {
+      for (const item of pending) {
+        if (item.previewUrl.startsWith("blob:")) URL.revokeObjectURL(item.previewUrl);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- revoke on unmount only
+  }, []);
 
   function setUrls(next: string[]) {
     onChange(joinUrls(next));
@@ -46,60 +118,110 @@ export default function ProductImagesField({
     const list = [...files].filter((f) => f.type.startsWith("image/"));
     if (!list.length) {
       setUploadError("Выберите файл изображения");
+      setBatchStatus("error");
       return;
     }
 
     setUploading(true);
     setUploadError(null);
     setLastInfo(null);
+    setBatchStatus("uploading");
+
+    const batch: PendingUpload[] = list.map((file, i) => ({
+      id: `${Date.now()}-${i}-${file.name}`,
+      name: file.name,
+      previewUrl: URL.createObjectURL(file),
+      status: "uploading" as const,
+    }));
+    setPending((prev) => [...prev, ...batch]);
 
     const added: string[] = [];
     const notes: string[] = [];
+    let hadError = false;
 
     try {
-      for (const file of list) {
+      for (let i = 0; i < list.length; i++) {
+        const file = list[i]!;
+        const item = batch[i]!;
         const body = new FormData();
         body.append("file", file);
         body.append("kind", "product");
         body.append("slug", slug.trim() || "draft");
 
-        const res = await fetch("/api/cms/upload-image", {
-          method: "POST",
-          credentials: "same-origin",
-          body,
-        });
-        const data = (await res.json()) as {
-          url?: string;
-          error?: string;
-          originalBytes?: number;
-          optimizedBytes?: number;
-          savingsPercent?: number;
-          width?: number;
-          height?: number;
-        };
-        if (!res.ok || !data.url) {
-          setUploadError(data.error ?? `Не удалось загрузить «${file.name}»`);
-          break;
-        }
-        added.push(data.url);
-        if (
-          typeof data.originalBytes === "number" &&
-          typeof data.optimizedBytes === "number"
-        ) {
-          notes.push(
-            `${file.name}: ${formatBytes(data.originalBytes)} → ${formatBytes(data.optimizedBytes)} (−${data.savingsPercent ?? 0}%)`,
+        try {
+          const res = await fetch("/api/cms/upload-image", {
+            method: "POST",
+            credentials: "same-origin",
+            body,
+          });
+          const data = (await res.json()) as {
+            url?: string;
+            error?: string;
+            originalBytes?: number;
+            optimizedBytes?: number;
+            savingsPercent?: number;
+          };
+          if (!res.ok || !data.url) {
+            hadError = true;
+            setPending((prev) =>
+              prev.map((p) =>
+                p.id === item.id
+                  ? { ...p, status: "error", error: data.error ?? "Ошибка" }
+                  : p,
+              ),
+            );
+            setUploadError(data.error ?? `Не удалось загрузить «${file.name}»`);
+            continue;
+          }
+
+          added.push(data.url);
+          setPending((prev) =>
+            prev.map((p) => (p.id === item.id ? { ...p, status: "done" } : p)),
           );
+          if (
+            typeof data.originalBytes === "number" &&
+            typeof data.optimizedBytes === "number"
+          ) {
+            notes.push(
+              `${file.name}: ${formatBytes(data.originalBytes)} → ${formatBytes(data.optimizedBytes)} (−${data.savingsPercent ?? 0}%)`,
+            );
+          }
+        } catch {
+          hadError = true;
+          setPending((prev) =>
+            prev.map((p) =>
+              p.id === item.id
+                ? { ...p, status: "error", error: "Ошибка сети" }
+                : p,
+            ),
+          );
+          setUploadError("Ошибка сети при загрузке");
         }
       }
 
       if (added.length) {
         setUrls([...urls, ...added]);
+        setJustUploaded((prev) => {
+          const next = new Set(prev);
+          for (const url of added) next.add(url);
+          return next;
+        });
         setLastInfo(notes.join(" · ") || `Загружено: ${added.length}`);
       }
-    } catch {
-      setUploadError("Ошибка сети при загрузке");
+      setBatchStatus(hadError && !added.length ? "error" : hadError ? "done" : "done");
     } finally {
       setUploading(false);
+      // Keep pending cards briefly with status, then clear done ones (rendered in main grid)
+      window.setTimeout(() => {
+        setPending((prev) => {
+          for (const p of prev) {
+            if (p.status === "done" && p.previewUrl.startsWith("blob:")) {
+              URL.revokeObjectURL(p.previewUrl);
+            }
+          }
+          return prev.filter((p) => p.status === "error");
+        });
+      }, 900);
     }
   }
 
@@ -118,17 +240,50 @@ export default function ProductImagesField({
   }
 
   function removeAt(index: number) {
+    const url = urls[index];
+    if (url) {
+      setJustUploaded((prev) => {
+        const next = new Set(prev);
+        next.delete(url);
+        return next;
+      });
+    }
     setUrls(urls.filter((_, i) => i !== index));
+  }
+
+  function dismissPending(id: string) {
+    setPending((prev) => {
+      const item = prev.find((p) => p.id === id);
+      if (item?.previewUrl.startsWith("blob:")) URL.revokeObjectURL(item.previewUrl);
+      return prev.filter((p) => p.id !== id);
+    });
   }
 
   return (
     <div className="space-y-4">
-      <div>
-        <p className={cmsLabelClass}>Изображения товара</p>
-        <p className="mt-1 font-sans text-xs text-museum-light/45 leading-relaxed">
-          Загрузка с максимальной компрессией (AVIF/WebP). Файлы:{" "}
-          <span className="text-museum-light/60">media/products/{slug || "draft"}/</span>
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className={cmsLabelClass}>Изображения товара</p>
+          <p className="mt-1 font-sans text-xs text-museum-light/45 leading-relaxed">
+            Загрузка с максимальной компрессией (AVIF/WebP). Файлы:{" "}
+            <span className="text-museum-light/60">
+              media/products/{slug || "draft"}/
+            </span>
+          </p>
+        </div>
+        <div className="flex flex-col items-center gap-1 shrink-0 pt-0.5">
+          <StatusCircle status={batchStatus} />
+          {batchStatus === "uploading" ? (
+            <span className="font-sans text-[10px] tracking-widest uppercase text-accent-gold/80">
+              Загрузка
+            </span>
+          ) : null}
+          {batchStatus === "done" && !uploading ? (
+            <span className="font-sans text-[10px] tracking-widest uppercase text-emerald-300/80">
+              Готово
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <input
@@ -140,51 +295,105 @@ export default function ProductImagesField({
         onChange={onFileSelected}
       />
 
-      {urls.length ? (
+      {urls.length || pending.length ? (
         <ul className="list-none m-0 p-0 grid grid-cols-2 md:grid-cols-3 gap-3">
-          {urls.map((url, index) => (
+          {urls.map((url, index) => {
+            const isNew = justUploaded.has(url);
+            return (
+              <li
+                key={`${url}-${index}`}
+                className="border border-museum-light/15 bg-luxury-base/30 overflow-hidden flex flex-col"
+              >
+                <div className="relative aspect-[4/5] bg-luxury-charcoal/50">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- CMS preview */}
+                  <img
+                    src={url}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  {index === 0 ? (
+                    <span className="absolute left-2 top-2 font-sans text-[9px] tracking-widest uppercase px-2 py-1 bg-luxury-base/85 text-accent-gold border border-accent-gold/30">
+                      Главное
+                    </span>
+                  ) : null}
+                  {isNew ? (
+                    <span className="absolute right-2 top-2 drop-shadow-md">
+                      <StatusCircle status="done" className="h-7 w-7 bg-luxury-base/80" />
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex flex-wrap gap-1.5 p-2.5 border-t border-museum-light/10">
+                  <button
+                    type="button"
+                    disabled={index === 0 || uploading}
+                    onClick={() => move(index, -1)}
+                    className="min-h-9 px-2 font-sans text-[10px] tracking-widest uppercase text-museum-light/55 hover:text-accent-gold disabled:opacity-30"
+                  >
+                    ←
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index === urls.length - 1 || uploading}
+                    onClick={() => move(index, 1)}
+                    className="min-h-9 px-2 font-sans text-[10px] tracking-widest uppercase text-museum-light/55 hover:text-accent-gold disabled:opacity-30"
+                  >
+                    →
+                  </button>
+                  <button
+                    type="button"
+                    disabled={uploading}
+                    onClick={() => removeAt(index)}
+                    className="min-h-9 px-2 ml-auto font-sans text-[10px] tracking-widest uppercase text-red-300/70 hover:text-red-200 disabled:opacity-50"
+                  >
+                    Удал.
+                  </button>
+                </div>
+                <p className="px-2.5 pb-2 font-sans text-[10px] text-museum-light/30 truncate">
+                  {url}
+                </p>
+              </li>
+            );
+          })}
+
+          {pending.map((item) => (
             <li
-              key={`${url}-${index}`}
+              key={item.id}
               className="border border-museum-light/15 bg-luxury-base/30 overflow-hidden flex flex-col"
             >
               <div className="relative aspect-[4/5] bg-luxury-charcoal/50">
-                {/* eslint-disable-next-line @next/next/no-img-element -- CMS preview of local/remote URLs */}
-                <img src={url} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                {index === 0 ? (
-                  <span className="absolute left-2 top-2 font-sans text-[9px] tracking-widest uppercase px-2 py-1 bg-luxury-base/85 text-accent-gold border border-accent-gold/30">
-                    Главное
-                  </span>
+                {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
+                <img
+                  src={item.previewUrl}
+                  alt=""
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity ${
+                    item.status === "uploading" ? "opacity-50" : "opacity-90"
+                  }`}
+                />
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <StatusCircle
+                    status={item.status}
+                    className="h-10 w-10 bg-luxury-base/75 shadow-lg"
+                  />
+                </span>
+              </div>
+              <div className="flex items-center gap-2 p-2.5 border-t border-museum-light/10">
+                <p className="min-w-0 flex-1 font-sans text-[10px] text-museum-light/45 truncate">
+                  {item.status === "uploading"
+                    ? "Оптимизация…"
+                    : item.status === "done"
+                      ? "Сохранено"
+                      : item.error ?? "Ошибка"}
+                </p>
+                {item.status === "error" ? (
+                  <button
+                    type="button"
+                    onClick={() => dismissPending(item.id)}
+                    className="font-sans text-[10px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold"
+                  >
+                    Скрыть
+                  </button>
                 ) : null}
               </div>
-              <div className="flex flex-wrap gap-1.5 p-2.5 border-t border-museum-light/10">
-                <button
-                  type="button"
-                  disabled={index === 0 || uploading}
-                  onClick={() => move(index, -1)}
-                  className="min-h-9 px-2 font-sans text-[10px] tracking-widest uppercase text-museum-light/55 hover:text-accent-gold disabled:opacity-30"
-                >
-                  ←
-                </button>
-                <button
-                  type="button"
-                  disabled={index === urls.length - 1 || uploading}
-                  onClick={() => move(index, 1)}
-                  className="min-h-9 px-2 font-sans text-[10px] tracking-widest uppercase text-museum-light/55 hover:text-accent-gold disabled:opacity-30"
-                >
-                  →
-                </button>
-                <button
-                  type="button"
-                  disabled={uploading}
-                  onClick={() => removeAt(index)}
-                  className="min-h-9 px-2 ml-auto font-sans text-[10px] tracking-widest uppercase text-red-300/70 hover:text-red-200 disabled:opacity-50"
-                >
-                  Удал.
-                </button>
-              </div>
-              <p className="px-2.5 pb-2 font-sans text-[10px] text-museum-light/30 truncate">
-                {url}
-              </p>
             </li>
           ))}
         </ul>
@@ -204,12 +413,13 @@ export default function ProductImagesField({
           setDragOver(false);
           if (e.dataTransfer.files?.length) void uploadFiles(e.dataTransfer.files);
         }}
-        className={`flex flex-col items-center justify-center gap-2 w-full min-h-[8rem] border-2 border-dashed px-6 transition-colors disabled:opacity-50 ${
+        className={`flex flex-col items-center justify-center gap-3 w-full min-h-[8rem] border-2 border-dashed px-6 transition-colors disabled:opacity-50 ${
           dragOver
             ? "border-accent-gold/60 bg-accent-gold/5"
             : "border-museum-light/20 bg-luxury-base/20 hover:border-accent-gold/40 hover:bg-luxury-base/35"
         }`}
       >
+        {uploading ? <StatusCircle status="uploading" className="h-9 w-9" /> : null}
         <span className="font-sans text-sm text-museum-light/70">
           {uploading ? "Оптимизация и загрузка…" : "Добавить изображения"}
         </span>
@@ -221,11 +431,15 @@ export default function ProductImagesField({
       </button>
 
       {lastInfo ? (
-        <p className="font-sans text-xs text-emerald-300/80">{lastInfo}</p>
+        <p className="font-sans text-xs text-emerald-300/80 flex items-center gap-2">
+          <StatusCircle status="done" className="h-5 w-5" />
+          <span>{lastInfo}</span>
+        </p>
       ) : null}
       {uploadError ? (
-        <p className="font-sans text-sm text-red-300/90" role="alert">
-          {uploadError}
+        <p className="font-sans text-sm text-red-300/90 flex items-center gap-2" role="alert">
+          <StatusCircle status="error" className="h-5 w-5" />
+          <span>{uploadError}</span>
         </p>
       ) : null}
 
