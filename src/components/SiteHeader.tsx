@@ -1,6 +1,7 @@
 import HeaderBurgerMenu from "@/components/HeaderBurgerMenu";
 import Logo from "@/components/Logo";
 import { EmailIcon, PhoneIcon } from "@/components/NavContactIcons";
+import { siteChromeSurfaceClass } from "@/components/site-chrome";
 import { siteConfig } from "@/lib/site";
 
 const navContactLinkClass =
