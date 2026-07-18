@@ -106,6 +106,33 @@ async function deploy() {
 
   discardPrevBuild(ROOT);
 
+  // Old deploys used `.next` as the live dir — remove leftover prod trees so
+  // `next dev` can own `.next` again without colliding with BUILD_ID artifacts.
+  try {
+    const legacyNext = path.join(ROOT, ".next");
+    const legacyBuildId = path.join(legacyNext, "BUILD_ID");
+    if (existsSync(legacyBuildId)) {
+      rmSync(legacyNext, { recursive: true, force: true });
+      console.log("Cleared legacy production tree from .next (dev cache path).");
+    }
+  } catch (err) {
+    console.warn("Could not clear legacy .next:", err?.message || err);
+  }
+
+  // Preview (`next dev` on :3771) keeps working after deploy.
+  try {
+    execSync("ss -ltn '( sport = :3771 )'", { stdio: "ignore" });
+    console.log("\nRestarting preview on :3771…");
+    try {
+      execSync("fuser -k 3771/tcp", { stdio: "ignore" });
+    } catch {
+      /* nothing listening */
+    }
+    runScript("scripts/restart-preview-3771.mjs");
+  } catch {
+    /* preview not running — skip */
+  }
+
   if (RESTART_BACKEND) {
     restartBackend();
   } else {
