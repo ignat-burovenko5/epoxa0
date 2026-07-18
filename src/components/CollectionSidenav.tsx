@@ -15,9 +15,10 @@ export default function CollectionSidenav() {
   const pathname = usePathname();
 
   return (
-    <aside aria-label="Категории каталога" className="shrink-0 md:w-52 lg:w-56">
-      <div className="md:hidden mb-6 overflow-x-auto hidden-scrollbar border-b border-luxury-charcoal/10 pb-3">
-        <ul className="flex gap-4 min-w-max">
+    <aside aria-label="Категории каталога" className="shrink-0 md:w-52 lg:w-56 md:self-start">
+      {/* Mobile: horizontal category strip with visible scrollbar */}
+      <div className="collection-category-scroll md:hidden mb-6 overflow-x-auto overscroll-x-contain border-b border-luxury-charcoal/10 pb-3">
+        <ul className="flex gap-4 min-w-max pr-1">
           <li>
             <Link
               href="/collection"
@@ -51,8 +52,12 @@ export default function CollectionSidenav() {
         </ul>
       </div>
 
-      <nav className="hidden md:block sticky top-4 max-h-[calc(100vh-5rem)] overflow-y-auto hidden-scrollbar pr-4 lg:pr-6 border-r border-luxury-charcoal/10">
-        <p className="font-sans text-[10px] tracking-widest uppercase text-luxury-charcoal/40 mb-3">
+      {/* Desktop: independent vertical scroll, below fixed header */}
+      <nav
+        className="collection-category-scroll hidden md:block sticky top-[calc(var(--site-header-offset)+0.75rem)] max-h-[calc(100dvh-var(--site-header-offset)-1.5rem)] overflow-y-auto overscroll-y-contain pr-3 lg:pr-5 border-r border-luxury-charcoal/10"
+        aria-label="Категории"
+      >
+        <p className="font-sans text-[10px] tracking-widest uppercase text-luxury-charcoal/40 mb-3 sticky top-0 z-[1] bg-museum-light/95 py-1 backdrop-blur-sm">
           Каталог
         </p>
         <ul>
