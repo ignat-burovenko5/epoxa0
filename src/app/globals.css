@@ -70,6 +70,8 @@
   html {
     scroll-padding-top: var(--site-header-offset);
     -webkit-text-size-adjust: 100%;
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   body {
@@ -79,6 +81,28 @@
     overflow-x: hidden;
     min-height: 100%;
     min-height: 100dvh;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Keep chrome controls from accidental drag-select; copy stays selectable. */
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  [role="button"],
+  .site-header-burger,
+  .catalog-nav-overlay {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   /* Brand-tinted scrollbar — gold thumb on a transparent track */
