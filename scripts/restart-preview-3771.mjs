@@ -1,8 +1,9 @@
 /**
  * Restart local CMS/storefront preview (`next dev` on 127.0.0.1:3771).
+ * Loads env via process env (not `node --env-file`) so Turbopack workers stay happy.
  */
 import { execSync } from "child_process";
-import { appendFileSync, existsSync } from "fs";
+import { appendFileSync, truncateSync, writeFileSync } from "fs";
 import net from "net";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -38,6 +39,11 @@ function stopListener() {
   } catch {
     /* nothing listening */
   }
+  try {
+    execSync(`lsof -ti:${PORT} | xargs -r kill -9`, { stdio: "ignore", shell: true });
+  } catch {
+    /* nothing listening */
+  }
 }
 
 async function waitForPortFree(maxMs = 15000) {
@@ -49,14 +55,14 @@ async function waitForPortFree(maxMs = 15000) {
   throw new Error(`Port ${PORT} still in use after ${maxMs}ms`);
 }
 
-async function waitForHttp(maxMs = 90000) {
+async function waitForHttp(maxMs = 120000) {
   const start = Date.now();
   while (Date.now() - start < maxMs) {
     try {
       const res = await fetch(`http://127.0.0.1:${PORT}/`, {
         signal: AbortSignal.timeout(5000),
       });
-      if (res.ok || res.status < 500) return;
+      if (res.ok || (res.status >= 200 && res.status < 500)) return;
     } catch {
       /* not ready */
     }
@@ -65,40 +71,49 @@ async function waitForHttp(maxMs = 90000) {
   throw new Error(`Preview did not respond on :${PORT} — see ${PROCESS_LOG}`);
 }
 
+function scrubNodeOptions(value) {
+  if (!value) return undefined;
+  const cleaned = value
+    .split(/\s+/)
+    .filter((part) => part && !part.startsWith("--env-file"))
+    .join(" ")
+    .trim();
+  return cleaned || undefined;
+}
+
 async function main() {
   stopListener();
   await waitForPortFree();
 
+  try {
+    writeFileSync(PROCESS_LOG, "");
+  } catch {
+    truncateSync(PROCESS_LOG, 0);
+  }
+
   const localEnv = loadEnvLocal(ROOT);
-  const envFile = path.join(ROOT, ".env.local");
   const nextBin = path.join(ROOT, "node_modules", "next", "dist", "bin", "next");
   const node = systemNodeExe();
-  const args = existsSync(envFile)
-    ? [
-        "--env-file",
-        envFile,
-        nextBin,
-        "dev",
-        "-p",
-        String(PORT),
-        "-H",
-        "127.0.0.1",
-      ]
-    : [nextBin, "dev", "-p", String(PORT), "-H", "127.0.0.1"];
+  const args = [nextBin, "dev", "-p", String(PORT), "-H", "127.0.0.1"];
+
+  const env = {
+    ...process.env,
+    ...localEnv,
+    PORT: String(PORT),
+    NODE_ENV: "development",
+  };
+  delete env.NEXT_BUILD_STAGING;
+  delete env.NEXT_DIST_DIR;
+  const nodeOptions = scrubNodeOptions(env.NODE_OPTIONS);
+  if (nodeOptions) env.NODE_OPTIONS = nodeOptions;
+  else delete env.NODE_OPTIONS;
 
   spawnDetached({
     executable: node,
     args,
     cwd: ROOT,
     logPath: PROCESS_LOG,
-    env: {
-      ...process.env,
-      ...localEnv,
-      PORT: String(PORT),
-      NODE_ENV: "development",
-      NEXT_BUILD_STAGING: undefined,
-      NEXT_DIST_DIR: undefined,
-    },
+    env,
   });
   log(`Started preview: ${node} ${args.join(" ")} (output: ${PROCESS_LOG})`);
   await waitForHttp();
