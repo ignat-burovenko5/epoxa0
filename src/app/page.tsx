@@ -85,7 +85,7 @@ export default async function Homepage() {
         </PageContainer>
       </section>
 
-      <section className="section-y bg-museum-light text-luxury-charcoal">
+      <section className="bg-museum-light text-luxury-charcoal pt-8 pb-12 sm:pt-10 sm:pb-16 md:pt-12 md:pb-24">
         <PageContainer>
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl max-w-2xl leading-snug mb-8 md:mb-10">
             Редкие предметы для вашего интерьера
