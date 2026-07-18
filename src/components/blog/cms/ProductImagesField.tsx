@@ -343,20 +343,36 @@ export default function ProductImagesField({
         <ul className="list-none m-0 p-0 grid grid-cols-2 md:grid-cols-3 gap-3">
           {urls.map((url, index) => {
             const isNew = justUploaded.has(url);
+            const isDragTarget = dragOverIndex === index && dragFrom !== index;
             return (
               <li
                 key={`${url}-${index}`}
-                className="border border-museum-light/15 bg-luxury-base/30 overflow-hidden flex flex-col"
+                draggable={!uploading}
+                onDragStart={(e) => onReorderDragStart(index, e)}
+                onDragOver={(e) => onReorderDragOver(index, e)}
+                onDrop={(e) => onReorderDrop(index, e)}
+                onDragEnd={onReorderDragEnd}
+                className={`border bg-luxury-base/30 overflow-hidden flex flex-col transition-colors ${
+                  isDragTarget
+                    ? "border-accent-gold/70 ring-1 ring-accent-gold/40"
+                    : dragFrom === index
+                      ? "border-museum-light/25 opacity-60"
+                      : "border-museum-light/15"
+                } ${uploading ? "" : "cursor-grab active:cursor-grabbing"}`}
               >
                 <div className="relative aspect-[4/5] bg-luxury-charcoal/50">
                   {/* eslint-disable-next-line @next/next/no-img-element -- CMS preview */}
                   <img
                     src={url}
                     alt=""
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+                    draggable={false}
                   />
+                  <span className="absolute left-2 top-2 inline-flex h-7 min-w-7 items-center justify-center px-1.5 font-sans text-xs tabular-nums bg-luxury-base/90 text-museum-light border border-museum-light/20">
+                    {index + 1}
+                  </span>
                   {index === 0 ? (
-                    <span className="absolute left-2 top-2 font-sans text-[9px] tracking-widest uppercase px-2 py-1 bg-luxury-base/85 text-accent-gold border border-accent-gold/30">
+                    <span className="absolute left-11 top-2 font-sans text-[9px] tracking-widest uppercase px-2 py-1.5 bg-luxury-base/85 text-accent-gold border border-accent-gold/30">
                       Главное
                     </span>
                   ) : null}
@@ -366,23 +382,54 @@ export default function ProductImagesField({
                     </span>
                   ) : null}
                 </div>
-                <div className="flex flex-wrap gap-1.5 p-2.5 border-t border-museum-light/10">
+                <div className="flex flex-wrap items-center gap-1.5 p-2.5 border-t border-museum-light/10">
+                  <label className="sr-only" htmlFor={`img-order-${index}`}>
+                    Позиция
+                  </label>
+                  <select
+                    id={`img-order-${index}`}
+                    disabled={uploading || urls.length < 2}
+                    value={index}
+                    onChange={(e) => moveTo(index, Number(e.target.value))}
+                    className="min-h-9 max-w-[4.5rem] bg-luxury-base border border-museum-light/20 px-1.5 font-sans text-[11px] text-museum-light focus:border-accent-gold/50 focus:outline-none disabled:opacity-40"
+                    title="Порядок"
+                  >
+                    {urls.map((_, pos) => (
+                      <option key={pos} value={pos}>
+                        {pos + 1}
+                        {pos === 0 ? " ★" : ""}
+                      </option>
+                    ))}
+                  </select>
                   <button
                     type="button"
                     disabled={index === 0 || uploading}
                     onClick={() => move(index, -1)}
                     className="min-h-9 px-2 font-sans text-[10px] tracking-widest uppercase text-museum-light/55 hover:text-accent-gold disabled:opacity-30"
+                    title="Раньше"
                   >
-                    ←
+                    ↑
                   </button>
                   <button
                     type="button"
                     disabled={index === urls.length - 1 || uploading}
                     onClick={() => move(index, 1)}
                     className="min-h-9 px-2 font-sans text-[10px] tracking-widest uppercase text-museum-light/55 hover:text-accent-gold disabled:opacity-30"
+                    title="Позже"
                   >
-                    →
+                    ↓
                   </button>
+                  {index !== 0 ? (
+                    <button
+                      type="button"
+                      disabled={uploading}
+                      onClick={() => makeMain(index)}
+                      className="min-h-9 px-2 font-sans text-[10px] tracking-widest uppercase text-accent-gold/80 hover:text-accent-gold disabled:opacity-50"
+                      title="Сделать главным"
+                    >
+                      ★
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     disabled={uploading}
