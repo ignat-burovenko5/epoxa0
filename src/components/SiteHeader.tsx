@@ -25,7 +25,9 @@ export default function SiteHeader() {
       <div className="site-header__inner mx-auto flex w-full max-w-[1760px] items-center justify-between gap-3 px-3 sm:px-4 lg:px-6">
         <div className="flex min-w-0 items-center gap-3 sm:gap-3.5">
           <div className="site-header-menu relative shrink-0">
-            <HeaderBurgerMenu />
+            <Suspense fallback={<div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14" aria-hidden />}>
+              <HeaderBurgerMenu />
+            </Suspense>
           </div>
           <div className="site-header-logo relative min-w-0 overflow-visible">
             <Logo className="shrink-0 max-w-full" />
