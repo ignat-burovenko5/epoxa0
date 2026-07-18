@@ -118,30 +118,6 @@ export default function HeaderBurgerMenu() {
               >
                 <div>
                   <p className="mb-2 px-3 font-sans text-[10px] tracking-[0.25em] uppercase text-museum-light/45">
-                    Сайт
-                  </p>
-                  <ul>
-                    <li>
-                      <Link href="/" onClick={close} className={navLinkClass(pathname === "/")}>
-                        Главная
-                      </Link>
-                    </li>
-                    {siteConfig.navLinks.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={close}
-                          className={navLinkClass(pathname === item.href)}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="mb-2 px-3 font-sans text-[10px] tracking-[0.25em] uppercase text-museum-light/45">
                     Каталог
                   </p>
                   <ul>
