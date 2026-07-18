@@ -360,9 +360,9 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
       : null;
 
   return (
-    <div className="w-full px-1 sm:px-2 lg:px-3 pt-4 lg:pt-6 pb-4">
+    <div className="w-full px-1 sm:px-2 lg:px-3 pt-10 sm:pt-12 lg:pt-14 pb-4">
       <div
-        className="relative w-full min-h-[calc(100dvh-var(--site-header-offset)-7rem)]"
+        className="relative w-full min-h-[calc(100dvh-var(--site-header-offset)-9rem)]"
         aria-label="Фотографии предмета"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}

@@ -114,7 +114,7 @@ export default async function ProductDossier({
           <ProductImageGallery slides={gallerySlides} />
         </div>
 
-        <div className="w-full lg:w-[32%] xl:w-[30%] px-4 sm:px-6 lg:px-8 xl:px-10 pt-10 pb-2 md:pt-16 md:pb-8 lg:pt-8 lg:pb-12 flex flex-col justify-start">
+        <div className="w-full lg:w-[32%] xl:w-[30%] px-4 sm:px-6 lg:px-8 xl:px-10 pt-10 pb-2 md:pt-16 md:pb-8 lg:pt-14 lg:pb-12 flex flex-col justify-start">
           <div className="max-w-md w-full">
             {categorySlug ? (
               <Link
