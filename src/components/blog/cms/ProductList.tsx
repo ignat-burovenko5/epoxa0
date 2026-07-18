@@ -1,8 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import type { CatalogProductSummary, ProductStatus } from "@/lib/shop/product-types";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type {
+  CatalogProductSummary,
+  ProductListPage,
+  ProductStatus,
+} from "@/lib/shop/product-types";
+import { ADMIN_PRODUCT_PAGE_SIZE } from "@/lib/shop/product-types";
 import { formatPrice } from "@/lib/catalog-shared";
 import {
   blogDashboardProductCreatePath,
@@ -45,24 +50,22 @@ const SORT_OPTIONS: { id: SortKey; label: string }[] = [
   { id: "featured", label: "Избранные сверху" },
 ];
 
-const STATUS_SORT_RANK: Record<ProductStatus, number> = {
-  active: 0,
-  draft: 1,
-  archived: 2,
-};
-
 const EMPTY_CATEGORY = "Без категории";
 
 const controlClass =
   "min-h-12 w-full bg-luxury-base border border-museum-light/20 px-3.5 py-2.5 font-sans text-sm text-museum-light focus:border-accent-gold/50 focus:outline-none";
 
 type ProductListProps = {
-  products: CatalogProductSummary[];
+  initialPage: ProductListPage;
   initialStatus?: string;
 };
 
 function productCategoryKey(product: CatalogProductSummary): string {
   return product.category?.trim() || EMPTY_CATEGORY;
+}
+
+function needsClientPriceFilter(query: string): boolean {
+  return /[><=]\d/.test(query) || /\b(featured|избранн)/i.test(query);
 }
 
 function matchesExtensiveSearch(product: CatalogProductSummary, query: string): boolean {
@@ -132,98 +135,183 @@ function matchesExtensiveSearch(product: CatalogProductSummary, query: string): 
   });
 }
 
-function compareProducts(a: CatalogProductSummary, b: CatalogProductSummary, sort: SortKey): number {
-  switch (sort) {
-    case "title_asc":
-      return a.title.localeCompare(b.title, "ru", { sensitivity: "base" });
-    case "title_desc":
-      return b.title.localeCompare(a.title, "ru", { sensitivity: "base" });
-    case "price_asc":
-      return a.price - b.price || a.title.localeCompare(b.title, "ru");
-    case "price_desc":
-      return b.price - a.price || a.title.localeCompare(b.title, "ru");
-    case "sort_asc":
-      return a.sortOrder - b.sortOrder || a.title.localeCompare(b.title, "ru");
-    case "sort_desc":
-      return b.sortOrder - a.sortOrder || a.title.localeCompare(b.title, "ru");
-    case "category_asc":
-      return (
-        productCategoryKey(a).localeCompare(productCategoryKey(b), "ru") ||
-        a.title.localeCompare(b.title, "ru")
-      );
-    case "era_asc":
-      return (
-        (a.era || "").localeCompare(b.era || "", "ru") ||
-        a.title.localeCompare(b.title, "ru")
-      );
-    case "status":
-      return (
-        STATUS_SORT_RANK[a.status] - STATUS_SORT_RANK[b.status] ||
-        a.title.localeCompare(b.title, "ru")
-      );
-    case "featured":
-      return Number(b.featured) - Number(a.featured) || a.title.localeCompare(b.title, "ru");
-    case "updated_asc": {
-      const ta = a.updatedAt ? Date.parse(a.updatedAt) : 0;
-      const tb = b.updatedAt ? Date.parse(b.updatedAt) : 0;
-      return ta - tb || a.title.localeCompare(b.title, "ru");
-    }
-    case "updated_desc":
-    default: {
-      const ta = a.updatedAt ? Date.parse(a.updatedAt) : 0;
-      const tb = b.updatedAt ? Date.parse(b.updatedAt) : 0;
-      return tb - ta || a.title.localeCompare(b.title, "ru");
-    }
+async function fetchProductPage(params: {
+  offset: number;
+  limit?: number;
+  status: string;
+  q: string;
+  category: string;
+  sort: SortKey;
+}): Promise<ProductListPage> {
+  const sp = new URLSearchParams({
+    offset: String(params.offset),
+    limit: String(params.limit ?? ADMIN_PRODUCT_PAGE_SIZE),
+    sort: params.sort,
+  });
+  if (params.status !== "all") sp.set("status", params.status);
+  if (params.q.trim()) sp.set("q", params.q.trim());
+  if (params.category !== "all") sp.set("category", params.category);
+
+  const res = await fetch(`/api/blog/admin/products?${sp}`, {
+    credentials: "same-origin",
+  });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(data.error ?? "Не удалось загрузить товары");
   }
+  return (await res.json()) as ProductListPage;
 }
 
 export default function ProductList({
-  products: initialProducts,
+  initialPage,
   initialStatus = "all",
 }: ProductListProps) {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState(initialPage.items);
+  const [total, setTotal] = useState(initialPage.total);
+  const [hasMore, setHasMore] = useState(initialPage.hasMore);
+  const [nextOffset, setNextOffset] = useState(initialPage.nextOffset);
+  const [counts, setCounts] = useState(initialPage.counts);
+  const [categoryCounts, setCategoryCounts] = useState(
+    initialPage.categoryCounts ?? [],
+  );
+
   const [filter, setFilter] = useState(initialStatus);
   const [category, setCategory] = useState<string>("all");
   const [sort, setSort] = useState<SortKey>("updated_desc");
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
+
   const [busySlug, setBusySlug] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const categoryCounts = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const p of products) {
-      const key = productCategoryKey(p);
-      map.set(key, (map.get(key) ?? 0) + 1);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(false);
+  const requestIdRef = useRef(0);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebouncedQ(q), 280);
+    return () => window.clearTimeout(t);
+  }, [q]);
+
+  const reload = useCallback(
+    async (opts?: { keepScroll?: boolean }) => {
+      const id = ++requestIdRef.current;
+      setRefreshing(true);
+      setError(null);
+      try {
+        const page = await fetchProductPage({
+          offset: 0,
+          status: filter,
+          q: debouncedQ,
+          category,
+          sort,
+        });
+        if (id !== requestIdRef.current) return;
+        setProducts(page.items);
+        setTotal(page.total);
+        setHasMore(page.hasMore);
+        setNextOffset(page.nextOffset);
+        setCounts(page.counts);
+        if (page.categoryCounts) setCategoryCounts(page.categoryCounts);
+        if (!opts?.keepScroll) {
+          // stay put — admin is scanning
+        }
+      } catch (e) {
+        if (id !== requestIdRef.current) return;
+        setError(e instanceof Error ? e.message : "Ошибка загрузки");
+      } finally {
+        if (id === requestIdRef.current) setRefreshing(false);
+      }
+    },
+    [filter, debouncedQ, category, sort],
+  );
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingRef.current || !hasMore || refreshing) return;
+    loadingRef.current = true;
+    setLoading(true);
+    setError(null);
+    const id = requestIdRef.current;
+    try {
+      const page = await fetchProductPage({
+        offset: nextOffset,
+        status: filter,
+        q: debouncedQ,
+        category,
+        sort,
+      });
+      if (id !== requestIdRef.current) return;
+      setProducts((prev) => {
+        const seen = new Set(prev.map((p) => p.slug));
+        return [...prev, ...page.items.filter((p) => !seen.has(p.slug))];
+      });
+      setTotal(page.total);
+      setHasMore(page.hasMore);
+      setNextOffset(page.nextOffset);
+      setCounts(page.counts);
+      if (page.categoryCounts) setCategoryCounts(page.categoryCounts);
+    } catch (e) {
+      if (id !== requestIdRef.current) return;
+      setError(e instanceof Error ? e.message : "Ошибка загрузки");
+    } finally {
+      loadingRef.current = false;
+      setLoading(false);
     }
-    const known: string[] = siteConfig.categoryLinks
-      .map((c) => c.label)
-      .filter((label) => map.has(label));
+  }, [hasMore, refreshing, nextOffset, filter, debouncedQ, category, sort]);
+
+  // Price/featured ops need the full filtered set — keep paging until done.
+  useEffect(() => {
+    if (!needsClientPriceFilter(debouncedQ) || !hasMore || loading || refreshing) {
+      return;
+    }
+    void loadMore();
+  }, [debouncedQ, hasMore, loading, refreshing, loadMore, products.length]);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) void loadMore();
+      },
+      { root: null, rootMargin: "320px 0px", threshold: 0 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, loadMore]);
+
+  const sidebarCategories = useMemo(() => {
+    const knownOrder = siteConfig.categoryLinks.map((c) => c.label);
+    const map = new Map(categoryCounts.map((c) => [c.label, c.count]));
+    const known = knownOrder.filter((label) => map.has(label));
     const extras = [...map.keys()]
       .filter((label) => !known.includes(label))
       .sort((a, b) => a.localeCompare(b, "ru"));
+    const facetTotal = categoryCounts.reduce((s, c) => s + c.count, 0);
     return [
-      { label: "all", count: products.length },
+      { label: "all", count: facetTotal || total },
       ...[...known, ...extras].map((label) => ({
         label,
         count: map.get(label) ?? 0,
       })),
     ];
-  }, [products]);
+  }, [categoryCounts, total]);
 
   const categoryChoices = useMemo(
-    () => categoryCounts.filter((item) => item.label !== "all"),
-    [categoryCounts],
+    () => sidebarCategories.filter((item) => item.label !== "all"),
+    [sidebarCategories],
   );
 
   const visible = useMemo(() => {
-    const query = q.trim();
-    const filtered = products.filter((p) => {
-      if (filter !== "all" && p.status !== filter) return false;
-      if (category !== "all" && productCategoryKey(p) !== category) return false;
-      return matchesExtensiveSearch(p, query);
-    });
-    return [...filtered].sort((a, b) => compareProducts(a, b, sort));
-  }, [products, filter, category, q, sort]);
+    if (!needsClientPriceFilter(debouncedQ)) return products;
+    return products.filter((p) => matchesExtensiveSearch(p, debouncedQ));
+  }, [products, debouncedQ]);
 
   async function setStatus(slug: string, status: ProductStatus) {
     setBusySlug(slug);
@@ -242,6 +330,7 @@ export default function ProductList({
       setProducts((current) =>
         current.map((p) => (p.slug === slug ? { ...p, status } : p)),
       );
+      void reload({ keepScroll: true });
     } catch {
       setError("Ошибка сети");
     } finally {
@@ -263,6 +352,7 @@ export default function ProductList({
         return;
       }
       setProducts((current) => current.filter((p) => p.slug !== slug));
+      void reload({ keepScroll: true });
     } catch {
       setError("Ошибка сети");
     } finally {
@@ -277,7 +367,8 @@ export default function ProductList({
     { id: "archived", label: "Архив" },
   ];
 
-  const hasActiveFilters = Boolean(q.trim()) || category !== "all" || filter !== "all";
+  const hasActiveFilters =
+    Boolean(q.trim()) || category !== "all" || filter !== "all";
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)] xl:gap-10">
@@ -287,7 +378,7 @@ export default function ProductList({
             Категории
           </p>
           <ul className="list-none m-0 p-0 max-h-[min(75vh,48rem)] overflow-y-auto hidden-scrollbar space-y-1">
-            {categoryCounts.map((item) => {
+            {sidebarCategories.map((item) => {
               const id = item.label;
               const active = category === id;
               const label = id === "all" ? "Все категории" : id;
@@ -329,6 +420,13 @@ export default function ProductList({
                 }`}
               >
                 {item.label}
+                {item.id === "all"
+                  ? ` · ${counts.all}`
+                  : item.id === "active"
+                    ? ` · ${counts.active}`
+                    : item.id === "draft"
+                      ? ` · ${counts.draft}`
+                      : ` · ${counts.archived}`}
               </button>
             ))}
           </div>
@@ -346,7 +444,7 @@ export default function ProductList({
                 type="search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Название, slug, категория, эпоха, цена, статус…  >10000  featured"
+                placeholder="Название, slug, категория, эпоха…  >10000  featured"
                 className={controlClass}
               />
             </div>
@@ -396,7 +494,9 @@ export default function ProductList({
 
             <div className="flex items-end gap-2 min-h-12 pb-0.5">
               <p className="font-sans text-sm text-museum-light/45 whitespace-nowrap">
-                {visible.length} из {products.length}
+                {visible.length}
+                {hasMore || visible.length < total ? ` / ${total}` : ""} 
+                {refreshing ? " · …" : ""}
               </p>
               {hasActiveFilters ? (
                 <button
@@ -415,10 +515,10 @@ export default function ProductList({
           </div>
 
           <p className="font-sans text-xs text-museum-light/40 leading-relaxed">
-            Ищет по названию, slug, категории, эпохе, статусу, цене, порядку, избранному и дате.
+            Подгрузка по мере прокрутки · на сервере фильтр и сортировка.
             Числовые фильтры:{" "}
             <span className="text-museum-light/55">{" >5000 <20000 =12000 "}</span>
-            · слова{" "}
+            ·{" "}
             <span className="text-museum-light/55">featured · черновик · архив</span>
           </p>
         </div>
@@ -429,7 +529,7 @@ export default function ProductList({
           </p>
         ) : null}
 
-        {!visible.length ? (
+        {!visible.length && !loading && !refreshing ? (
           <p className="font-sans text-sm text-museum-light/60 text-center py-16 border border-museum-light/10">
             {hasActiveFilters ? (
               <>Ничего не найдено по текущим фильтрам.</>
@@ -446,103 +546,120 @@ export default function ProductList({
             )}
           </p>
         ) : (
-          <ul className="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 md:gap-6">
-            {visible.map((product) => (
-              <li
-                key={product.slug}
-                className="flex flex-col border border-museum-light/10 bg-luxury-base/25 hover:border-accent-gold/35 transition-colors"
-              >
-                <Link
-                  href={blogDashboardProductEditPath(product.slug)}
-                  className="relative block aspect-[4/5] overflow-hidden bg-luxury-base/60"
+          <>
+            <ul className="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 md:gap-6">
+              {visible.map((product) => (
+                <li
+                  key={product.slug}
+                  className="flex flex-col border border-museum-light/10 bg-luxury-base/25 hover:border-accent-gold/35 transition-colors"
                 >
-                  {product.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- admin catalog thumb
-                    <img
-                      src={product.image}
-                      alt=""
-                      className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center font-sans text-xs uppercase tracking-widest text-museum-light/30">
-                      Нет фото
-                    </div>
-                  )}
-                  <span className="absolute left-2.5 top-2.5 font-sans text-[10px] tracking-widest uppercase px-2.5 py-1.5 bg-luxury-base/85 text-museum-light/85 border border-museum-light/15">
-                    {STATUS_LABEL[product.status]}
-                    {product.featured ? " · ★" : ""}
-                  </span>
-                </Link>
-
-                <div className="flex flex-1 flex-col gap-2.5 p-4 md:p-5">
-                  <p className="font-sans text-[11px] tracking-widest uppercase text-accent-gold/75 line-clamp-2">
-                    {product.category || EMPTY_CATEGORY}
-                  </p>
-                  <h2 className="font-serif text-xl md:text-2xl text-museum-light leading-snug line-clamp-2">
-                    {product.title}
-                  </h2>
-                  <p className="font-sans text-sm text-museum-light/45 line-clamp-1">
-                    {product.era || "—"}
-                  </p>
-                  <p className="font-serif text-2xl text-museum-light mt-auto pt-1">
-                    {formatPrice(product.price)}
-                    {product.compareAtPrice && product.compareAtPrice > product.price ? (
-                      <span className="ml-2 font-sans text-sm text-museum-light/35 line-through">
-                        {formatPrice(product.compareAtPrice)}
-                      </span>
-                    ) : null}
-                  </p>
-                  <p className="font-sans text-xs text-museum-light/30 truncate">
-                    /{product.slug}
-                  </p>
-
-                  <div className="mt-1 flex flex-wrap gap-2 border-t border-museum-light/10 pt-3.5">
-                    <Link
-                      href={blogDashboardProductEditPath(product.slug)}
-                      className="min-h-11 px-3 inline-flex items-center font-sans text-[11px] tracking-widest uppercase border border-museum-light/25 hover:border-accent-gold/50"
-                    >
-                      Изменить
-                    </Link>
-                    <a
-                      href={`/${product.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="min-h-11 px-3 inline-flex items-center font-sans text-[11px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold"
-                    >
-                      Сайт
-                    </a>
-                    {product.status !== "active" ? (
-                      <button
-                        type="button"
-                        disabled={busySlug === product.slug}
-                        onClick={() => void setStatus(product.slug, "active")}
-                        className="min-h-11 px-3 font-sans text-[11px] tracking-widest uppercase text-emerald-300/80 hover:text-emerald-200 disabled:opacity-50"
-                      >
-                        В каталог
-                      </button>
+                  <Link
+                    href={blogDashboardProductEditPath(product.slug)}
+                    className="relative block aspect-[4/5] overflow-hidden bg-luxury-base/60"
+                  >
+                    {product.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- admin catalog thumb
+                      <img
+                        src={product.image}
+                        alt=""
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.03]"
+                      />
                     ) : (
+                      <div className="flex h-full w-full items-center justify-center font-sans text-xs uppercase tracking-widest text-museum-light/30">
+                        Нет фото
+                      </div>
+                    )}
+                    <span className="absolute left-2.5 top-2.5 font-sans text-[10px] tracking-widest uppercase px-2.5 py-1.5 bg-luxury-base/85 text-museum-light/85 border border-museum-light/15">
+                      {STATUS_LABEL[product.status]}
+                      {product.featured ? " · ★" : ""}
+                    </span>
+                  </Link>
+
+                  <div className="flex flex-1 flex-col gap-2.5 p-4 md:p-5">
+                    <p className="font-sans text-[11px] tracking-widest uppercase text-accent-gold/75 line-clamp-2">
+                      {product.category || EMPTY_CATEGORY}
+                    </p>
+                    <h2 className="font-serif text-xl md:text-2xl text-museum-light leading-snug line-clamp-2">
+                      {product.title}
+                    </h2>
+                    <p className="font-sans text-sm text-museum-light/45 line-clamp-1">
+                      {product.era || "—"}
+                    </p>
+                    <p className="font-serif text-2xl text-museum-light mt-auto pt-1">
+                      {formatPrice(product.price)}
+                      {product.compareAtPrice && product.compareAtPrice > product.price ? (
+                        <span className="ml-2 font-sans text-sm text-museum-light/35 line-through">
+                          {formatPrice(product.compareAtPrice)}
+                        </span>
+                      ) : null}
+                    </p>
+                    <p className="font-sans text-xs text-museum-light/30 truncate">
+                      /{product.slug}
+                    </p>
+
+                    <div className="mt-1 flex flex-wrap gap-2 border-t border-museum-light/10 pt-3.5">
+                      <Link
+                        href={blogDashboardProductEditPath(product.slug)}
+                        className="min-h-11 px-3 inline-flex items-center font-sans text-[11px] tracking-widest uppercase border border-museum-light/25 hover:border-accent-gold/50"
+                      >
+                        Изменить
+                      </Link>
+                      <a
+                        href={`/${product.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="min-h-11 px-3 inline-flex items-center font-sans text-[11px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold"
+                      >
+                        Сайт
+                      </a>
+                      {product.status !== "active" ? (
+                        <button
+                          type="button"
+                          disabled={busySlug === product.slug}
+                          onClick={() => void setStatus(product.slug, "active")}
+                          className="min-h-11 px-3 font-sans text-[11px] tracking-widest uppercase text-emerald-300/80 hover:text-emerald-200 disabled:opacity-50"
+                        >
+                          В каталог
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={busySlug === product.slug}
+                          onClick={() => void setStatus(product.slug, "archived")}
+                          className="min-h-11 px-3 font-sans text-[11px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold disabled:opacity-50"
+                        >
+                          В архив
+                        </button>
+                      )}
                       <button
                         type="button"
                         disabled={busySlug === product.slug}
-                        onClick={() => void setStatus(product.slug, "archived")}
-                        className="min-h-11 px-3 font-sans text-[11px] tracking-widest uppercase text-museum-light/50 hover:text-accent-gold disabled:opacity-50"
+                        onClick={() => void remove(product.slug, product.title)}
+                        className="min-h-11 px-3 ml-auto font-sans text-[11px] tracking-widest uppercase text-red-300/70 hover:text-red-200 disabled:opacity-50"
                       >
-                        В архив
+                        Удал.
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      disabled={busySlug === product.slug}
-                      onClick={() => void remove(product.slug, product.title)}
-                      className="min-h-11 px-3 ml-auto font-sans text-[11px] tracking-widest uppercase text-red-300/70 hover:text-red-200 disabled:opacity-50"
-                    >
-                      Удал.
-                    </button>
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+
+            <div ref={sentinelRef} className="h-px w-full" aria-hidden="true" />
+
+            {loading || refreshing ? (
+              <p className="text-center font-sans text-xs tracking-widest uppercase text-museum-light/45 py-6">
+                Загрузка…
+              </p>
+            ) : null}
+
+            {!hasMore && visible.length > 0 ? (
+              <p className="text-center font-sans text-xs text-museum-light/40 py-4">
+                Показаны все {total} по фильтру
+              </p>
+            ) : null}
+          </>
         )}
       </div>
     </div>
