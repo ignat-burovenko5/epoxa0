@@ -1,5 +1,3 @@
-import { blogIndexPath } from "@/lib/blog/urls";
-
 export const siteConfig = {
   locale: "ru",
   name: "Эпоха",
