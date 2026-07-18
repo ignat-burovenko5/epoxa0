@@ -11,26 +11,22 @@ const menuTransitionMs = 420;
 
 function BurgerIcon({ open, className }: { open: boolean; className?: string }) {
   const bar =
-    "absolute inset-x-0 h-[1.5px] rounded-full bg-current transition-[transform,opacity,top,bottom] duration-300 ease-luxury-ease";
+    "absolute inset-x-0 h-[1.5px] -translate-y-1/2 rounded-full bg-current transition-[transform,opacity,top] duration-300 ease-luxury-ease";
   return (
     <span
       className={`relative block h-3.5 w-[1.125rem] sm:h-4 sm:w-5 ${className ?? ""}`.trim()}
       aria-hidden="true"
     >
       <span
-        className={`${bar} ${
-          open ? "top-1/2 -translate-y-1/2 rotate-45" : "top-0"
-        }`}
+        className={`${bar} ${open ? "top-1/2 rotate-45" : "top-1/4"}`}
       />
       <span
-        className={`${bar} top-1/2 -translate-y-1/2 ${
+        className={`${bar} top-1/2 ${
           open ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"
         }`}
       />
       <span
-        className={`${bar} ${
-          open ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0 top-auto"
-        }`}
+        className={`${bar} ${open ? "top-1/2 -rotate-45" : "top-3/4"}`}
       />
     </span>
   );

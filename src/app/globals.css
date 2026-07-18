@@ -45,25 +45,25 @@
 
   @media (min-width: 640px) {
     :root {
-      --site-header-bar-height: calc(5.25rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(4.25rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 768px) {
     :root {
-      --site-header-bar-height: calc(6.75rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(5.25rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 1024px) {
     :root {
-      --site-header-bar-height: calc(9.5rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(6rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 1280px) {
     :root {
-      --site-header-bar-height: calc(11rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(6.5rem + var(--site-header-safe-top));
     }
   }
 
@@ -413,35 +413,35 @@ img.logo-nav-mark {
   display: block;
   filter: none;
   width: auto;
-  height: 3.5rem;
-  max-height: 3.5rem;
+  height: 2.75rem;
+  max-height: 2.75rem;
 }
 
 @media (min-width: 640px) {
   img.logo-nav-mark {
-    height: 4.25rem;
-    max-height: 4.25rem;
+    height: 3.25rem;
+    max-height: 3.25rem;
   }
 }
 
 @media (min-width: 768px) {
   img.logo-nav-mark {
-    height: 5.25rem;
-    max-height: 5.25rem;
+    height: 3.75rem;
+    max-height: 3.75rem;
   }
 }
 
 @media (min-width: 1024px) {
   img.logo-nav-mark {
-    height: 8rem;
-    max-height: 8rem;
+    height: 4.5rem;
+    max-height: 4.5rem;
   }
 }
 
 @media (min-width: 1280px) {
   img.logo-nav-mark {
-    height: 9.5rem;
-    max-height: 9.5rem;
+    height: 5rem;
+    max-height: 5rem;
   }
 }
 
