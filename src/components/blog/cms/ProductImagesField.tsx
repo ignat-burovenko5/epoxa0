@@ -536,19 +536,16 @@ export default function ProductImagesField({
               className="border border-museum-light/15 bg-luxury-base/30 overflow-hidden flex flex-col"
             >
               <div className="relative aspect-[4/5] bg-luxury-charcoal/50">
-                {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
-                <img
+                <PreviewImage
                   src={item.previewUrl}
-                  alt=""
                   className={`absolute inset-0 h-full w-full object-cover transition-opacity ${
-                    item.status === "uploading" ? "opacity-50" : "opacity-90"
+                    item.status === "uploading" ? "opacity-40" : "opacity-90"
                   }`}
                 />
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <StatusCircle
-                    status={item.status}
-                    className="h-10 w-10 bg-luxury-base/75 shadow-lg"
-                  />
+                <span className="absolute inset-0 z-[2] flex items-center justify-center pointer-events-none">
+                  <span className="rounded-full bg-luxury-base/80 p-1.5 shadow-lg">
+                    <StatusCircle status={item.status} className="h-11 w-11" />
+                  </span>
                 </span>
               </div>
               <div className="flex items-center gap-2 p-2.5 border-t border-museum-light/10">
