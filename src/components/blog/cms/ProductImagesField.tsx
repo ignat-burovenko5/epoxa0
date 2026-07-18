@@ -420,7 +420,7 @@ export default function ProductImagesField({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+        accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif,.heic,.heif"
         multiple
         className="sr-only"
         onChange={onFileSelected}

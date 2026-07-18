@@ -33,7 +33,12 @@ export default function BlogImageField({
         credentials: "same-origin",
         body,
       });
-      const data = (await res.json()) as { url?: string; error?: string };
+      let data: { url?: string; error?: string } = {};
+      try {
+        data = (await res.json()) as typeof data;
+      } catch {
+        data = { error: `Ответ сервера ${res.status}` };
+      }
       if (!res.ok || !data.url) {
         setUploadError(data.error ?? "Не удалось загрузить");
         return;

@@ -34,7 +34,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Неизвестный тип загрузки" }, { status: 400 });
   }
 
-  if (!file.type.startsWith("image/")) {
+  const looksLikeImage =
+    file.type.startsWith("image/") ||
+    /\.(jpe?g|png|gif|webp|avif|heic|heif)$/i.test(file.name || "");
+  if (!looksLikeImage) {
     return NextResponse.json({ error: "Допустимы только изображения" }, { status: 400 });
   }
 

@@ -27,10 +27,10 @@ function runScript(rel, env = {}) {
 }
 
 async function main() {
-  const buildId = path.join(ROOT, ".next", "BUILD_ID");
+  const buildId = path.join(ROOT, ".next-prod", "BUILD_ID");
   if (!existsSync(buildId)) {
     console.warn(
-      "Warning: no production build (.next/BUILD_ID). Run `npm run build` or `npm run push` first.\n",
+      "Warning: no production build (.next-prod/BUILD_ID). Run `npm run build` or `npm run push` first.\n",
     );
   }
 

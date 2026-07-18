@@ -6,6 +6,7 @@
  *   PUSH_BACKEND=1  — also restart Django after deploy (API code changed)
  */
 import { execSync } from "child_process";
+import { existsSync, rmSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import {
@@ -119,18 +120,12 @@ async function deploy() {
     console.warn("Could not clear legacy .next:", err?.message || err);
   }
 
-  // Preview (`next dev` on :3771) keeps working after deploy.
+  // Preview (`next dev` on :3771) — always refresh so CMS uploads keep working.
+  console.log("\nRestarting preview on :3771…");
   try {
-    execSync("ss -ltn '( sport = :3771 )'", { stdio: "ignore" });
-    console.log("\nRestarting preview on :3771…");
-    try {
-      execSync("fuser -k 3771/tcp", { stdio: "ignore" });
-    } catch {
-      /* nothing listening */
-    }
     runScript("scripts/restart-preview-3771.mjs");
-  } catch {
-    /* preview not running — skip */
+  } catch (err) {
+    console.warn("Preview restart skipped:", err?.message || err);
   }
 
   if (RESTART_BACKEND) {
