@@ -464,7 +464,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
               ) : null}
 
               <div
-                className="flex w-full flex-wrap items-center justify-center gap-1.5 rounded-sm border border-museum-light/15 bg-luxury-base/80 px-2 py-2 backdrop-blur-sm"
+                className="flex items-center justify-center gap-1.5 rounded-sm border border-museum-light/15 bg-luxury-base/80 px-2 py-2 backdrop-blur-sm"
                 role="toolbar"
                 aria-label="Масштаб изображения"
               >
@@ -477,35 +477,6 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
                 >
                   −
                 </button>
-
-                {ZOOM_STEPS.map((step) => {
-                  const active = step === zoom;
-                  return (
-                    <button
-                      key={step}
-                      type="button"
-                      className={`${zoomControlBtnClass} ${
-                        active
-                          ? "border-accent-gold/70 bg-accent-brass/15 text-accent-gold"
-                          : ""
-                      }`}
-                      aria-pressed={active}
-                      aria-label={`Масштаб ${step}%`}
-                      onClick={() => {
-                        const stage = stageRef.current;
-                        const imageEl = imageRef.current;
-                        const anchor =
-                          stage && imageEl
-                            ? captureViewportCenterAnchor(stage, imageEl)
-                            : null;
-                        setZoomAt(step, anchor);
-                      }}
-                    >
-                      {step}%
-                    </button>
-                  );
-                })}
-
                 <button
                   type="button"
                   className={zoomControlBtnClass}
@@ -516,10 +487,6 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
                   +
                 </button>
               </div>
-
-              <p className="font-sans text-[10px] tracking-[0.14em] uppercase text-museum-light/40">
-                {zoom}% · клик / колесо — в точку курсора
-              </p>
             </div>
           </div>,
           document.body,
