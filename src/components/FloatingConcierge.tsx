@@ -1,19 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { PersonIcon, PhoneIcon, TelegramIcon, WhatsAppIcon } from "@/components/NavContactIcons";
-import { siteConfig } from "@/lib/site";
+import { MaxIcon, PhoneIcon, TelegramIcon, WhatsAppIcon } from "@/components/NavContactIcons";
+import { maxUrl, siteConfig, telegramUrl, whatsappUrl } from "@/lib/site";
 
-const WHATSAPP_HREF = `https://wa.me/${siteConfig.whatsapp}`;
-const TELEGRAM_HREF = `https://t.me/${siteConfig.telegram}`;
-
-function whatsappHref(message: string) {
-  return `${WHATSAPP_HREF}?text=${encodeURIComponent(message)}`;
-}
-
-function telegramHref(message: string) {
-  return `${TELEGRAM_HREF}?text=${encodeURIComponent(message)}`;
-}
+const CONSULT_MESSAGE =
+  "Здравствуйте! Хотел(а) бы получить консультацию по коллекции. Салон «Эпоха», тел. +7 (963) 780-64-30";
 
 const contactLinkClass =
   "contact-link-animated group flex min-h-12 w-full cursor-pointer items-center gap-3 border border-accent-brass/40 px-3 py-2.5 font-sans text-xs tracking-widest uppercase text-museum-light transition-colors hover:border-accent-gold/70 hover:bg-accent-brass/10";
@@ -40,23 +32,24 @@ export default function FloatingConcierge() {
             Ответит на вопросы о провенансе, состоянии и доставке по России. Выберите удобный способ связи.
           </p>
           <div className="space-y-3">
-            <div
-              className="flex w-full items-center gap-3 border border-accent-gold/30 bg-accent-brass/10 px-3 py-2.5 font-sans text-xs tracking-widest uppercase text-museum-light"
-              aria-label={`Куратор: ${siteConfig.curatorName}`}
-            >
-              <span className={contactIconClass}>
-                <PersonIcon className="h-5 w-5" />
-              </span>
-              <span className="font-serif text-sm tracking-normal normal-case text-accent-gold">
-                {siteConfig.curatorName}
-              </span>
-            </div>
             <a
-              href={whatsappHref("Здравствуйте! Хотел(а) бы получить консультацию по коллекции.")}
+              href={maxUrl(CONSULT_MESSAGE)}
               target="_blank"
               rel="noopener noreferrer"
               className={contactLinkClass}
-              aria-label={`Написать куратору ${siteConfig.curatorName} в WhatsApp`}
+              aria-label="Написать куратору в MAX"
+            >
+              <span className={`${contactIconClass} overflow-hidden p-0`}>
+                <MaxIcon className="h-9 w-9 rounded-full" />
+              </span>
+              <span>MAX</span>
+            </a>
+            <a
+              href={whatsappUrl(CONSULT_MESSAGE)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={contactLinkClass}
+              aria-label="Написать куратору в WhatsApp"
             >
               <span className={contactIconClass}>
                 <WhatsAppIcon className="h-5 w-5" />
@@ -64,11 +57,11 @@ export default function FloatingConcierge() {
               <span>WhatsApp</span>
             </a>
             <a
-              href={telegramHref("Здравствуйте! Хотел(а) бы получить консультацию по коллекции.")}
+              href={telegramUrl(CONSULT_MESSAGE)}
               target="_blank"
               rel="noopener noreferrer"
               className={contactLinkClass}
-              aria-label={`Написать куратору ${siteConfig.curatorName} в Telegram`}
+              aria-label="Написать куратору в Telegram"
             >
               <span className={contactIconClass}>
                 <TelegramIcon className="h-5 w-5" />
@@ -78,7 +71,7 @@ export default function FloatingConcierge() {
             <a
               href={siteConfig.phoneHref}
               className={`${contactLinkClass} contact-link-phone`}
-              aria-label={`Позвонить куратору ${siteConfig.curatorName}: ${siteConfig.phone}`}
+              aria-label={`Позвонить куратору: ${siteConfig.phone}`}
             >
               <span className={contactIconClass}>
                 <PhoneIcon className="h-5 w-5" />
