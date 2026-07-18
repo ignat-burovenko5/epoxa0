@@ -14,7 +14,7 @@ function BurgerIcon({ open, className }: { open: boolean; className?: string }) 
     "absolute inset-x-0 h-[1.5px] -translate-y-1/2 rounded-full bg-current transition-[transform,opacity,top] duration-300 ease-luxury-ease";
   return (
     <span
-      className={`relative block h-3.5 w-[1.125rem] sm:h-4 sm:w-5 ${className ?? ""}`.trim()}
+      className={`relative block h-5 w-4 sm:h-6 sm:w-5 ${className ?? ""}`.trim()}
       aria-hidden="true"
     >
       <span
