@@ -25,6 +25,9 @@
   --spacing-48: 12rem;
   
   --ease-luxury-ease: cubic-bezier(0.25, 0.1, 0.25, 1.0);
+  /* Soft decelerate for drawers / burger (less abrupt than linear-ish luxury ease) */
+  --ease-drawer: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-drawer: 0.62s;
 }
 
 @layer base {
