@@ -78,7 +78,8 @@
     background-color: var(--color-luxury-base);
     color: var(--color-museum-light);
     font-family: var(--font-sans);
-    overflow-x: hidden;
+    /* clip keeps sticky sidebars working; hidden breaks position:sticky */
+    overflow-x: clip;
     min-height: 100%;
     min-height: 100dvh;
     -webkit-user-select: text;

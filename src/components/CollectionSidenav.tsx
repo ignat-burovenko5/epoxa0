@@ -47,7 +47,7 @@ export default function CollectionSidenav() {
   return (
     <aside
       aria-label="Категории каталога"
-      className="shrink-0 md:w-56 lg:w-64 md:self-start"
+      className="shrink-0 md:w-56 lg:w-64 md:sticky md:top-[calc(var(--site-header-offset)+0.75rem)] md:self-start md:max-h-[calc(100dvh-var(--site-header-offset)-1.5rem)] md:flex md:flex-col"
     >
       {/* Mobile strip */}
       <div className="collection-category-scroll md:hidden mb-6 overflow-x-auto overscroll-x-contain border-b border-luxury-charcoal/10 pb-3">
@@ -97,12 +97,12 @@ export default function CollectionSidenav() {
         </ul>
       </div>
 
-      {/* Desktop pane */}
+      {/* Desktop pane — sticky lives on aside; nav scrolls inside */}
       <nav
-        className="collection-category-scroll collection-sidenav-panel hidden md:block sticky top-[calc(var(--site-header-offset)+0.75rem)] max-h-[calc(100dvh-var(--site-header-offset)-1.5rem)] overflow-y-auto overscroll-y-contain"
+        className="collection-category-scroll collection-sidenav-panel hidden md:flex md:min-h-0 md:flex-1 md:flex-col md:overflow-y-auto md:overscroll-y-contain border-r border-luxury-charcoal/10 pr-2 lg:pr-3"
         aria-label="Категории"
       >
-        <header className="sticky top-0 z-[1] border-b border-luxury-charcoal/10 bg-museum-light/95 pb-4 pt-1 backdrop-blur-sm">
+        <header className="sticky top-0 z-[1] shrink-0 border-b border-luxury-charcoal/10 bg-museum-light/95 pb-4 pt-1 backdrop-blur-sm">
           <p className="font-sans text-[9px] tracking-[0.28em] uppercase text-accent-brass/80 mb-1.5">
             Навигация
           </p>
