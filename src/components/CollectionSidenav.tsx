@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
-import { categoryHref, groupedCategoryLinks } from "@/lib/site";
+import {
+  categoryHref,
+  COLLECTION_SALE_HREF,
+  groupedCategoryLinks,
+} from "@/lib/site";
 
 function isActive(pathname: string, slug: string) {
   return pathname === categoryHref(slug);
@@ -33,7 +37,11 @@ const groupLabelClass =
 
 export default function CollectionSidenav() {
   const pathname = usePathname();
-  const allActive = pathname === "/collection";
+  const searchParams = useSearchParams();
+  const saleOnly =
+    searchParams.get("sale") === "1" || searchParams.get("sale") === "true";
+  const allActive = pathname === "/collection" && !saleOnly;
+  const saleActive = pathname === "/collection" && saleOnly;
   const groups = useMemo(() => groupedCategoryLinks(), []);
   const flat = useMemo(
     () => groups.flatMap((group) => group.items),
@@ -62,6 +70,18 @@ export default function CollectionSidenav() {
               }`}
             >
               Все
+            </Link>
+          </li>
+          <li>
+            <Link
+              href={COLLECTION_SALE_HREF}
+              className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
+                saleActive
+                  ? "border-luxury-bordeaux text-luxury-bordeaux"
+                  : "border-transparent text-luxury-bordeaux/70 hover:text-luxury-bordeaux"
+              }`}
+            >
+              Акционные
             </Link>
           </li>
           {flat.map((item) => {
@@ -105,9 +125,22 @@ export default function CollectionSidenav() {
         </header>
 
         <div className="mb-6">
-          <Link href="/collection" className={itemClass(allActive)}>
-            Все категории
-          </Link>
+          <p className={groupLabelClass}>Обзор</p>
+          <ul className="m-0 flex list-none flex-col gap-1 p-0">
+            <li>
+              <Link href="/collection" className={itemClass(allActive)}>
+                Все категории
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={COLLECTION_SALE_HREF}
+                className={itemClass(saleActive, true)}
+              >
+                Акционные товары
+              </Link>
+            </li>
+          </ul>
         </div>
 
         <div className="flex flex-col gap-6 pb-8">
