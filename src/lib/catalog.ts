@@ -1,4 +1,6 @@
-import catalogData from "@/data/catalog.json";
+import fs from "node:fs";
+import path from "node:path";
+import catalogFallback from "@/data/catalog.json";
 import { categoryLabel } from "@/lib/site";
 
 export type CatalogProduct = {
@@ -14,17 +16,73 @@ export type CatalogProduct = {
   sourceUrl?: string;
 };
 
-const products = (catalogData as CatalogProduct[]).filter((p) => p.price > 0);
+let cachedProducts: CatalogProduct[] | null = null;
+let cachedMtimeMs = -1;
 
-export const catalogProducts: Record<string, CatalogProduct> = Object.fromEntries(
-  products.map((p) => [p.slug, p]),
-);
+function loadCatalogProducts(): CatalogProduct[] {
+  const livePath = path.join(process.cwd(), "data", "catalog_live.json");
+  try {
+    const stat = fs.statSync(livePath);
+    if (cachedProducts && cachedMtimeMs === stat.mtimeMs) {
+      return cachedProducts;
+    }
+    const raw = JSON.parse(fs.readFileSync(livePath, "utf8")) as CatalogProduct[];
+    const products = (Array.isArray(raw) ? raw : []).filter((p) => p.price > 0);
+    cachedProducts = products;
+    cachedMtimeMs = stat.mtimeMs;
+    return products;
+  } catch {
+    // fall through to bundled JSON
+  }
 
-export const catalogItems = products;
+  const products = (catalogFallback as CatalogProduct[]).filter((p) => p.price > 0);
+  cachedProducts = products;
+  cachedMtimeMs = 0;
+  return products;
+}
+
+function products(): CatalogProduct[] {
+  return loadCatalogProducts();
+}
 
 export const CATALOG_PAGE_SIZE = 9;
 
 export const HOMEPAGE_FEATURED_COUNT = 9;
+
+/** Snapshot for modules that need a Record; rebuilds when live catalog changes. */
+export function getCatalogProductsMap(): Record<string, CatalogProduct> {
+  return Object.fromEntries(products().map((p) => [p.slug, p]));
+}
+
+/** @deprecated Prefer getCatalogProduct / getCatalogSlugs — kept for existing imports. */
+export const catalogProducts: Record<string, CatalogProduct> = new Proxy(
+  {},
+  {
+    get(_target, prop: string | symbol) {
+      if (typeof prop !== "string") return undefined;
+      return getCatalogProductsMap()[prop];
+    },
+    ownKeys() {
+      return Reflect.ownKeys(getCatalogProductsMap());
+    },
+    getOwnPropertyDescriptor(_target, prop) {
+      const map = getCatalogProductsMap();
+      if (typeof prop === "string" && prop in map) {
+        return { configurable: true, enumerable: true, value: map[prop] };
+      }
+      return undefined;
+    },
+  },
+);
+
+/** @deprecated Prefer getCatalogPage — live list from catalog_live.json. */
+export const catalogItems: CatalogProduct[] = new Proxy([] as CatalogProduct[], {
+  get(_target, prop) {
+    const list = products();
+    const value = Reflect.get(list, prop, list);
+    return typeof value === "function" ? value.bind(list) : value;
+  },
+});
 
 function shuffleArray<T>(items: T[]): T[] {
   const copy = [...items];
@@ -36,16 +94,16 @@ function shuffleArray<T>(items: T[]): T[] {
 }
 
 export function getRandomFeaturedSlugs(count: number = HOMEPAGE_FEATURED_COUNT): string[] {
-  const shuffled = shuffleArray(products);
+  const shuffled = shuffleArray(products());
   return shuffled.slice(0, Math.min(count, shuffled.length)).map((p) => p.slug);
 }
 
 export function getCatalogProduct(slug: string) {
-  return catalogProducts[slug];
+  return getCatalogProductsMap()[slug];
 }
 
 export function getCatalogSlugs() {
-  return products.map((p) => p.slug);
+  return products().map((p) => p.slug);
 }
 
 export function formatPrice(amount: number) {
@@ -71,14 +129,15 @@ function normalizeCategoryName(value: string) {
 
 /** Filter catalog by nav category slug; omit slug for full catalog. */
 export function getProductsForCategory(categorySlug?: string | null) {
+  const list = products();
   if (!categorySlug) {
-    return products;
+    return list;
   }
 
   const label = categoryLabel(categorySlug);
   const normalized = normalizeCategoryName(label);
 
-  return products.filter(
+  return list.filter(
     (product) => normalizeCategoryName(product.category) === normalized,
   );
 }

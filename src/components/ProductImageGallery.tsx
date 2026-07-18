@@ -29,8 +29,9 @@ type ZoomAnchor = {
   clientY: number;
 };
 
-/** Discrete zoom levels (fit → 2× → 3× → 4×). Not shown in UI. */
-const ZOOM_LEVELS = 4;
+/** Discrete zoom levels (fit → 1st zoom → 2nd zoom). Two zoom-in clicks,
+ * then the next click zooms back out. Not shown in UI. */
+const ZOOM_LEVELS = 3;
 const DEFAULT_ZOOM = 0;
 
 const mainImageClass =
@@ -136,8 +137,7 @@ function applyZoomAnchor(
 function zoomWidthFor(level: number): string | undefined {
   if (level <= 0) return undefined;
   if (level === 1) return "min(160vw, 1600px)";
-  if (level === 2) return "min(240vw, 2400px)";
-  return "min(320vw, 3200px)";
+  return "min(240vw, 2400px)";
 }
 
 export default function ProductImageGallery({ slides }: ProductImageGalleryProps) {
