@@ -367,13 +367,13 @@ body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
 
 @media (min-width: 768px) {
   .catalog-sidenav-root__panel {
-    background-color: rgb(12 12 12 / 95%);
+    background-color: color-mix(in srgb, var(--color-luxury-base) 95%, transparent);
     backdrop-filter: blur(12px);
   }
 
   @supports (backdrop-filter: blur(1px)) {
     .catalog-sidenav-root__panel {
-      background-color: rgb(12 12 12 / 90%);
+      background-color: color-mix(in srgb, var(--color-luxury-base) 90%, transparent);
     }
   }
 }
