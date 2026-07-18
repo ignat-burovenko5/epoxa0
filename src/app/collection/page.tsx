@@ -25,22 +25,9 @@ export default function CollectionListing() {
         </p>
       </header>
 
-      <div className="flex flex-col gap-3 border-y border-luxury-charcoal/10 py-3 mb-8 font-sans text-xs md:text-sm tracking-widest uppercase text-luxury-base">
-        <div className="flex gap-5 overflow-x-auto hidden-scrollbar">
-          <button type="button" className="inline-flex items-center min-h-12 px-3 whitespace-nowrap hover:text-accent-brass transition-colors">
-            Эпоха
-          </button>
-          <button type="button" className="inline-flex items-center min-h-12 px-3 whitespace-nowrap hover:text-accent-brass transition-colors">
-            Материал
-          </button>
-          <button type="button" className="inline-flex items-center min-h-12 px-3 whitespace-nowrap hover:text-accent-brass transition-colors">
-            Мастерская
-          </button>
-        </div>
-        <p className="text-luxury-charcoal/50 normal-case tracking-normal text-xs md:text-sm shrink-0">
-          {total} предметов
-        </p>
-      </div>
+      <p className="mb-8 font-sans text-xs md:text-sm text-luxury-charcoal/50">
+        {total} предметов
+      </p>
 
       <CollectionCatalog />
       <FloatingConcierge />
