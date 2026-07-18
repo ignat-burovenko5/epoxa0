@@ -33,44 +33,14 @@ function BurgerIcon({ open, className }: { open: boolean; className?: string }) 
   );
 }
 
-function categoryLinkClass(opts: {
-  active: boolean;
-  highlighted?: boolean;
-  primary?: boolean;
-}) {
-  const { active, highlighted, primary } = opts;
-  const base =
-    "group relative block w-full border-l-2 pl-3.5 pr-2 transition-colors duration-300 ease-luxury-ease";
-
-  if (primary) {
-    return `${base} min-h-11 py-2.5 font-sans text-[11px] tracking-[0.16em] uppercase ${
-      active
-        ? "border-accent-gold bg-accent-gold/[0.08] text-accent-gold"
-        : "border-transparent text-museum-light/70 hover:border-museum-light/15 hover:bg-museum-light/[0.04] hover:text-accent-gold"
-    }`;
-  }
-
-  if (highlighted) {
-    return `${base} min-h-10 py-2 font-sans text-[10px] leading-snug tracking-[0.08em] uppercase ${
-      active
-        ? "border-[#E8A6AB] bg-[#E8A6AB]/[0.08] text-[#F5C7CA]"
-        : "border-transparent text-[#E8A6AB]/80 hover:border-[#E8A6AB]/30 hover:bg-[#E8A6AB]/[0.05] hover:text-[#F5C7CA]"
-    }`;
-  }
-
-  return `${base} min-h-10 py-2 font-sans text-[10px] leading-snug tracking-[0.08em] uppercase ${
-    active
-      ? "border-accent-gold bg-accent-gold/[0.08] text-accent-gold"
-      : "border-transparent text-museum-light/50 hover:border-museum-light/12 hover:bg-museum-light/[0.04] hover:text-museum-light/85"
-  }`;
-}
+const categoryLinkBase =
+  "block min-h-10 py-2 pl-3 pr-2 font-sans text-[10px] leading-snug tracking-[0.08em] uppercase border-l-2 transition-colors duration-300 select-text";
 
 export default function HeaderBurgerMenu() {
   const panelId = useId();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const categoryCount = siteConfig.categoryLinks.length;
 
   const close = useCallback(() => setOpen(false), []);
   const show = useCallback(() => {
