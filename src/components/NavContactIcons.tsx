@@ -21,20 +21,43 @@ export function MaxIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
-/** SVG Repo: email-1 — https://www.svgrepo.com/svg/521128/email-1 */
+/** Envelope — flap opens and letter rises on `.contact-link-email:hover`. */
 export function EmailIcon({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg
-      className={className}
+      className={`email-icon ${className}`.trim()}
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
+      {/* Letter (slides up on hover) */}
+      <rect
+        className="email-icon__letter"
+        x="7.25"
+        y="9.5"
+        width="9.5"
+        height="7"
+        rx="0.6"
+        fill="currentColor"
+        opacity="0.35"
+      />
+      {/* Envelope body */}
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M3.75 5.25L3 6V18L3.75 18.75H20.25L21 18V6L20.25 5.25H3.75ZM4.5 7.6955V17.25H19.5V7.69525L11.9999 14.5136L4.5 7.6955ZM18.3099 6.75H5.68986L11.9999 12.4864L18.3099 6.75Z"
+        className="email-icon__body"
+        d="M4.5 8.25h15v9.5a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-9.5Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      {/* Closed flap — flips open on hover */}
+      <path
+        className="email-icon__flap"
+        d="M4.5 8.25 12 13.5l7.5-5.25"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

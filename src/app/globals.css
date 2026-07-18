@@ -1017,16 +1017,6 @@ img.logo-nav-mark--footer {
     }
   }
 
-  @keyframes email-icon-hover {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-1.5px);
-    }
-  }
-
   @keyframes phone-icon-hover {
     0%,
     100% {
@@ -1115,12 +1105,44 @@ img.logo-nav-mark--footer {
       transform-origin: center;
     }
 
-    .contact-link-email:hover .contact-icon-ring svg {
-      animation: email-icon-hover 0.55s ease-in-out;
-    }
-
     .contact-link-phone:hover .contact-icon-ring svg {
       animation: phone-icon-hover 0.55s ease-in-out;
+    }
+
+    /* Mail: envelope flap opens + letter rises on hover */
+    .email-icon {
+      overflow: visible;
+    }
+
+    .email-icon__flap,
+    .email-icon__letter {
+      transform-box: fill-box;
+      transition:
+        transform 0.45s cubic-bezier(0.25, 0.1, 0.25, 1),
+        opacity 0.35s ease;
+    }
+
+    .email-icon__flap {
+      transform-origin: 12px 8.25px;
+    }
+
+    .email-icon__letter {
+      transform-origin: center bottom;
+      transform: translateY(1.5px) scaleY(0.85);
+      opacity: 0.2;
+    }
+
+    .contact-link-email:hover .email-icon__flap {
+      transform: translateY(-1px) scaleY(-1);
+    }
+
+    .contact-link-email:hover .email-icon__letter {
+      transform: translateY(-3.5px) scaleY(1);
+      opacity: 0.55;
+    }
+
+    .contact-link-email:hover .contact-icon-ring {
+      overflow: visible;
     }
   }
 }
