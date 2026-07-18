@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Count, Q
 
 from api.models import CatalogProduct
 
@@ -250,8 +250,6 @@ def list_products(
     offset: int = 0,
     limit: int = 100,
 ) -> dict[str, Any]:
-    from django.db.models import Count
-
     qs = CatalogProduct.objects.all()
     if status and status in PRODUCT_STATUSES:
         qs = qs.filter(status=status)
@@ -265,7 +263,10 @@ def list_products(
         )
     category = (category or "").strip()
     if category and category.lower() != "all":
-        qs = qs.filter(category__iexact=category)
+        if category == "Без категории":
+            qs = qs.filter(Q(category="") | Q(category__isnull=True))
+        else:
+            qs = qs.filter(category__iexact=category)
 
     order = _LIST_SORTS.get(sort) or _LIST_SORTS["updated_desc"]
     qs = qs.order_by(*order)

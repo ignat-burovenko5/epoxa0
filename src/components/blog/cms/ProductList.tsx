@@ -228,7 +228,12 @@ export default function ProductList({
     [filter, debouncedQ, category, sort],
   );
 
+  const skipFirstReload = useRef(true);
   useEffect(() => {
+    if (skipFirstReload.current) {
+      skipFirstReload.current = false;
+      return;
+    }
     void reload();
   }, [reload]);
 
