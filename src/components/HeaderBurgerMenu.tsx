@@ -34,7 +34,7 @@ function BurgerIcon({ open, className }: { open: boolean; className?: string }) 
 }
 
 const categoryLinkBase =
-  "block min-h-10 py-2 pl-3 pr-2 font-sans text-[10px] leading-snug tracking-[0.08em] uppercase border-l-2 transition-colors duration-300 select-text";
+  "block min-h-11 rounded-sm py-2.5 pl-3.5 pr-3 font-sans text-[11px] leading-snug tracking-[0.1em] uppercase border-l-2 transition-colors duration-300 select-text";
 
 export default function HeaderBurgerMenu() {
   const panelId = useId();
