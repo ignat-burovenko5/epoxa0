@@ -1,4 +1,4 @@
-import { ArrowSquareUpRightIcon, ClockIcon, LocationIcon, YandexMapsIcon } from "@/components/NavContactIcons";
+import { ArrowSquareUpRightIcon, LocationIcon } from "@/components/NavContactIcons";
 import {
   siteConfig,
   yandexMapsUrl,
@@ -87,7 +87,6 @@ export default function YandexSalonMap({
           rel="noopener noreferrer"
           className={`inline-flex items-center gap-2 min-h-11 py-2 font-sans text-xs tracking-widest uppercase transition-colors ${linkClass[variant]}`}
         >
-          <YandexMapsIcon className="h-4 w-4 shrink-0" />
           <span>Открыть в Яндекс Картах</span>
           <ArrowSquareUpRightIcon className="h-4 w-4 shrink-0" />
         </a>
