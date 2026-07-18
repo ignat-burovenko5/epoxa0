@@ -216,6 +216,42 @@
     cursor: var(--cursor-antique-pointer);
   }
 
+  /* I-beam over copy so text can be aimed and selected with the cursor */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  li,
+  dd,
+  dt,
+  blockquote,
+  figcaption,
+  td,
+  th,
+  pre,
+  code,
+  time,
+  address,
+  label:not([for]),
+  .site-main .font-serif,
+  a[href^="mailto:"],
+  a[href^="tel:"],
+  a[href^="mailto:"] *,
+  a[href^="tel:"] * {
+    cursor: text;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="range"]):not([type="color"]),
+  textarea,
+  [contenteditable="true"] {
+    cursor: text;
+  }
+
   button:disabled,
   [type="button"]:disabled,
   [type="submit"]:disabled,

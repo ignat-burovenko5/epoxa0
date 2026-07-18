@@ -159,6 +159,18 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
     document.body.style.overflow = "hidden";
 
     const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest("input, textarea, select, [contenteditable='true']")
+      ) {
+        return;
+      }
+      const selection = window.getSelection();
+      if (selection && !selection.isCollapsed && selection.toString().length > 0) {
+        return;
+      }
+
       if (event.key === "Escape") {
         event.preventDefault();
         if (zoomed) resetZoom();
@@ -189,6 +201,18 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
     if (lightboxOpen || !hasMultiple) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest("input, textarea, select, [contenteditable='true']")
+      ) {
+        return;
+      }
+      const selection = window.getSelection();
+      if (selection && !selection.isCollapsed && selection.toString().length > 0) {
+        return;
+      }
+
       if (event.key === "ArrowLeft") {
         event.preventDefault();
         goPrev();
