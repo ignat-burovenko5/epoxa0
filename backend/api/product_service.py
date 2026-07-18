@@ -288,7 +288,7 @@ def list_products(
             "count": row["count"],
         }
         for row in facet_qs.values("category")
-        .annotate(count=Count("id"))
+        .annotate(count=Count("pk"))
         .order_by("category")
     ]
 
