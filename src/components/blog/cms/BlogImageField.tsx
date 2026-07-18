@@ -25,9 +25,10 @@ export default function BlogImageField({
 
     const body = new FormData();
     body.append("file", file);
+    body.append("kind", "blog");
 
     try {
-      const res = await fetch("/api/blog/admin/upload", {
+      const res = await fetch("/api/cms/upload-image", {
         method: "POST",
         credentials: "same-origin",
         body,
@@ -124,7 +125,7 @@ export default function BlogImageField({
           <span className="font-sans text-xs text-museum-light/40 text-center leading-relaxed">
             Нажмите или перетащите файл
             <br />
-            JPEG, PNG, WebP или GIF · до 10 МБ
+            JPEG, PNG, WebP или GIF · до 12 МБ · сжатие AVIF/WebP
           </span>
         </button>
       )}

@@ -315,18 +315,11 @@ export default function ProductEditor({ product }: ProductEditorProps) {
 
       <section className={cmsSectionClass}>
         <h2 className={cmsSectionTitleClass}>Изображения</h2>
-        <div>
-          <label className={cmsLabelClass} htmlFor="images">
-            URL изображений (по одному на строку)
-          </label>
-          <textarea
-            id="images"
-            className={cmsTextareaClass}
-            placeholder="/products/slug/main.jpg"
-            value={typeof form.images === "string" ? form.images : ""}
-            onChange={(e) => patch("images", e.target.value)}
-          />
-        </div>
+        <ProductImagesField
+          value={typeof form.images === "string" ? form.images : ""}
+          onChange={(urls) => patch("images", urls)}
+          slug={String(form.slug || "").trim() || slugify(String(form.title || ""))}
+        />
         <div>
           <label className={cmsLabelClass} htmlFor="sourceUrl">
             Исходный URL
