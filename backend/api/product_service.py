@@ -7,16 +7,13 @@ from pathlib import Path
 from typing import Any
 
 from django.conf import settings
+from django.db.models import Q
 
 from api.models import CatalogProduct
 
 PRODUCT_STATUSES = ("active", "draft", "archived")
 LIVE_CATALOG_PATH = Path(settings.REPO_ROOT) / "data" / "catalog_live.json"
 SEED_CATALOG_PATH = Path(settings.REPO_ROOT) / "src" / "data" / "catalog.json"
-
-
-def iso_now() -> str:
-    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _dt_to_iso(dt: datetime | None) -> str | None:
@@ -78,7 +75,6 @@ def product_summary(product: CatalogProduct) -> dict[str, Any]:
 
 
 def storefront_dict(product: CatalogProduct) -> dict[str, Any]:
-    """Public catalog shape (matches CatalogProduct / catalog.json)."""
     out: dict[str, Any] = {
         "slug": product.slug,
         "title": product.title,
@@ -121,6 +117,11 @@ def normalize_input(body: dict[str, Any], *, existing: CatalogProduct | None = N
     else:
         slug = unique_slug(title)
 
+    if existing is None:
+        slug = unique_slug(slug)
+    elif slug != existing.slug:
+        slug = unique_slug(slug, exclude=existing.slug)
+
     status = str(body.get("status") or (existing.status if existing else "active")).strip()
     if status not in PRODUCT_STATUSES:
         raise ValueError("Некорректный статус")
@@ -131,7 +132,7 @@ def normalize_input(body: dict[str, Any], *, existing: CatalogProduct | None = N
     elif isinstance(description, list):
         description = [str(p).strip() for p in description if str(p).strip()]
     else:
-        description = existing.description if existing else []
+        description = list(existing.description) if existing else []
 
     images = body.get("images")
     if isinstance(images, str):
@@ -139,16 +140,23 @@ def normalize_input(body: dict[str, Any], *, existing: CatalogProduct | None = N
     elif isinstance(images, list):
         images = [str(x).strip() for x in images if str(x).strip()]
     else:
-        images = existing.images if existing else []
+        images = list(existing.images) if existing else []
 
     try:
-        price = float(body.get("price") if body.get("price") is not None else (existing.price if existing else 0))
+        price = float(
+            body.get("price")
+            if body.get("price") is not None
+            else (existing.price if existing else 0)
+        )
     except (TypeError, ValueError) as err:
         raise ValueError("Цена должна быть числом") from err
 
     compare_raw = body.get("compareAtPrice", body.get("compare_at_price"))
-    compare_at_price = None
-    if compare_raw not in (None, "", False):
+    if "compareAtPrice" not in body and "compare_at_price" not in body and existing:
+        compare_at_price = existing.compare_at_price
+    elif compare_raw in (None, "", False):
+        compare_at_price = None
+    else:
         try:
             compare_at_price = float(compare_raw)
         except (TypeError, ValueError) as err:
@@ -162,29 +170,47 @@ def normalize_input(body: dict[str, Any], *, existing: CatalogProduct | None = N
     except (TypeError, ValueError):
         sort_order = 0
 
+    badge_raw = body.get("badge")
+    if "badge" not in body and existing:
+        badge = existing.badge
+    else:
+        badge = (str(badge_raw).strip() if badge_raw else "") or None
+
     return {
-        "slug": slug if existing is None else (slug if slug == existing.slug else unique_slug(slug, exclude=existing.slug)),
+        "slug": slug,
         "title": title,
-        "era": str(body.get("era") or (existing.era if existing else "")).strip(),
-        "category": str(body.get("category") or (existing.category if existing else "")).strip(),
+        "era": str(body.get("era") if "era" in body else (existing.era if existing else "")).strip(),
+        "category": str(
+            body.get("category") if "category" in body else (existing.category if existing else "")
+        ).strip(),
         "description": description,
         "price": price,
         "compare_at_price": compare_at_price,
-        "badge": (str(body.get("badge")).strip() if body.get("badge") else "") or None,
+        "badge": badge,
         "images": images,
-        "source_url": str(body.get("sourceUrl") or body.get("source_url") or (existing.source_url if existing else "")).strip(),
+        "source_url": str(
+            body.get("sourceUrl")
+            if "sourceUrl" in body
+            else body.get("source_url")
+            if "source_url" in body
+            else (existing.source_url if existing else "")
+        ).strip(),
         "status": status,
         "featured": bool(body.get("featured", existing.featured if existing else False)),
         "sort_order": sort_order,
-        "admin_notes": str(body.get("adminNotes") or body.get("admin_notes") or (existing.admin_notes if existing else "")).strip(),
+        "admin_notes": str(
+            body.get("adminNotes")
+            if "adminNotes" in body
+            else body.get("admin_notes")
+            if "admin_notes" in body
+            else (existing.admin_notes if existing else "")
+        ).strip(),
     }
 
 
 def export_live_catalog() -> int:
-    """Write active storefront products to data/catalog_live.json."""
-    qs = (
-        CatalogProduct.objects.filter(status="active", price__gt=0)
-        .order_by("sort_order", "title")
+    qs = CatalogProduct.objects.filter(status="active", price__gt=0).order_by(
+        "sort_order", "title"
     )
     payload = [storefront_dict(p) for p in qs]
     LIVE_CATALOG_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -211,48 +237,32 @@ def list_products(
         qs = qs.filter(status=status)
     q = (q or "").strip()
     if q:
-        qs = qs.filter(title__icontains=q) | CatalogProduct.objects.filter(
-            slug__icontains=q
+        qs = qs.filter(
+            Q(title__icontains=q) | Q(slug__icontains=q) | Q(category__icontains=q)
         )
-        if status and status in PRODUCT_STATUSES:
-            qs = qs.filter(status=status)
-        # rebuild after OR quirk — cleaner:
-        from django.db.models import Q
-
-        qs = CatalogProduct.objects.all()
-        if status and status in PRODUCT_STATUSES:
-            qs = qs.filter(status=status)
-        qs = qs.filter(Q(title__icontains=q) | Q(slug__icontains=q) | Q(category__icontains=q))
 
     total = qs.count()
     items = [product_summary(p) for p in qs[offset : offset + limit]]
     next_offset = offset + len(items)
-    counts = {
-        "all": CatalogProduct.objects.count(),
-        "active": CatalogProduct.objects.filter(status="active").count(),
-        "draft": CatalogProduct.objects.filter(status="draft").count(),
-        "archived": CatalogProduct.objects.filter(status="archived").count(),
-    }
     return {
         "items": items,
         "total": total,
         "offset": offset,
         "nextOffset": next_offset,
         "hasMore": next_offset < total,
-        "counts": counts,
+        "counts": {
+            "all": CatalogProduct.objects.count(),
+            "active": CatalogProduct.objects.filter(status="active").count(),
+            "draft": CatalogProduct.objects.filter(status="draft").count(),
+            "archived": CatalogProduct.objects.filter(status="archived").count(),
+        },
     }
 
 
 def create_product(body: dict[str, Any]) -> dict[str, Any]:
     data = normalize_input(body)
-    if CatalogProduct.objects.filter(slug=data["slug"]).exists():
-        data["slug"] = unique_slug(data["slug"])
     now = datetime.now(timezone.utc)
-    product = CatalogProduct.objects.create(
-        **data,
-        created_at=now,
-        updated_at=now,
-    )
+    product = CatalogProduct.objects.create(**data, created_at=now, updated_at=now)
     export_live_catalog()
     return product_to_dict(product)
 
@@ -262,37 +272,27 @@ def update_product(slug: str, body: dict[str, Any]) -> dict[str, Any] | None:
     if not product:
         return None
     data = normalize_input(body, existing=product)
-    new_slug = data.pop("slug")
-    for key, value in data.items():
-        setattr(product, key, value)
-    product.updated_at = datetime.now(timezone.utc)
+    new_slug = data["slug"]
+    now = datetime.now(timezone.utc)
+
     if new_slug != product.slug:
-        # recreate with new PK if slug changes
-        old = product
-        CatalogProduct.objects.filter(slug=old.slug).delete()
+        CatalogProduct.objects.filter(slug=product.slug).delete()
         product = CatalogProduct.objects.create(
-            slug=new_slug,
-            title=old.title if "title" not in data else data.get("title", old.title),
-            era=data.get("era", old.era),
-            category=data.get("category", old.category),
-            description=data.get("description", old.description),
-            price=data.get("price", old.price),
-            compare_at_price=data.get("compare_at_price", old.compare_at_price),
-            badge=data.get("badge", old.badge),
-            images=data.get("images", old.images),
-            source_url=data.get("source_url", old.source_url),
-            status=data.get("status", old.status),
-            featured=data.get("featured", old.featured),
-            sort_order=data.get("sort_order", old.sort_order),
-            admin_notes=data.get("admin_notes", old.admin_notes),
-            created_at=old.created_at,
-            updated_at=datetime.now(timezone.utc),
+            **data,
+            created_at=product.created_at or now,
+            updated_at=now,
         )
-        # fix: we already set attrs on old before delete — redo cleanly
     else:
+        for key, value in data.items():
+            if key == "slug":
+                continue
+            setattr(product, key, value)
+        product.updated_at = now
         product.save()
+
     export_live_catalog()
-    return product_to_dict(get_product(new_slug) or product)
+    refreshed = get_product(new_slug)
+    return product_to_dict(refreshed) if refreshed else None
 
 
 def set_status(slug: str, status: str) -> dict[str, Any] | None:
@@ -316,7 +316,6 @@ def delete_product(slug: str) -> bool:
 
 
 def seed_from_catalog_json(*, force: bool = False) -> dict[str, int]:
-    """Import src/data/catalog.json into DB. Skip existing slugs unless force."""
     if not SEED_CATALOG_PATH.exists():
         return {"created": 0, "updated": 0, "skipped": 0}
     raw = json.loads(SEED_CATALOG_PATH.read_text(encoding="utf-8"))
@@ -354,17 +353,16 @@ def seed_from_catalog_json(*, force: bool = False) -> dict[str, int]:
         if existing and force:
             update_product(slug, payload)
             updated += 1
-        else:
-            data = normalize_input(payload)
-            CatalogProduct.objects.create(**data, created_at=now, updated_at=now)
-            created += 1
+            continue
+        data = normalize_input(payload)
+        CatalogProduct.objects.create(**data, created_at=now, updated_at=now)
+        created += 1
 
     export_live_catalog()
     return {"created": created, "updated": updated, "skipped": skipped}
 
 
 def ensure_seeded() -> None:
-    """Auto-seed once when the table is empty."""
     if CatalogProduct.objects.exists():
         return
     seed_from_catalog_json(force=False)
