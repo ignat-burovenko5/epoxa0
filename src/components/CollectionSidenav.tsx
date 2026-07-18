@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
-import { categoryHref, groupedCategoryLinks, siteConfig } from "@/lib/site";
+import { categoryHref, groupedCategoryLinks } from "@/lib/site";
 
 function isActive(pathname: string, slug: string) {
   return pathname === categoryHref(slug);

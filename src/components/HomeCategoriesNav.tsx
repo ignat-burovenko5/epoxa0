@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { categoryHref, siteConfig } from "@/lib/site";
+import { categoryHref, groupedCategoryLinks } from "@/lib/site";
 
 /**
- * Homepage catalog index — scannable columns, no middot wall.
+ * Homepage catalog index — grouped columns for scanability.
  */
 export default function HomeCategoriesNav() {
+  const groups = groupedCategoryLinks();
+
   return (
     <nav
       aria-label="Категории каталога"
@@ -32,25 +34,34 @@ export default function HomeCategoriesNav() {
         aria-hidden="true"
       />
 
-      <ul className="m-0 grid list-none grid-cols-1 gap-x-10 gap-y-3.5 p-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {siteConfig.categoryLinks.map((item) => {
-          const highlighted = "highlight" in item && item.highlight;
-          return (
-            <li key={item.slug}>
-              <Link
-                href={categoryHref(item.slug)}
-                className={`cursor-pointer block py-0.5 font-sans text-[12px] leading-relaxed tracking-[0.06em] uppercase transition-colors duration-300 ${
-                  highlighted
-                    ? "text-luxury-bordeaux hover:text-luxury-bordeaux/80"
-                    : "text-luxury-charcoal/65 hover:text-accent-brass"
-                }`}
-              >
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+        {groups.map((group) => (
+          <div key={group.label}>
+            <p className="mb-3 font-sans text-[10px] tracking-[0.18em] uppercase text-luxury-charcoal/40">
+              {group.label}
+            </p>
+            <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
+              {group.items.map((item) => {
+                const highlighted = "highlight" in item && item.highlight;
+                return (
+                  <li key={item.slug}>
+                    <Link
+                      href={categoryHref(item.slug)}
+                      className={`cursor-pointer block py-0.5 font-sans text-[12px] leading-relaxed tracking-[0.06em] uppercase transition-colors duration-300 ${
+                        highlighted
+                          ? "text-luxury-bordeaux hover:text-luxury-bordeaux/80"
+                          : "text-luxury-charcoal/65 hover:text-accent-brass"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
     </nav>
   );
 }
