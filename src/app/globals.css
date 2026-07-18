@@ -165,8 +165,8 @@
    sweeps down-right. Touch / coarse pointers keep the native cursor. */
 @media (pointer: fine) {
   :root {
-    --cursor-antique: url("/cursor-antique.svg") 0 0, url("/cursor-antique.png") 0 0, auto;
-    --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 0 0, url("/cursor-antique-pointer.png") 0 0, pointer;
+    --cursor-antique: url("/cursor-antique.svg") 2 2, url("/cursor-antique.png") 2 2, auto;
+    --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 2 2, url("/cursor-antique-pointer.png") 2 2, pointer;
   }
 
   html {
