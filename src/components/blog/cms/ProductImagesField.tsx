@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import {
   cmsLabelClass,
   cmsTextareaClass,
@@ -32,7 +33,7 @@ function joinUrls(urls: string[]): string {
   return urls.join("\n");
 }
 
-/** Circular status: spinner / success check / error. */
+/** Circular status: SVG spinner / success / error — always visible on dark CMS. */
 function StatusCircle({
   status,
   className = "",
@@ -42,18 +43,45 @@ function StatusCircle({
 }) {
   if (status === "idle") return null;
 
+  if (status === "uploading") {
+    return (
+      <span
+        className={`inline-flex h-8 w-8 shrink-0 items-center justify-center ${className}`.trim()}
+        role="status"
+        aria-label="Загрузка"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className="h-full w-full animate-spin text-accent-gold"
+          fill="none"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            stroke="currentColor"
+            strokeOpacity="0.25"
+            strokeWidth="2.5"
+          />
+          <path
+            d="M21 12a9 9 0 0 0-9-9"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </span>
+    );
+  }
+
   const ring =
-    status === "uploading"
-      ? "border-accent-gold/35 border-t-accent-gold"
-      : status === "done"
-        ? "border-emerald-400/80 bg-emerald-500/15 text-emerald-300"
-        : "border-red-400/70 bg-red-500/15 text-red-300";
+    status === "done"
+      ? "border-emerald-400/80 bg-emerald-500/15 text-emerald-300"
+      : "border-red-400/70 bg-red-500/15 text-red-300";
 
   return (
     <span
-      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 ${ring} ${
-        status === "uploading" ? "animate-spin" : ""
-      } ${className}`.trim()}
+      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 ${ring} ${className}`.trim()}
       aria-hidden="true"
     >
       {status === "done" ? (
@@ -66,8 +94,7 @@ function StatusCircle({
             strokeLinejoin="round"
           />
         </svg>
-      ) : null}
-      {status === "error" ? (
+      ) : (
         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none">
           <path
             d="M4 4l8 8M12 4l-8 8"
@@ -76,8 +103,58 @@ function StatusCircle({
             strokeLinecap="round"
           />
         </svg>
-      ) : null}
+      )}
     </span>
+  );
+}
+
+function PreviewImage({
+  src,
+  alt = "",
+  className = "",
+}: {
+  src: string;
+  alt?: string;
+  className?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+    setLoaded(false);
+  }, [src]);
+
+  if (failed) {
+    return (
+      <div
+        className={`flex flex-col items-center justify-center gap-2 bg-luxury-charcoal/60 text-red-300/80 ${className}`}
+      >
+        <StatusCircle status="error" className="h-8 w-8" />
+        <span className="px-2 text-center font-sans text-[10px] tracking-wide uppercase">
+          Не удалось показать
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {!loaded ? (
+        <span className="absolute inset-0 z-[1] flex items-center justify-center bg-luxury-charcoal/40">
+          <StatusCircle status="uploading" className="h-9 w-9" />
+        </span>
+      ) : null}
+      {/* eslint-disable-next-line @next/next/no-img-element -- CMS preview */}
+      <img
+        src={src}
+        alt={alt}
+        className={`${className} ${loaded ? "opacity-100" : "opacity-0"}`}
+        draggable={false}
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+      />
+    </>
   );
 }
 
