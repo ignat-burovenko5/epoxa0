@@ -157,15 +157,16 @@
   }
 }
 
-/* ── Antique manicule cursor ─────────────────────────────────────────
-   Brass pointing-hand (manicule) cursor for pointer devices, adapted
-   from the CC0 work "Hand Cursor.svg" by Cowemoji (Wikimedia Commons,
-   public domain). Touch / coarse pointers keep the native cursor.
-   Hotspot sits on the index fingertip. */
+/* ── Antique quill cursor ─────────────────────────────────────────
+   Brass minimalist quill (feather pen) cursor for pointer devices.
+   Adapted from "Used Quill" by Solar_Granulation (Openclipart, public
+   domain / CC0), recoloured to the brass palette. The writing nib sits
+   at the top-left so the hotspot (0 0) is the click point; the feather
+   sweeps down-right. Touch / coarse pointers keep the native cursor. */
 @media (pointer: fine) {
   :root {
-    --cursor-antique: url("/cursor-antique.svg") 14 0, url("/cursor-antique.png") 14 0, auto;
-    --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 14 0, url("/cursor-antique-pointer.png") 14 0, pointer;
+    --cursor-antique: url("/cursor-antique.svg") 0 0, url("/cursor-antique.png") 0 0, auto;
+    --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 0 0, url("/cursor-antique-pointer.png") 0 0, pointer;
   }
 
   html {
