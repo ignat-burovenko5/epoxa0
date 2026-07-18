@@ -106,71 +106,50 @@ export default function HeaderBurgerMenu() {
                 className="catalog-sidenav-panel__nav collection-category-scroll flex-1 overflow-y-auto overscroll-y-contain px-3 py-4"
                 aria-label="Навигация по сайту"
               >
-                <header className="mb-4 border-b border-museum-light/10 px-1 pb-4">
-                  <p className="mb-1.5 font-sans text-[9px] tracking-[0.28em] uppercase text-accent-gold/75">
-                    Навигация
-                  </p>
-                  <div className="flex items-end justify-between gap-3">
-                    <h2 className="font-serif text-2xl leading-none tracking-tight text-museum-light">
-                      Каталог
-                    </h2>
-                    <span className="pb-0.5 font-sans text-[10px] tabular-nums tracking-[0.12em] uppercase text-museum-light/35">
-                      {categoryCount}
-                    </span>
-                  </div>
-                  <span
-                    className="mt-3 block h-px w-10 bg-gradient-to-r from-accent-gold/70 to-transparent"
-                    aria-hidden="true"
-                  />
-                </header>
+                <p className="mb-3 px-3 font-sans text-[10px] tracking-[0.22em] uppercase text-museum-light/40 select-text">
+                  Каталог
+                </p>
+                <ul className="m-0 list-none space-y-0.5 p-0">
+                  {siteConfig.catalogNavLinks.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={close}
+                        className={`${categoryLinkBase} ${
+                          pathname === item.href
+                            ? "border-accent-gold text-accent-gold"
+                            : "border-transparent text-museum-light/55 hover:text-accent-gold"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                  {siteConfig.categoryLinks.map((item) => {
+                    const active = pathname === categoryHref(item.slug);
+                    const highlighted = "highlight" in item && item.highlight;
 
-                {siteConfig.catalogNavLinks.length > 0 ? (
-                  <div className="mb-4">
-                    <p className="mb-1.5 px-3.5 font-sans text-[9px] tracking-[0.2em] uppercase text-museum-light/35">
-                      Обзор
-                    </p>
-                    <ul className="m-0 list-none space-y-0.5 p-0">
-                      {siteConfig.catalogNavLinks.map((item) => (
-                        <li key={item.href}>
-                          <Link
-                            href={item.href}
-                            onClick={close}
-                            className={categoryLinkClass({
-                              active: pathname === item.href,
-                              primary: true,
-                            })}
-                          >
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-
-                <div>
-                  <p className="mb-1.5 px-3.5 font-sans text-[9px] tracking-[0.2em] uppercase text-museum-light/35">
-                    Разделы
-                  </p>
-                  <ul className="m-0 list-none space-y-0.5 border-t border-museum-light/[0.06] p-0 pt-1">
-                    {siteConfig.categoryLinks.map((item) => {
-                      const active = pathname === categoryHref(item.slug);
-                      const highlighted = "highlight" in item && item.highlight;
-
-                      return (
-                        <li key={item.slug}>
-                          <Link
-                            href={categoryHref(item.slug)}
-                            onClick={close}
-                            className={categoryLinkClass({ active, highlighted })}
-                          >
-                            <span className="line-clamp-2">{item.label}</span>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
+                    return (
+                      <li key={item.slug}>
+                        <Link
+                          href={categoryHref(item.slug)}
+                          onClick={close}
+                          className={`${categoryLinkBase} ${
+                            active
+                              ? highlighted
+                                ? "border-[#E8A6AB] text-[#F5C7CA]"
+                                : "border-accent-gold text-accent-gold"
+                              : highlighted
+                                ? "border-transparent text-[#E8A6AB]/80 hover:text-[#F5C7CA]"
+                                : "border-transparent text-museum-light/50 hover:text-museum-light/85"
+                          }`}
+                        >
+                          <span className="line-clamp-2">{item.label}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
               </nav>
 
               <div className="border-t border-museum-light/5 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
