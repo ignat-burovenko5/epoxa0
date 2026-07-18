@@ -2,52 +2,44 @@ import Link from "next/link";
 import { categoryHref, siteConfig } from "@/lib/site";
 
 /**
- * Homepage catalog index — compact, few rules, clear hierarchy.
+ * Homepage catalog index — scannable columns, no middot wall.
  */
 export default function HomeCategoriesNav() {
   return (
-    <nav aria-label="Категории каталога" className="mb-10 md:mb-14">
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+    <nav aria-label="Категории каталога" className="mb-12 md:mb-16">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 md:mb-8">
         <div>
-          <p className="font-sans text-[9px] tracking-[0.28em] uppercase text-accent-brass/75 mb-1.5">
+          <p className="mb-2 font-sans text-[10px] tracking-[0.22em] uppercase text-accent-brass/85">
             Каталог
           </p>
-          <h3 className="font-serif text-xl md:text-2xl leading-none tracking-tight text-luxury-base">
+          <h3 className="font-serif text-2xl md:text-[1.75rem] leading-none tracking-tight text-luxury-base">
             Категории
           </h3>
         </div>
         <Link
           href="/collection"
-          className="font-sans text-[10px] tracking-[0.16em] uppercase text-accent-brass hover:text-luxury-base transition-colors underline-offset-4 hover:underline"
+          className="font-sans text-[11px] tracking-[0.14em] uppercase text-accent-brass transition-colors hover:text-luxury-base underline-offset-4 hover:underline"
         >
           Все предметы
         </Link>
       </div>
 
       <span
-        className="mb-5 block h-px w-12 bg-gradient-to-r from-accent-brass/70 to-transparent"
+        className="mb-7 block h-px w-14 bg-gradient-to-r from-accent-brass/75 to-transparent md:mb-8"
         aria-hidden="true"
       />
 
-      <ul className="m-0 flex list-none flex-wrap gap-x-1 gap-y-1.5 p-0">
-        {siteConfig.categoryLinks.map((item, index) => {
+      <ul className="m-0 grid list-none grid-cols-1 gap-x-10 gap-y-3.5 p-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {siteConfig.categoryLinks.map((item) => {
           const highlighted = "highlight" in item && item.highlight;
           return (
-            <li key={item.slug} className="inline-flex items-center">
-              {index > 0 ? (
-                <span
-                  className="mx-2 select-none text-luxury-charcoal/20"
-                  aria-hidden="true"
-                >
-                  ·
-                </span>
-              ) : null}
+            <li key={item.slug}>
               <Link
                 href={categoryHref(item.slug)}
-                className={`font-sans text-[10px] sm:text-[11px] leading-snug tracking-[0.08em] uppercase transition-colors duration-300 ${
+                className={`block py-0.5 font-sans text-[12px] leading-relaxed tracking-[0.06em] uppercase transition-colors duration-300 ${
                   highlighted
-                    ? "text-luxury-bordeaux hover:text-luxury-bordeaux/75"
-                    : "text-luxury-charcoal/50 hover:text-accent-brass"
+                    ? "text-luxury-bordeaux hover:text-luxury-bordeaux/80"
+                    : "text-luxury-charcoal/65 hover:text-accent-brass"
                 }`}
               >
                 {item.label}
