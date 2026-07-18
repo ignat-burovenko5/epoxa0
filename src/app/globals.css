@@ -45,13 +45,13 @@
 
   @media (min-width: 640px) {
     :root {
-      --site-header-bar-height: calc(5.125rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(5.25rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 768px) {
     :root {
-      --site-header-bar-height: calc(7.75rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(6.75rem + var(--site-header-safe-top));
     }
   }
 
@@ -63,7 +63,7 @@
 
   @media (min-width: 1280px) {
     :root {
-      --site-header-bar-height: calc(11.75rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(11rem + var(--site-header-safe-top));
     }
   }
 
@@ -322,7 +322,7 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
 }
 
 .catalog-sidenav-panel__nav {
-  padding-top: var(--site-header-bar-height);
+  padding-top: calc(var(--site-header-bar-height) + 0.75rem);
 }
 
 @media (min-width: 768px) {
@@ -332,7 +332,7 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
   }
 
   .catalog-sidenav-panel__nav {
-    padding-top: 0;
+    padding-top: 1.25rem;
   }
 }
 
