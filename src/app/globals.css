@@ -308,6 +308,13 @@ nextjs-portal {
 .site-header {
   position: fixed;
   z-index: var(--z-site-header);
+  height: var(--site-header-bar-height);
+  box-sizing: border-box;
+}
+
+.site-header__inner {
+  height: 100%;
+  min-height: 0;
 }
 
 /* Header (× + logo) always above the catalog overlay when menu is open */
