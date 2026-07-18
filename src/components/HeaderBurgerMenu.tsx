@@ -32,19 +32,8 @@ function BurgerIcon({ open, className }: { open: boolean; className?: string }) 
   );
 }
 
-const siteNavLinkBase =
-  "block min-h-11 py-2 pl-3 font-sans text-xs tracking-wide transition-colors border-l-2 border-transparent";
-
 const categoryLinkBase =
   "block min-h-12 py-2.5 pl-3 font-sans text-[10px] leading-snug tracking-wide uppercase transition-colors border-l-2 border-transparent";
-
-function navLinkClass(active: boolean) {
-  return `${siteNavLinkBase} ${
-    active
-      ? "border-accent-gold text-accent-gold"
-      : "text-museum-light/70 hover:text-museum-light"
-  }`;
-}
 
 export default function HeaderBurgerMenu() {
   const panelId = useId();
