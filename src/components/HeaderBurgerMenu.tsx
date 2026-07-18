@@ -126,19 +126,6 @@ export default function HeaderBurgerMenu() {
                         </Link>
                       </li>
                     ))}
-                    <li>
-                      <Link
-                        href="/collection"
-                        onClick={close}
-                        className={`${categoryLinkBase} ${
-                          pathname === "/collection"
-                            ? "border-accent-gold text-accent-gold"
-                            : "text-museum-light/65 hover:text-accent-gold"
-                        }`}
-                      >
-                        Все категории
-                      </Link>
-                    </li>
                     {siteConfig.categoryLinks.map((item) => {
                     const active = pathname === categoryHref(item.slug);
                     const highlighted = "highlight" in item && item.highlight;
