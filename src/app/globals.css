@@ -30,9 +30,9 @@
 @layer base {
   :root {
     --site-header-safe-top: env(safe-area-inset-top, 0px);
-    /* Visible fixed header bar (sidenav aligns to this; offset may stay larger for page scroll) */
+    /* Keep offset == bar height so light pages don’t show a dark “extended” band. */
     --site-header-bar-height: calc(5.6875rem + var(--site-header-safe-top));
-    --site-header-offset: calc(6.75rem + var(--site-header-safe-top));
+    --site-header-offset: var(--site-header-bar-height);
     --mobile-sticky-bar-height: 0px;
     --mobile-fab-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
     /* Stacking (low → high): page 0, chrome 40–50, catalog 80, header-when-open 100 */
@@ -46,28 +46,24 @@
   @media (min-width: 640px) {
     :root {
       --site-header-bar-height: calc(6.125rem + var(--site-header-safe-top));
-      --site-header-offset: calc(7.5rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 768px) {
     :root {
       --site-header-bar-height: calc(9.4375rem + var(--site-header-safe-top));
-      --site-header-offset: calc(9.25rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 1024px) {
     :root {
       --site-header-bar-height: calc(11.6875rem + var(--site-header-safe-top));
-      --site-header-offset: calc(11.5rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 1280px) {
     :root {
       --site-header-bar-height: calc(14.4375rem + var(--site-header-safe-top));
-      --site-header-offset: calc(14rem + var(--site-header-safe-top));
     }
   }
 
