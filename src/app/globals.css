@@ -207,8 +207,8 @@
    keep the native cursor. */
 @media (pointer: fine) {
   :root {
-    --cursor-antique: url("/cursor-antique.svg") 2 2, url("/cursor-antique.png") 2 2, auto;
-    --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 2 2, url("/cursor-antique-pointer.png") 2 2, pointer;
+    --cursor-antique: url("/cursor-antique.svg?v=3") 2 2, url("/cursor-antique.png?v=3") 2 2, auto;
+    --cursor-antique-pointer: url("/cursor-antique-pointer.svg?v=3") 2 2, url("/cursor-antique-pointer.png?v=3") 2 2, pointer;
   }
 
   html,
