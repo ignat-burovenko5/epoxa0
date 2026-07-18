@@ -41,7 +41,7 @@ export const siteConfig = {
   ],
   catalogNavLinks: [
     { label: "Все товары", href: "/collection" },
-    { label: "Акционные товары", href: "/aktsionnye-tovary" },
+    { label: "Акционные товары", href: "/collection?sale=1" },
   ],
   /** Flat catalog — order follows categoryGroups (sorted for nav / CMS). */
   categoryLinks: [
@@ -140,6 +140,9 @@ export const siteConfig = {
 } as const;
 
 export type CategoryLink = (typeof siteConfig.categoryLinks)[number];
+
+/** Catalog view of all products with compareAtPrice > price. */
+export const COLLECTION_SALE_HREF = "/collection?sale=1";
 
 export function categoryHref(slug: string) {
   return `/collection/${slug}`;

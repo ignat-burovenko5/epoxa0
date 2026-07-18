@@ -3,7 +3,6 @@ import CollectionCatalog from "@/components/CollectionCatalog";
 import FloatingConcierge from "@/components/FloatingConcierge";
 import { getCategoryProductCount, getSaleProductCount } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo";
-import { COLLECTION_SALE_HREF } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "Архив коллекции — антикварная мебель на продажу",
