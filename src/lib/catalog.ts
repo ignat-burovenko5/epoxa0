@@ -76,9 +76,21 @@ function normalizeCategoryName(value: string) {
   return value.trim().toUpperCase();
 }
 
-/** Filter catalog by nav category slug; omit slug for full catalog. */
-export function getProductsForCategory(categorySlug?: string | null) {
+export type CatalogListFilter = {
+  categorySlug?: string | null;
+  /** Products with compareAtPrice > price (скидка). */
+  saleOnly?: boolean;
+};
+
+/** Filter catalog by category and/or sale flag. */
+export function getFilteredProducts(filter: CatalogListFilter = {}) {
   const list = getCatalogItems();
+
+  if (filter.saleOnly) {
+    return list.filter((product) => hasDiscount(product.price, product.compareAtPrice));
+  }
+
+  const categorySlug = filter.categorySlug;
   if (!categorySlug) {
     return list;
   }
@@ -91,16 +103,29 @@ export function getProductsForCategory(categorySlug?: string | null) {
   );
 }
 
+/** Filter catalog by nav category slug; omit slug for full catalog. */
+export function getProductsForCategory(categorySlug?: string | null) {
+  return getFilteredProducts({ categorySlug });
+}
+
 export function getCategoryProductCount(categorySlug?: string | null) {
   return getProductsForCategory(categorySlug).length;
+}
+
+export function getSaleProductCount() {
+  return getFilteredProducts({ saleOnly: true }).length;
 }
 
 export function getCatalogPage(
   categorySlug: string | null | undefined,
   offset: number,
   limit: number = CATALOG_PAGE_SIZE,
+  saleOnly = false,
 ) {
-  const filtered = getProductsForCategory(categorySlug ?? null);
+  const filtered = getFilteredProducts({
+    categorySlug: saleOnly ? null : categorySlug,
+    saleOnly,
+  });
   const items = filtered.slice(offset, offset + limit);
   const nextOffset = offset + items.length;
 
