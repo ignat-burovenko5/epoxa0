@@ -224,8 +224,6 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
     return () => stage.removeEventListener("wheel", onWheel);
   }, [lightboxOpen, resetZoom]);
 
-  const imageButtonRef = useRef<HTMLButtonElement | null>(null);
-
   const onTouchStart = (event: React.TouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? 0;
   };
