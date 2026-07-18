@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { MaxIcon, PhoneIcon, TelegramIcon, WhatsAppIcon } from "@/components/NavContactIcons";
 import { maxUrl, siteConfig, telegramUrl, whatsappUrl } from "@/lib/site";
 
@@ -15,16 +16,37 @@ const contactIconClass =
 
 export default function FloatingConcierge() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  return (
-    <div className="mobile-fab fixed flex flex-col items-end">
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen]);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div
+      className="mobile-fab pointer-events-none fixed flex flex-col items-end"
+      data-curator-fab
+    >
       <div
-        className={`transition-all duration-500 ease-luxury-ease origin-bottom-right mb-3 md:mb-4 ${
-          isOpen ? "opacity-100 scale-100" : "hidden"
+        className={`pointer-events-auto transition-all duration-500 ease-luxury-ease origin-bottom-right mb-3 md:mb-4 ${
+          isOpen
+            ? "opacity-100 scale-100 visible"
+            : "pointer-events-none invisible absolute opacity-0 scale-95"
         }`}
         aria-hidden={!isOpen}
       >
-        <div className="bg-luxury-base text-museum-light p-5 sm:p-8 w-[min(20rem,calc(100vw-2rem))] shadow-2xl border border-luxury-charcoal max-h-[min(70dvh,28rem)] overflow-y-auto hidden-scrollbar">
+        <div className="bg-luxury-base text-museum-light p-5 sm:p-8 w-[min(20rem,calc(100vw-2rem))] max-h-[min(70dvh,28rem)] overflow-y-auto hidden-scrollbar shadow-2xl border border-luxury-charcoal">
           <p className="font-serif text-2xl mb-2 text-accent-gold">
             Ваш личный куратор
           </p>
@@ -76,7 +98,7 @@ export default function FloatingConcierge() {
               <span className={contactIconClass}>
                 <PhoneIcon className="h-5 w-5" />
               </span>
-              <span>{siteConfig.phone}</span>
+              <span className="whitespace-nowrap">{siteConfig.phone}</span>
             </a>
           </div>
         </div>
@@ -87,10 +109,11 @@ export default function FloatingConcierge() {
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-label={isOpen ? "Закрыть меню куратора" : "Связаться с куратором"}
-        className="relative z-[1] cursor-pointer bg-accent-brass text-luxury-base rounded-full min-h-12 h-12 sm:h-14 px-5 sm:px-6 font-sans text-xs tracking-widest uppercase shadow-lg hover:bg-accent-gold transition-colors flex items-center gap-2 touch-manipulation"
+        className="pointer-events-auto relative z-[1] cursor-pointer bg-accent-brass text-luxury-base rounded-full min-h-12 h-12 sm:h-14 px-5 sm:px-6 font-sans text-xs tracking-widest uppercase shadow-lg hover:bg-accent-gold transition-colors flex items-center justify-center gap-2 touch-manipulation whitespace-nowrap shrink-0"
       >
         <span>{isOpen ? "Закрыть" : "Куратор"}</span>
       </button>
-    </div>
+    </div>,
+    document.body,
   );
 }
