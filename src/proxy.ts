@@ -18,7 +18,7 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
     "img-src 'self' blob: data: https://images.unsplash.com https://static-maps.yandex.ru https://*.maps.yandex.net",
     "font-src 'self'",
     "connect-src 'self'",
-    "frame-src 'self' https://yandex.ru https://yandex.com https://api-maps.yandex.ru",
+    "frame-src 'self' https://yandex.ru https://yandex.com https://*.yandex.ru https://*.yandex.com https://api-maps.yandex.ru",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
