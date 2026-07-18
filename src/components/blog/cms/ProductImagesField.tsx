@@ -201,22 +201,27 @@ export default function ProductImagesField({
       return;
     }
 
-    setUploading(true);
-    setUploadError(null);
-    setLastInfo(null);
-    setBatchStatus("uploading");
-
     const batch: PendingUpload[] = list.map((file, i) => ({
       id: `${Date.now()}-${i}-${file.name}`,
       name: file.name,
       previewUrl: URL.createObjectURL(file),
       status: "uploading" as const,
     }));
-    setPending((prev) => [...prev, ...batch]);
+
+    // Paint spinner cards before the first await (sharp can take seconds).
+    flushSync(() => {
+      setUploading(true);
+      setUploadError(null);
+      setLastInfo(null);
+      setBatchStatus("uploading");
+      setPending((prev) => [...prev, ...batch]);
+    });
 
     const added: string[] = [];
     const notes: string[] = [];
     let hadError = false;
+    // Capture current URLs at start so concurrent edits don't drop new rows.
+    const baseUrls = parseUrls(value);
 
     try {
       for (let i = 0; i < list.length; i++) {
@@ -233,13 +238,18 @@ export default function ProductImagesField({
             credentials: "same-origin",
             body,
           });
-          const data = (await res.json()) as {
+          let data: {
             url?: string;
             error?: string;
             originalBytes?: number;
             optimizedBytes?: number;
             savingsPercent?: number;
-          };
+          } = {};
+          try {
+            data = (await res.json()) as typeof data;
+          } catch {
+            data = { error: `Ответ сервера ${res.status}` };
+          }
           if (!res.ok || !data.url) {
             hadError = true;
             setPending((prev) =>
@@ -279,7 +289,7 @@ export default function ProductImagesField({
       }
 
       if (added.length) {
-        setUrls([...urls, ...added]);
+        setUrls([...baseUrls, ...added]);
         setJustUploaded((prev) => {
           const next = new Set(prev);
           for (const url of added) next.add(url);
@@ -287,7 +297,7 @@ export default function ProductImagesField({
         });
         setLastInfo(notes.join(" · ") || `Загружено: ${added.length}`);
       }
-      setBatchStatus(hadError && !added.length ? "error" : hadError ? "done" : "done");
+      setBatchStatus(hadError && !added.length ? "error" : "done");
     } finally {
       setUploading(false);
       // Keep pending cards briefly with status, then clear done ones (rendered in main grid)
@@ -300,7 +310,7 @@ export default function ProductImagesField({
           }
           return prev.filter((p) => p.status === "error");
         });
-      }, 900);
+      }, 1200);
     }
   }
 
@@ -438,23 +448,20 @@ export default function ProductImagesField({
                 } ${uploading ? "" : "cursor-grab active:cursor-grabbing"}`}
               >
                 <div className="relative aspect-[4/5] bg-luxury-charcoal/50">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- CMS preview */}
-                  <img
+                  <PreviewImage
                     src={url}
-                    alt=""
                     className="absolute inset-0 h-full w-full object-cover pointer-events-none"
-                    draggable={false}
                   />
-                  <span className="absolute left-2 top-2 inline-flex h-7 min-w-7 items-center justify-center px-1.5 font-sans text-xs tabular-nums bg-luxury-base/90 text-museum-light border border-museum-light/20">
+                  <span className="absolute left-2 top-2 z-[2] inline-flex h-7 min-w-7 items-center justify-center px-1.5 font-sans text-xs tabular-nums bg-luxury-base/90 text-museum-light border border-museum-light/20">
                     {index + 1}
                   </span>
                   {index === 0 ? (
-                    <span className="absolute left-11 top-2 font-sans text-[9px] tracking-widest uppercase px-2 py-1.5 bg-luxury-base/85 text-accent-gold border border-accent-gold/30">
+                    <span className="absolute left-11 top-2 z-[2] font-sans text-[9px] tracking-widest uppercase px-2 py-1.5 bg-luxury-base/85 text-accent-gold border border-accent-gold/30">
                       Главное
                     </span>
                   ) : null}
                   {isNew ? (
-                    <span className="absolute right-2 top-2 drop-shadow-md">
+                    <span className="absolute right-2 top-2 z-[2] drop-shadow-md">
                       <StatusCircle status="done" className="h-7 w-7 bg-luxury-base/80" />
                     </span>
                   ) : null}
