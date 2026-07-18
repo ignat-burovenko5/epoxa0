@@ -103,22 +103,28 @@ export default function HeaderBurgerMenu() {
               className={`catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col border-r ${siteChromeSurfaceClass} pb-[env(safe-area-inset-bottom,0px)]`}
             >
               <nav
-                className="catalog-sidenav-panel__nav collection-category-scroll flex-1 overflow-y-auto overscroll-y-contain px-3 py-4"
+                className="catalog-sidenav-panel__nav collection-category-scroll flex-1 overflow-y-auto overscroll-y-contain px-5 py-6"
                 aria-label="Навигация по сайту"
               >
-                <p className="mb-3 px-3 font-sans text-[10px] tracking-[0.22em] uppercase text-museum-light/40 select-text">
-                  Каталог
-                </p>
-                <ul className="m-0 list-none space-y-0.5 p-0">
+                <header className="mb-5 px-1">
+                  <h2 className="font-serif text-[1.5rem] leading-none tracking-tight text-museum-light select-text">
+                    Каталог
+                  </h2>
+                  <span
+                    className="mt-3 block h-px w-11 bg-gradient-to-r from-accent-gold to-accent-gold/0"
+                    aria-hidden="true"
+                  />
+                </header>
+                <ul className="m-0 flex list-none flex-col gap-1 p-0">
                   {siteConfig.catalogNavLinks.map((item) => (
-                    <li key={item.href}>
+                    <li key={item.href} className="mb-1">
                       <Link
                         href={item.href}
                         onClick={close}
                         className={`${categoryLinkBase} ${
                           pathname === item.href
-                            ? "border-accent-gold text-accent-gold"
-                            : "border-transparent text-museum-light/55 hover:text-accent-gold"
+                            ? "border-accent-gold bg-accent-gold/10 text-accent-gold"
+                            : "border-transparent text-museum-light/60 hover:bg-museum-light/[0.04] hover:text-accent-gold"
                         }`}
                       >
                         {item.label}
@@ -137,11 +143,11 @@ export default function HeaderBurgerMenu() {
                           className={`${categoryLinkBase} ${
                             active
                               ? highlighted
-                                ? "border-[#E8A6AB] text-[#F5C7CA]"
-                                : "border-accent-gold text-accent-gold"
+                                ? "border-[#E8A6AB] bg-[#E8A6AB]/10 text-[#F5C7CA]"
+                                : "border-accent-gold bg-accent-gold/10 text-accent-gold"
                               : highlighted
-                                ? "border-transparent text-[#E8A6AB]/80 hover:text-[#F5C7CA]"
-                                : "border-transparent text-museum-light/50 hover:text-museum-light/85"
+                                ? "border-transparent text-[#E8A6AB]/80 hover:bg-[#E8A6AB]/[0.06] hover:text-[#F5C7CA]"
+                                : "border-transparent text-museum-light/50 hover:bg-museum-light/[0.04] hover:text-museum-light/85"
                           }`}
                         >
                           <span className="line-clamp-2">{item.label}</span>
