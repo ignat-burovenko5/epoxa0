@@ -124,30 +124,32 @@ export default function CollectionSidenav() {
           />
         </header>
 
-        <div className="mb-6">
-          <p className={groupLabelClass}>Обзор</p>
-          <ul className="m-0 flex list-none flex-col gap-1 p-0">
-            <li>
-              <Link href="/collection" className={itemClass(allActive)}>
-                Все категории
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={COLLECTION_SALE_HREF}
-                className={itemClass(saleActive, true)}
-              >
-                Акционные товары
-              </Link>
-            </li>
-          </ul>
-        </div>
-
         <div className="flex flex-col gap-6 pb-8">
-          {groups.map((group) => (
+          {groups.map((group, groupIndex) => {
+            const isFeatured = groupIndex === 0;
+            return (
             <div key={group.label}>
-              <p className={groupLabelClass}>{group.label}</p>
+              <p className={groupLabelClass}>
+                {isFeatured ? "Подборка" : group.label}
+              </p>
               <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                {isFeatured ? (
+                  <>
+                    <li>
+                      <Link href="/collection" className={itemClass(allActive)}>
+                        Все категории
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={COLLECTION_SALE_HREF}
+                        className={itemClass(saleActive, true)}
+                      >
+                        Акционные товары
+                      </Link>
+                    </li>
+                  </>
+                ) : null}
                 {group.items.map((item) => {
                   const active = isActive(pathname, item.slug);
                   const highlighted = "highlight" in item && item.highlight;
@@ -164,7 +166,8 @@ export default function CollectionSidenav() {
                 })}
               </ul>
             </div>
-          ))}
+            );
+          })}
         </div>
       </nav>
     </aside>
