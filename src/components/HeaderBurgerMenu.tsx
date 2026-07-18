@@ -94,12 +94,12 @@ export default function HeaderBurgerMenu() {
   const show = useCallback(() => {
     clearTimers();
     setMounted(true);
-    // Paint closed frame first so the slide transition always runs.
+    // If already mounted (e.g. mid-close), open on next frame so CSS can tween.
     openTimerRef.current = window.setTimeout(() => {
       openTimerRef.current = null;
       setOpen(true);
-    }, 20);
-  }, [clearTimers]);
+    }, mounted ? 0 : 20);
+  }, [clearTimers, mounted]);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
@@ -272,7 +272,7 @@ export default function HeaderBurgerMenu() {
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          if (open || mounted) close();
+          if (open) close();
           else show();
         }}
       >
