@@ -640,11 +640,27 @@ img.logo-nav-mark--footer {
     page-break-inside: avoid;
   }
 
+  /* Group labels sit above item links — serif + brass tick */
+  .home-categories-group__label {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    color: var(--color-luxury-base);
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent-brass) 35%, transparent);
+  }
+
+  .home-categories-featured {
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-luxury-charcoal) 10%, transparent);
+  }
+
   /* Homepage category links — soft underline draw + tracking */
   .home-cat-link {
     position: relative;
     display: inline-block;
-    padding-bottom: 0.2em;
+    padding-bottom: 0.15em;
     text-decoration: none;
     transition:
       color 0.35s var(--ease-luxury-ease),
@@ -662,13 +678,13 @@ img.logo-nav-mark--footer {
     background: currentColor;
     transform: scaleX(0);
     transform-origin: left center;
-    opacity: 0.7;
+    opacity: 0.65;
     transition: transform 0.4s var(--ease-luxury-ease);
   }
 
   .home-cat-link:hover,
   .home-cat-link:focus-visible {
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
   }
 
   .home-cat-link:hover::after,
@@ -676,8 +692,10 @@ img.logo-nav-mark--footer {
     transform: scaleX(1);
   }
 
+  /* Column items — quieter than featured */
   .home-cat-link--muted {
-    color: color-mix(in srgb, var(--color-luxury-charcoal) 65%, transparent);
+    color: color-mix(in srgb, var(--color-luxury-charcoal) 55%, transparent);
+    font-weight: 400;
   }
 
   .home-cat-link--muted:hover,
@@ -685,8 +703,22 @@ img.logo-nav-mark--footer {
     color: var(--color-accent-brass);
   }
 
+  .home-cat-link--featured {
+    font-weight: 500;
+  }
+
+  .home-cat-link--featured-muted {
+    color: color-mix(in srgb, var(--color-luxury-charcoal) 78%, transparent);
+  }
+
+  .home-cat-link--featured-muted:hover,
+  .home-cat-link--featured-muted:focus-visible {
+    color: var(--color-accent-brass);
+  }
+
   .home-cat-link--accent {
     color: var(--color-luxury-bordeaux);
+    font-weight: 500;
   }
 
   .home-cat-link--accent:hover,
