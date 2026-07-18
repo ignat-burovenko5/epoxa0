@@ -214,6 +214,7 @@ export default function ProductEditor({ product }: ProductEditorProps) {
 
       <section className={cmsSectionClass}>
         <h2 className={cmsSectionTitleClass}>Категория и эпоха</h2>
+        <div className="grid sm:grid-cols-2 gap-4">
         <div>
           <label className={cmsLabelClass} htmlFor="category">
             Категория
