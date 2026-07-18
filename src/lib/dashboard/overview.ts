@@ -1,6 +1,6 @@
 import { backendFetch } from "@/lib/backend/client";
 import { mergeDashboardOverview, type RemoteDashboardOverview } from "@/lib/dashboard/merge-overview";
-import type { ShopCatalogStats } from "@/lib/shop/stats";
+import { getShopCatalogStats, type ShopCatalogStats } from "@/lib/shop/stats";
 import type { ShopLead } from "@/lib/shop/types";
 
 export type AnalyticsDailyPoint = {
@@ -104,5 +104,5 @@ export async function getDashboardOverview(
     `/api/blog/admin/overview?${params}`,
     { forwardCookies: true },
   );
-  return mergeDashboardOverview(remote);
+  return mergeDashboardOverview(remote, getShopCatalogStats());
 }
