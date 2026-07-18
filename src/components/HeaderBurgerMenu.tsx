@@ -11,26 +11,25 @@ const menuTransitionMs = 420;
 
 function BurgerIcon({ open, className }: { open: boolean; className?: string }) {
   const bar =
-    "absolute left-0 h-[1.5px] w-full rounded-full bg-current transition-all duration-300 ease-luxury-ease";
+    "absolute inset-x-0 h-[1.5px] rounded-full bg-current transition-[transform,opacity,top,bottom] duration-300 ease-luxury-ease";
   return (
-    <span className={className} aria-hidden="true">
+    <span
+      className={`relative block h-3.5 w-[1.125rem] sm:h-4 sm:w-5 ${className ?? ""}`.trim()}
+      aria-hidden="true"
+    >
       <span
         className={`${bar} ${
-          open
-            ? "top-1/2 -translate-y-1/2 rotate-45"
-            : "top-[5px] sm:top-[6px]"
+          open ? "top-1/2 -translate-y-1/2 rotate-45" : "top-0"
         }`}
       />
       <span
         className={`${bar} top-1/2 -translate-y-1/2 ${
-          open ? "opacity-0 [transform:translateY(-50%)_scaleX(0)]" : "opacity-100"
+          open ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"
         }`}
       />
       <span
         className={`${bar} ${
-          open
-            ? "top-1/2 -translate-y-1/2 -rotate-45"
-            : "top-[20px] sm:top-[24px]"
+          open ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0 top-auto"
         }`}
       />
     </span>
@@ -237,10 +236,7 @@ export default function HeaderBurgerMenu() {
           else show();
         }}
       >
-        <BurgerIcon
-          open={open}
-          className="relative h-6 w-6 sm:h-7 sm:w-7 pointer-events-none"
-        />
+        <BurgerIcon open={open} className="pointer-events-none" />
       </button>
       {menuOverlay}
     </>
