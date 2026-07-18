@@ -141,39 +141,39 @@ export default function HeaderBurgerMenu() {
                   />
                 </header>
 
-                <div className="mb-7">
-                  <p className={groupLabelClass}>Обзор</p>
-                  <ul className="m-0 flex list-none flex-col gap-1 p-0">
-                    {siteConfig.catalogNavLinks.map((item) => {
-                      const active = navLinkIsActive(
-                        pathname,
-                        searchParams,
-                        item.href,
-                      );
-                      return (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={close}
-                          className={`${categoryLinkBase} ${
-                            active
-                              ? "border-accent-gold bg-accent-gold/10 text-accent-gold"
-                              : "border-transparent text-museum-light/60 hover:bg-museum-light/[0.04] hover:text-accent-gold"
-                          }`}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-
                 <div className="flex flex-col gap-7">
-                  {groups.map((group) => (
+                  {groups.map((group, groupIndex) => {
+                    const isFeatured = groupIndex === 0;
+                    return (
                     <div key={group.label}>
-                      <p className={groupLabelClass}>{group.label}</p>
+                      <p className={groupLabelClass}>
+                        {isFeatured ? "Подборка" : group.label}
+                      </p>
                       <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                        {isFeatured
+                          ? siteConfig.catalogNavLinks.map((item) => {
+                              const active = navLinkIsActive(
+                                pathname,
+                                searchParams,
+                                item.href,
+                              );
+                              return (
+                                <li key={item.href}>
+                                  <Link
+                                    href={item.href}
+                                    onClick={close}
+                                    className={`${categoryLinkBase} ${
+                                      active
+                                        ? "border-accent-gold bg-accent-gold/10 text-accent-gold"
+                                        : "border-transparent text-museum-light/60 hover:bg-museum-light/[0.04] hover:text-accent-gold"
+                                    }`}
+                                  >
+                                    {item.label}
+                                  </Link>
+                                </li>
+                              );
+                            })
+                          : null}
                         {group.items.map((item) => {
                           const active = pathname === categoryHref(item.slug);
                           const highlighted =
@@ -201,7 +201,8 @@ export default function HeaderBurgerMenu() {
                         })}
                       </ul>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </nav>
 
