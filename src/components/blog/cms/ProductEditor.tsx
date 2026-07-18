@@ -9,6 +9,7 @@ import {
   cmsSectionTitleClass,
   cmsTextareaClass,
 } from "@/components/blog/cms/cms-field-styles";
+import ProductImagesField from "@/components/blog/cms/ProductImagesField";
 import type {
   CatalogProductAdmin,
   CatalogProductInput,
