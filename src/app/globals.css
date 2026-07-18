@@ -596,6 +596,29 @@ img.logo-nav-mark--footer {
     }
   }
 
+  /* Homepage category groups — balanced column heights */
+  .home-categories-columns {
+    columns: 1;
+    column-gap: 2.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-categories-columns {
+      columns: 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-categories-columns {
+      columns: 3;
+    }
+  }
+
+  .home-categories-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
   .mobile-fab {
     bottom: var(--mobile-fab-bottom);
     right: max(1rem, env(safe-area-inset-right, 0px));
