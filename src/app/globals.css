@@ -346,8 +346,8 @@ body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
   padding: 0;
   border: 0;
   cursor: pointer;
-  background: rgba(12, 12, 12, 0.82);
-  backdrop-filter: blur(2px);
+  background: rgb(12 12 12 / 35%);
+  backdrop-filter: blur(4px);
 }
 
 .catalog-sidenav-root__panel {
@@ -360,10 +360,22 @@ body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
   max-height: 100dvh;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  border-right: 1px solid rgba(247, 245, 240, 0.1);
+  border-right: 1px solid rgb(245 240 232 / 5%);
   background-color: var(--color-luxury-base);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
   animation: catalog-sidenav-slide-in 0.42s var(--ease-luxury-ease) both;
+}
+
+@media (min-width: 768px) {
+  .catalog-sidenav-root__panel {
+    background-color: rgb(12 12 12 / 95%);
+    backdrop-filter: blur(12px);
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    .catalog-sidenav-root__panel {
+      background-color: rgb(12 12 12 / 90%);
+    }
+  }
 }
 
 @keyframes catalog-sidenav-slide-in {
