@@ -2,24 +2,22 @@ type IconProps = {
   className?: string;
 };
 
-/** Person silhouette — curator identity */
-export function PersonIcon({ className = "h-5 w-5" }: IconProps) {
+/**
+ * MAX messenger app icon (colored) — assets from https://maxicons.ru/
+ * File: /public/icons/MAX.svg
+ */
+export function MaxIcon({ className = "h-5 w-5" }: IconProps) {
   return (
-    <svg
+    // eslint-disable-next-line @next/next/no-img-element -- local brand SVG from maxicons.ru
+    <img
+      src="/icons/MAX.svg"
+      alt=""
+      width={20}
+      height={20}
       className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
-    >
-      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M5 19c0-3.6 3.2-6 7-6s7 2.4 7 6"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
+      draggable={false}
+    />
   );
 }
 

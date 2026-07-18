@@ -13,9 +13,10 @@ export const siteConfig = {
   phoneHref: "tel:+79637806430",
   salonEmail: "salon@epoxa.ru",
   salonEmailHref: "mailto:salon@epoxa.ru",
-  curatorName: "Макс",
   whatsapp: "79637806430",
   telegram: "epoxa_gallery",
+  /** MAX messenger (VK) — share deeplink opens MAX with prefilled text */
+  maxShare: "https://max.ru/:share",
   email: "gallery@epoxa.ru",
   address: {
     city: "Одинцово",
@@ -113,6 +114,13 @@ export function whatsappUrl(message?: string) {
 
 export function telegramUrl(message?: string) {
   const base = `https://t.me/${siteConfig.telegram}`;
+  if (!message) return base;
+  return `${base}?text=${encodeURIComponent(message)}`;
+}
+
+/** MAX messenger share link — https://dev.max.ru/help/deeplinks */
+export function maxUrl(message?: string) {
+  const base = siteConfig.maxShare;
   if (!message) return base;
   return `${base}?text=${encodeURIComponent(message)}`;
 }
