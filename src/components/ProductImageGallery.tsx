@@ -64,7 +64,6 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [zoomed, setZoomed] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const touchStartX = useRef(0);
   const lightboxTouchStartX = useRef(0);
   const hasMultiple = slides.length > 1;
@@ -88,10 +87,6 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   const closeLightbox = useCallback(() => {
     setLightboxOpen(false);
     setZoomed(false);
-  }, []);
-
-  useEffect(() => {
-    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -171,7 +166,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   };
 
   const lightbox =
-    mounted && lightboxOpen && activeSlide
+    lightboxOpen && activeSlide && typeof document !== "undefined"
       ? createPortal(
           <div
             className="fixed inset-0 z-[200] flex items-center justify-center bg-luxury-base/92 backdrop-blur-sm"
