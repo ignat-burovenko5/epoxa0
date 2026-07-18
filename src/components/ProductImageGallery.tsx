@@ -29,7 +29,7 @@ function GalleryArrow({
   className = arrowButtonClass,
 }: {
   direction: "prev" | "next";
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
 }) {
   const label = direction === "prev" ? "Предыдущее фото" : "Следующее фото";
