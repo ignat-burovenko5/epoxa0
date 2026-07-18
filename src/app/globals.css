@@ -203,23 +203,29 @@
    the "pen-tool" icon (svgrepo #491685, derived from Lucide, ISC). The
    nib is stroked in the brass gradient with a transparent fill; the tip
    points to the top-left so the hotspot (2 2) sits on the nib point.
-   Touch / coarse pointers keep the native cursor. */
+   Pen cursor everywhere; text stays selectable. Touch / coarse pointers
+   keep the native cursor. */
 @media (pointer: fine) {
   :root {
     --cursor-antique: url("/cursor-antique.svg") 2 2, url("/cursor-antique.png") 2 2, auto;
     --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 2 2, url("/cursor-antique-pointer.png") 2 2, pointer;
   }
 
-  html {
+  html,
+  body,
+  * {
     cursor: var(--cursor-antique);
   }
 
   a,
+  a *,
   button:not(:disabled),
+  button:not(:disabled) *,
   [type="button"]:not(:disabled),
   [type="submit"]:not(:disabled),
   [type="reset"]:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
+  [role="button"]:not([aria-disabled="true"]) *,
   label[for],
   summary,
   .site-header-burger,
@@ -229,11 +235,12 @@
   .checkout-option,
   .checkout-upsell,
   .cart-drawer-backdrop,
-  .catalog-sidenav-root__backdrop {
-    cursor: var(--cursor-antique-pointer);
+  .catalog-sidenav-root__backdrop,
+  .cursor-pointer {
+    cursor: var(--cursor-antique-pointer) !important;
   }
 
-  /* I-beam over copy so text can be aimed and selected with the cursor */
+  /* Selection still works; do not switch to I-beam over copy */
   p,
   h1,
   h2,
@@ -241,7 +248,7 @@
   h4,
   h5,
   h6,
-  li:not(:has(> a)),
+  li,
   dd,
   dt,
   blockquote,
@@ -252,21 +259,11 @@
   code,
   time,
   address,
-  label:not([for]),
-  .site-main .font-serif,
-  a[href^="mailto:"],
-  a[href^="tel:"],
-  a[href^="mailto:"] *,
-  a[href^="tel:"] * {
-    cursor: text;
+  label,
+  span,
+  .site-main .font-serif {
     -webkit-user-select: text;
     user-select: text;
-  }
-
-  input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="range"]):not([type="color"]),
-  textarea,
-  [contenteditable="true"] {
-    cursor: text;
   }
 
   button:disabled,
@@ -274,16 +271,7 @@
   [type="submit"]:disabled,
   [type="reset"]:disabled,
   [aria-disabled="true"] {
-    cursor: not-allowed;
-  }
-
-  /*
-   * Links always win over I-beam rules (homepage categories, burger, collection).
-   * mailto/tel keep text cursor for copy/aim.
-   */
-  a:any-link:not([href^="mailto:"]):not([href^="tel:"]),
-  a:any-link:not([href^="mailto:"]):not([href^="tel:"]) * {
-    cursor: var(--cursor-antique-pointer) !important;
+    cursor: not-allowed !important;
   }
 }
 
