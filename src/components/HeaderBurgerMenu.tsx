@@ -226,7 +226,7 @@ export default function HeaderBurgerMenu() {
     <>
       <button
         type="button"
-        className="site-header-burger relative isolate cursor-pointer flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
+        className="site-header-burger relative isolate cursor-pointer flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
         aria-expanded={open}
         aria-controls={mounted ? panelId : undefined}
         aria-label={open ? "Закрыть каталог" : "Открыть каталог категорий"}
@@ -239,7 +239,7 @@ export default function HeaderBurgerMenu() {
       >
         <BurgerIcon
           open={open}
-          className="relative h-7 w-7 sm:h-8 sm:w-8 pointer-events-none"
+          className="relative h-6 w-6 sm:h-7 sm:w-7 pointer-events-none"
         />
       </button>
       {menuOverlay}
