@@ -371,7 +371,7 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
   bottom: 0;
   z-index: 1;
   opacity: 0;
-  transition: opacity 0.42s var(--ease-luxury-ease);
+  transition: opacity var(--duration-drawer) var(--ease-drawer);
 }
 
 /* Mobile: drawer full viewport height; desktop: flush with bottom of topnav */
@@ -379,9 +379,10 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
   top: 0;
   bottom: 0;
   z-index: 2;
-  transform: translateX(-100%);
-  transition: transform 0.42s var(--ease-luxury-ease);
+  transform: translate3d(-100%, 0, 0);
+  transition: transform var(--duration-drawer) var(--ease-drawer);
   will-change: transform;
+  backface-visibility: hidden;
 }
 
 .catalog-nav-overlay[data-state="open"] .catalog-sidenav-backdrop {
@@ -389,11 +390,28 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
 }
 
 .catalog-nav-overlay[data-state="open"] .catalog-sidenav-panel {
-  transform: translateX(0);
+  transform: translate3d(0, 0, 0);
 }
 
 .catalog-sidenav-panel__nav {
   padding-top: calc(var(--site-header-bar-height) + 0.75rem);
+  opacity: 0;
+  transform: translate3d(-0.75rem, 0, 0);
+  transition:
+    opacity 0.45s var(--ease-drawer),
+    transform 0.55s var(--ease-drawer);
+  transition-delay: 0s;
+}
+
+.catalog-nav-overlay[data-state="open"] .catalog-sidenav-panel__nav {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 0.08s;
+}
+
+.catalog-nav-overlay[data-state="closed"] .catalog-sidenav-panel__nav {
+  transition-duration: 0.28s, 0.32s;
+  transition-delay: 0s;
 }
 
 @media (min-width: 768px) {
@@ -456,7 +474,7 @@ body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
   padding-bottom: env(safe-area-inset-bottom, 0px);
   border-right: 1px solid rgb(245 240 232 / 5%);
   background-color: var(--color-luxury-base);
-  animation: catalog-sidenav-slide-in 0.42s var(--ease-luxury-ease) both;
+  animation: catalog-sidenav-slide-in var(--duration-drawer) var(--ease-drawer) both;
 }
 
 @media (min-width: 768px) {
@@ -484,9 +502,11 @@ body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
 @media (prefers-reduced-motion: reduce) {
   .catalog-sidenav-root__panel,
   .catalog-sidenav-panel,
+  .catalog-sidenav-panel__nav,
   .catalog-sidenav-backdrop {
     animation-duration: 0.01ms;
     transition-duration: 0.01ms;
+    transition-delay: 0s;
   }
 }
 

@@ -28,26 +28,32 @@ function navLinkIsActive(
   return true;
 }
 
-const menuTransitionMs = 420;
+const menuTransitionMs = 620;
 
 function BurgerIcon({ open, className }: { open: boolean; className?: string }) {
   const bar =
-    "absolute inset-x-0 h-[1.5px] -translate-y-1/2 rounded-full bg-current transition-[transform,opacity,top] duration-300 ease-luxury-ease";
+    "absolute inset-x-0 h-[1.5px] -translate-y-1/2 rounded-full bg-current transition-[transform,opacity,top,width,left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none";
   return (
     <span
       className={`relative block h-5 w-4 sm:h-6 sm:w-5 ${className ?? ""}`.trim()}
       aria-hidden="true"
     >
       <span
-        className={`${bar} ${open ? "top-1/2 rotate-45" : "top-1/4"}`}
-      />
-      <span
-        className={`${bar} top-1/2 ${
-          open ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100"
+        className={`${bar} ${
+          open ? "top-1/2 left-0 w-full rotate-45" : "top-[18%] left-0 w-full"
         }`}
       />
       <span
-        className={`${bar} ${open ? "top-1/2 -rotate-45" : "top-3/4"}`}
+        className={`${bar} top-1/2 ${
+          open
+            ? "left-[50%] w-0 opacity-0"
+            : "left-0 w-full opacity-100"
+        }`}
+      />
+      <span
+        className={`${bar} ${
+          open ? "top-1/2 left-0 w-full -rotate-45" : "top-[82%] left-0 w-full"
+        }`}
       />
     </span>
   );
