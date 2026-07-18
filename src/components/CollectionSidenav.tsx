@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { categoryHref, siteConfig } from "@/lib/site";
+import { useMemo } from "react";
+import { categoryHref, groupedCategoryLinks, siteConfig } from "@/lib/site";
 
 function isActive(pathname: string, slug: string) {
   return pathname === categoryHref(slug);
@@ -27,16 +28,24 @@ function itemClass(active: boolean, highlighted = false) {
   }`;
 }
 
+const groupLabelClass =
+  "mb-2 font-sans text-[10px] tracking-[0.18em] uppercase text-luxury-charcoal/40";
+
 export default function CollectionSidenav() {
   const pathname = usePathname();
   const allActive = pathname === "/collection";
+  const groups = useMemo(() => groupedCategoryLinks(), []);
+  const flat = useMemo(
+    () => groups.flatMap((group) => group.items),
+    [groups],
+  );
 
   return (
     <aside
       aria-label="Категории каталога"
       className="shrink-0 md:w-60 lg:w-64 md:sticky md:top-[calc(var(--site-header-offset)+1rem)] md:self-start md:max-h-[calc(100dvh-var(--site-header-offset)-2rem)] md:flex md:flex-col"
     >
-      {/* Mobile */}
+      {/* Mobile — flat sorted strip */}
       <div className="collection-category-scroll md:hidden mb-8 overflow-x-auto overscroll-x-contain pb-3">
         <div className="mb-3 flex items-baseline gap-3">
           <p className="font-serif text-lg text-luxury-base">Каталог</p>
@@ -55,7 +64,7 @@ export default function CollectionSidenav() {
               Все
             </Link>
           </li>
-          {siteConfig.categoryLinks.map((item) => {
+          {flat.map((item) => {
             const active = isActive(pathname, item.slug);
             const highlighted = "highlight" in item && item.highlight;
             return (
@@ -80,7 +89,7 @@ export default function CollectionSidenav() {
         </ul>
       </div>
 
-      {/* Desktop */}
+      {/* Desktop — grouped */}
       <nav
         className="collection-category-scroll collection-sidenav-panel hidden md:flex md:min-h-0 md:flex-1 md:flex-col md:overflow-y-auto md:overscroll-y-contain border-r border-luxury-charcoal/10 pr-4 lg:pr-5"
         aria-label="Категории"
@@ -95,28 +104,35 @@ export default function CollectionSidenav() {
           />
         </header>
 
-        <ul className="m-0 flex list-none flex-col gap-1 p-0 pb-8">
-          <li className="mb-2">
-            <Link href="/collection" className={itemClass(allActive)}>
-              Все категории
-            </Link>
-          </li>
+        <div className="mb-6">
+          <Link href="/collection" className={itemClass(allActive)}>
+            Все категории
+          </Link>
+        </div>
 
-          {siteConfig.categoryLinks.map((item) => {
-            const active = isActive(pathname, item.slug);
-            const highlighted = "highlight" in item && item.highlight;
-            return (
-              <li key={item.slug}>
-                <Link
-                  href={categoryHref(item.slug)}
-                  className={itemClass(active, Boolean(highlighted))}
-                >
-                  <span className="line-clamp-2">{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="flex flex-col gap-6 pb-8">
+          {groups.map((group) => (
+            <div key={group.label}>
+              <p className={groupLabelClass}>{group.label}</p>
+              <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                {group.items.map((item) => {
+                  const active = isActive(pathname, item.slug);
+                  const highlighted = "highlight" in item && item.highlight;
+                  return (
+                    <li key={item.slug}>
+                      <Link
+                        href={categoryHref(item.slug)}
+                        className={itemClass(active, Boolean(highlighted))}
+                      >
+                        <span className="line-clamp-2">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
       </nav>
     </aside>
   );
