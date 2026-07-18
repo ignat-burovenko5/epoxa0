@@ -35,8 +35,22 @@ export function blogAdminAnalyticsPath(days?: number, date?: string): string {
   return `${BLOG_ADMIN_BASE}?${params}`;
 }
 
+export function blogAdminProductsPath(status?: string): string {
+  const params = new URLSearchParams({ view: "products" });
+  if (status && status !== "all") params.set("status", status);
+  return `${BLOG_ADMIN_BASE}?${params}`;
+}
+
 export function blogDashboardPath(): string {
   return blogAdminBlogPath();
+}
+
+export function blogDashboardProductCreatePath(): string {
+  return `${BLOG_ADMIN_BASE}/dashboard/products/create`;
+}
+
+export function blogDashboardProductEditPath(slug: string): string {
+  return `${BLOG_ADMIN_BASE}/dashboard/products/edit/${encodeURIComponent(slug)}`;
 }
 
 export function blogDashboardLoginPath(): string {

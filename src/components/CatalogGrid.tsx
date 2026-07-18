@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import ProductPrice from "@/components/ProductPrice";
-import { catalogItems, getDiscountPercent, type CatalogProduct } from "@/lib/catalog";
+import { getCatalogItems, getDiscountPercent, type CatalogProduct } from "@/lib/catalog";
 import { getCatalogImage } from "@/lib/site-images";
 
 export type CatalogItem = CatalogProduct;
@@ -55,4 +55,4 @@ export function CatalogGrid({ items }: { items: CatalogItem[] }) {
   );
 }
 
-export { catalogItems };
+export { getCatalogItems as catalogItems };

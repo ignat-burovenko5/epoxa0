@@ -148,7 +148,7 @@ export default async function Homepage() {
               <ArrowSquareUpRightIcon className="h-4 w-4 shrink-0" />
             </Link>
             <p className="font-sans text-sm text-luxury-charcoal/55">
-              {catalogItems.length} предметов в коллекции
+              {getCatalogItems().length} предметов в коллекции
             </p>
           </div>
         </PageContainer>
