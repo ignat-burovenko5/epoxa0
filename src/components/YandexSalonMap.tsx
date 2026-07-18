@@ -222,14 +222,6 @@ export default function YandexSalonMap({
         </p>
       ) : null}
       <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
-        <button
-          type="button"
-          onClick={open}
-          className={`inline-flex items-center gap-2 min-h-11 py-2 font-sans text-xs tracking-widest uppercase transition-colors ${linkClass[variant]}`}
-        >
-          <ExpandIcon className="h-4 w-4 shrink-0" />
-          <span>Открыть крупнее</span>
-        </button>
         <a
           href={mapsUrl}
           target="_blank"
