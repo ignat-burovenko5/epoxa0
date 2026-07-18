@@ -211,6 +211,19 @@ export function yandexMapsUrl() {
   return `https://yandex.ru/maps/?text=${text}&z=17&l=map`;
 }
 
+/** Interactive Yandex Maps widget (iframe, no API key). */
+export function yandexMapsEmbedSrc(zoom = 16) {
+  const { lon, lat } = siteConfig.mapCenter;
+  const params = new URLSearchParams({
+    ll: `${lon},${lat}`,
+    z: String(zoom),
+    pt: `${lon},${lat},pm2rdm`,
+    l: "map",
+    lang: "ru_RU",
+  });
+  return `https://yandex.ru/map-widget/v1/?${params.toString()}`;
+}
+
 /** Static map preview (works without iframe / API key). */
 export function yandexStaticMapSrc(width = 650, height = 400) {
   const { lon, lat } = siteConfig.mapCenter;
