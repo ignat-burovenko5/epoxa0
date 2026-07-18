@@ -29,7 +29,7 @@ export default async function BlogAdminHubPage({ searchParams }: PageProps) {
   const [page, overview, productsPage] = await Promise.all([
     getBlogListPage(0, 100, { includeDrafts: true }),
     getDashboardOverview(periodDays, dateParam),
-    getAdminProductList({ status: productStatus, limit: 500 }),
+    getAdminProductList({ limit: 500 }),
   ]);
 
   return (
