@@ -93,7 +93,7 @@
   [type="reset"],
   [role="button"],
   .site-header-burger,
-  .catalog-nav-overlay {
+  .catalog-sidenav-backdrop {
     -webkit-user-select: none;
     user-select: none;
   }
@@ -104,6 +104,21 @@
   [contenteditable="true"] {
     -webkit-user-select: text;
     user-select: text;
+  }
+
+  /* Catalog labels must stay selectable (burger + collection sidenav) */
+  .catalog-sidenav-panel,
+  .catalog-sidenav-panel a,
+  .collection-sidenav-panel,
+  .collection-sidenav-panel a,
+  .collection-category-scroll,
+  .collection-category-scroll a,
+  nav[aria-label="Категории каталога"],
+  nav[aria-label="Категории каталога"] a,
+  nav[aria-label="Категории"],
+  nav[aria-label="Категории"] a {
+    -webkit-user-select: text !important;
+    user-select: text !important;
   }
 
   /* Brand-tinted scrollbar — gold thumb on a transparent track */
@@ -241,7 +256,12 @@
   a[href^="mailto:"],
   a[href^="tel:"],
   a[href^="mailto:"] *,
-  a[href^="tel:"] * {
+  a[href^="tel:"] *,
+  .catalog-sidenav-panel a,
+  .collection-sidenav-panel a,
+  .collection-category-scroll a,
+  nav[aria-label="Категории каталога"] a,
+  nav[aria-label="Категории"] a {
     cursor: text;
     -webkit-user-select: text;
     user-select: text;
