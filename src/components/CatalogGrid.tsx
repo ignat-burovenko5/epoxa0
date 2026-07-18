@@ -1,16 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import ProductPrice from "@/components/ProductPrice";
-import { getCatalogItems, getDiscountPercent, type CatalogProduct } from "@/lib/catalog";
-import { getCatalogImage } from "@/lib/site-images";
+import { getDiscountPercent, type CatalogProduct } from "@/lib/catalog-shared";
 
 export type CatalogItem = CatalogProduct;
+
+const DEFAULT_CATALOG_IMAGE =
+  "https://images.unsplash.com/photo-1540932239986-30128078f3c5?q=80&w=1974&auto=format&fit=crop";
 
 export function CatalogGrid({ items }: { items: CatalogItem[] }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 md:gap-x-8 md:gap-y-12">
       {items.map((item) => {
         const discountPercent = getDiscountPercent(item.price, item.compareAtPrice);
+        const imageSrc = item.images?.[0] ?? DEFAULT_CATALOG_IMAGE;
 
         return (
           <Link
@@ -25,7 +28,7 @@ export function CatalogGrid({ items }: { items: CatalogItem[] }) {
                   aria-hidden="true"
                 />
                 <Image
-                  src={getCatalogImage(item.slug)}
+                  src={imageSrc}
                   alt={item.title}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
@@ -54,5 +57,3 @@ export function CatalogGrid({ items }: { items: CatalogItem[] }) {
     </div>
   );
 }
-
-export { getCatalogItems as catalogItems };

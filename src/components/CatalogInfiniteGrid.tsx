@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CatalogGrid, type CatalogItem } from "@/components/CatalogGrid";
-import { CATALOG_PAGE_SIZE } from "@/lib/catalog";
+import { CATALOG_PAGE_SIZE } from "@/lib/catalog-shared";
 
 type CatalogPageResponse = {
   items: CatalogItem[];
