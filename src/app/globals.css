@@ -34,9 +34,10 @@
     --site-header-bar-height: calc(4.5rem + var(--site-header-safe-top));
     --site-header-offset: var(--site-header-bar-height);
     --mobile-sticky-bar-height: 0px;
-    --mobile-fab-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+    --mobile-fab-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
     /* Stacking (low → high): page 0, chrome 40–50, catalog 80, header-when-open 100 */
-    --z-site-fab: 40;
+    /* Above sticky inquiry / footer chrome so curator stays fully tappable */
+    --z-site-fab: 55;
     --z-site-chrome: 50;
     --z-site-header: 60;
     --z-catalog-overlay: 80;
@@ -172,9 +173,9 @@
   }
 
   body:has(.sticky-inquiry-bar) {
-    --mobile-sticky-bar-height: 5.25rem;
+    --mobile-sticky-bar-height: 5.75rem;
     --mobile-fab-bottom: calc(
-      var(--mobile-sticky-bar-height) + max(0.5rem, env(safe-area-inset-bottom, 0px))
+      var(--mobile-sticky-bar-height) + max(0.75rem, env(safe-area-inset-bottom, 0px))
     );
   }
 
@@ -599,13 +600,22 @@ img.logo-nav-mark--footer {
     bottom: var(--mobile-fab-bottom);
     right: max(1rem, env(safe-area-inset-right, 0px));
     z-index: var(--z-site-fab);
+    /* Keep pill + open panel inside the visual viewport */
+    max-width: calc(100vw - 1.5rem);
+    max-height: calc(100dvh - var(--mobile-fab-bottom) - 1rem);
   }
 
   @media (min-width: 768px) {
     .mobile-fab {
       bottom: 2rem;
       right: 2rem;
+      max-height: calc(100dvh - 3rem);
     }
+  }
+
+  /* Catalog open: curator stays above page, under menu dialog */
+  body.catalog-nav-open .mobile-fab {
+    z-index: calc(var(--z-catalog-overlay) - 1);
   }
 
   .pb-mobile-chrome {
