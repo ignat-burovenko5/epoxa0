@@ -2,19 +2,23 @@ import fs from "node:fs";
 import path from "node:path";
 import catalogFallback from "@/data/catalog.json";
 import { categoryLabel } from "@/lib/site";
+import {
+  CATALOG_PAGE_SIZE,
+  HOMEPAGE_FEATURED_COUNT,
+  formatPrice,
+  getDiscountPercent,
+  hasDiscount,
+  type CatalogProduct,
+} from "@/lib/catalog-shared";
 
-export type CatalogProduct = {
-  slug: string;
-  title: string;
-  era: string;
-  category: string;
-  description: string[];
-  price: number;
-  compareAtPrice?: number;
-  badge?: string | null;
-  images?: string[];
-  sourceUrl?: string;
+export {
+  CATALOG_PAGE_SIZE,
+  HOMEPAGE_FEATURED_COUNT,
+  formatPrice,
+  getDiscountPercent,
+  hasDiscount,
 };
+export type { CatalogProduct };
 
 let cachedProducts: CatalogProduct[] | null = null;
 let cachedMtimeMs = -1;
@@ -46,9 +50,6 @@ export function getCatalogItems(): CatalogProduct[] {
   return loadCatalogProducts();
 }
 
-export const CATALOG_PAGE_SIZE = 9;
-export const HOMEPAGE_FEATURED_COUNT = 9;
-
 function shuffleArray<T>(items: T[]): T[] {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -69,23 +70,6 @@ export function getCatalogProduct(slug: string) {
 
 export function getCatalogSlugs() {
   return getCatalogItems().map((p) => p.slug);
-}
-
-export function formatPrice(amount: number) {
-  return new Intl.NumberFormat("ru-RU", {
-    style: "currency",
-    currency: "RUB",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-export function getDiscountPercent(price: number, compareAtPrice?: number) {
-  if (!compareAtPrice || compareAtPrice <= price) return null;
-  return Math.round((1 - price / compareAtPrice) * 100);
-}
-
-export function hasDiscount(price: number, compareAtPrice?: number) {
-  return getDiscountPercent(price, compareAtPrice) !== null;
 }
 
 function normalizeCategoryName(value: string) {

@@ -11,7 +11,7 @@ import {
   type CheckoutDraft,
 } from "@/lib/checkout";
 import { trackEvent } from "@/lib/analytics/track";
-import { orderTotals, type Order } from "@/lib/order";
+import { orderTotals, type Order } from "@/lib/order-shared";
 import { formatRuPhone, isValidRuPhone } from "@/lib/phone";
 import { siteConfig, whatsappUrl } from "@/lib/site";
 

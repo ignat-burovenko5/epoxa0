@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { CatalogProductSummary, ProductStatus } from "@/lib/shop/product-types";
-import { formatPrice } from "@/lib/catalog";
+import { formatPrice } from "@/lib/catalog-shared";
 import {
   blogDashboardProductCreatePath,
   blogDashboardProductEditPath,

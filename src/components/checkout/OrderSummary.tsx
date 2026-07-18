@@ -1,7 +1,7 @@
 import Link from "next/link";
 import ProductPrice from "@/components/ProductPrice";
-import { formatPrice } from "@/lib/catalog";
-import { orderHasDiscount, orderTotals, type Order } from "@/lib/order";
+import { formatPrice } from "@/lib/catalog-shared";
+import { orderHasDiscount, orderTotals, type Order } from "@/lib/order-shared";
 
 type OrderSummaryProps = {
   order: Order;

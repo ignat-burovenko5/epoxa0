@@ -7,7 +7,7 @@ import type { CatalogProductSummary, ProductListPage } from "@/lib/shop/product-
 import {
   blogDashboardProductCreatePath,
 } from "@/lib/blog/urls";
-import { formatPrice } from "@/lib/catalog";
+import { formatPrice } from "@/lib/catalog-shared";
 
 type DashboardProductsPanelProps = {
   initialPage: ProductListPage;

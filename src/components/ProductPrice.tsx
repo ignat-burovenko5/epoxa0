@@ -2,7 +2,7 @@ import {
   formatPrice,
   getDiscountPercent,
   hasDiscount,
-} from "@/lib/catalog";
+} from "@/lib/catalog-shared";
 
 type ProductPriceProps = {
   price: number;

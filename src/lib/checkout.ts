@@ -1,5 +1,5 @@
-import { formatPrice } from "@/lib/catalog";
-import { orderTotals, type Order } from "@/lib/order";
+import { formatPrice } from "@/lib/catalog-shared";
+import { orderTotals, type Order } from "@/lib/order-shared";
 import { siteConfig } from "@/lib/site";
 
 export type DeliveryMethod =
