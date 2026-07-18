@@ -31,6 +31,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   async rewrites() {
     return [
+      // Serve CMS uploads from disk (public/ is snapshotted at `next start`).
+      {
+        source: "/products/:path*",
+        destination: "/api/cms/product-file/:path*",
+      },
+      {
+        source: "/blog/uploads/:path*",
+        destination: "/api/cms/blog-file/:path*",
+      },
       { source: "/api/blog/:path*", destination: `${backendUrl}/api/blog/:path*` },
       { source: "/api/analytics/:path*", destination: `${backendUrl}/api/analytics/:path*` },
       { source: "/api/shop/:path*", destination: `${backendUrl}/api/shop/:path*` },
