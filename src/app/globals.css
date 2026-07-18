@@ -240,7 +240,7 @@
   h4,
   h5,
   h6,
-  li,
+  li:not(:has(> a)),
   dd,
   dt,
   blockquote,
@@ -256,15 +256,19 @@
   a[href^="mailto:"],
   a[href^="tel:"],
   a[href^="mailto:"] *,
-  a[href^="tel:"] *,
+  a[href^="tel:"] * {
+    cursor: text;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Category / catalog nav links stay clickable (pointer), not I-beam */
   .catalog-sidenav-panel a,
   .collection-sidenav-panel a,
   .collection-category-scroll a,
   nav[aria-label="Категории каталога"] a,
   nav[aria-label="Категории"] a {
-    cursor: text;
-    -webkit-user-select: text;
-    user-select: text;
+    cursor: var(--cursor-antique-pointer);
   }
 
   input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="range"]):not([type="color"]),
