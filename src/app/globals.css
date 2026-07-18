@@ -30,8 +30,8 @@
 @layer base {
   :root {
     --site-header-safe-top: env(safe-area-inset-top, 0px);
-    /* Keep offset == bar height so light pages don’t show a dark “extended” band. */
-    --site-header-bar-height: calc(3.5rem + var(--site-header-safe-top));
+    /* Fixed bar height == page offset (no dark band / no content underlap). */
+    --site-header-bar-height: calc(3.75rem + var(--site-header-safe-top));
     --site-header-offset: var(--site-header-bar-height);
     --mobile-sticky-bar-height: 0px;
     --mobile-fab-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
@@ -45,25 +45,25 @@
 
   @media (min-width: 640px) {
     :root {
-      --site-header-bar-height: calc(4.25rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(4rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 768px) {
     :root {
-      --site-header-bar-height: calc(5.25rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(4.5rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 1024px) {
     :root {
-      --site-header-bar-height: calc(6rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(4.75rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 1280px) {
     :root {
-      --site-header-bar-height: calc(6.5rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(5rem + var(--site-header-safe-top));
     }
   }
 
