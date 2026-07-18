@@ -4,7 +4,7 @@ import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
 import { siteChromeSurfaceClass } from "@/components/site-chrome";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { categoryHref, groupedCategoryLinks, siteConfig } from "@/lib/site";
 
@@ -28,31 +28,31 @@ function navLinkIsActive(
   return true;
 }
 
-const menuTransitionMs = 620;
+/** Keep in sync with --duration-drawer in globals.css */
+const MENU_MS = 520;
 
 function BurgerIcon({ open, className }: { open: boolean; className?: string }) {
+  // Transform-only morph (no top/width animation — those stutter).
   const bar =
-    "absolute inset-x-0 h-[1.5px] -translate-y-1/2 rounded-full bg-current transition-[transform,opacity,top,width,left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none";
+    "absolute left-0 right-0 top-1/2 h-[1.5px] origin-center rounded-full bg-current will-change-transform";
   return (
     <span
-      className={`relative block h-5 w-4 sm:h-6 sm:w-5 ${className ?? ""}`.trim()}
+      className={`relative block h-3.5 w-[1.125rem] sm:h-4 sm:w-5 ${className ?? ""}`.trim()}
       aria-hidden="true"
     >
       <span
-        className={`${bar} ${
-          open ? "top-1/2 left-0 w-full rotate-45" : "top-[18%] left-0 w-full"
+        className={`${bar} transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          open ? "translate-y-0 rotate-45" : "-translate-y-[6px] sm:-translate-y-[7px] rotate-0"
         }`}
       />
       <span
-        className={`${bar} top-1/2 ${
-          open
-            ? "left-[50%] w-0 opacity-0"
-            : "left-0 w-full opacity-100"
+        className={`${bar} transition-opacity duration-200 ease-out motion-reduce:transition-none ${
+          open ? "opacity-0" : "opacity-100"
         }`}
       />
       <span
-        className={`${bar} ${
-          open ? "top-1/2 left-0 w-full -rotate-45" : "top-[82%] left-0 w-full"
+        className={`${bar} transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          open ? "translate-y-0 -rotate-45" : "translate-y-[6px] sm:translate-y-[7px] rotate-0"
         }`}
       />
     </span>
@@ -72,14 +72,36 @@ export default function HeaderBurgerMenu() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const groups = useMemo(() => groupedCategoryLinks(), []);
+  const openTimerRef = useRef<number | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
+  const prevPathRef = useRef(pathname);
 
-  const close = useCallback(() => setOpen(false), []);
-  const show = useCallback(() => {
-    setMounted(true);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setOpen(true));
-    });
+  const clearTimers = useCallback(() => {
+    if (openTimerRef.current != null) {
+      window.clearTimeout(openTimerRef.current);
+      openTimerRef.current = null;
+    }
+    if (closeTimerRef.current != null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
   }, []);
+
+  const close = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const show = useCallback(() => {
+    clearTimers();
+    setMounted(true);
+    // Paint closed frame first so the slide transition always runs.
+    openTimerRef.current = window.setTimeout(() => {
+      openTimerRef.current = null;
+      setOpen(true);
+    }, 20);
+  }, [clearTimers]);
+
+  useEffect(() => () => clearTimers(), [clearTimers]);
 
   useEffect(() => {
     document.body.classList.toggle("catalog-nav-open", mounted);
@@ -102,13 +124,24 @@ export default function HeaderBurgerMenu() {
 
   useEffect(() => {
     if (!mounted || open) return;
-    const timeout = window.setTimeout(() => setMounted(false), menuTransitionMs);
-    return () => window.clearTimeout(timeout);
-  }, [mounted, open]);
+    clearTimers();
+    closeTimerRef.current = window.setTimeout(() => {
+      closeTimerRef.current = null;
+      setMounted(false);
+    }, MENU_MS);
+    return () => {
+      if (closeTimerRef.current != null) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
+  }, [mounted, open, clearTimers]);
 
+  // Close only when the route actually changes — not on mount.
   useEffect(() => {
-    const frame = requestAnimationFrame(close);
-    return () => cancelAnimationFrame(frame);
+    if (prevPathRef.current === pathname) return;
+    prevPathRef.current = pathname;
+    close();
   }, [pathname, close]);
 
   const menuOverlay =
@@ -121,7 +154,7 @@ export default function HeaderBurgerMenu() {
           >
             <button
               type="button"
-              className="catalog-sidenav-backdrop pointer-events-auto fixed inset-0 cursor-pointer border-0 bg-luxury-base/40 max-md:backdrop-blur-none md:bg-luxury-base/35 md:backdrop-blur-sm md:supports-[backdrop-filter]:bg-luxury-base/30 touch-manipulation"
+              className="catalog-sidenav-backdrop pointer-events-auto fixed inset-0 cursor-pointer border-0 bg-luxury-base/45 touch-manipulation"
               aria-label="Закрыть меню"
               onClick={close}
             />
@@ -151,62 +184,62 @@ export default function HeaderBurgerMenu() {
                   {groups.map((group, groupIndex) => {
                     const isFeatured = groupIndex === 0;
                     return (
-                    <div key={group.label}>
-                      <p className={groupLabelClass}>
-                        {isFeatured ? "Подборка" : group.label}
-                      </p>
-                      <ul className="m-0 flex list-none flex-col gap-1 p-0">
-                        {isFeatured
-                          ? siteConfig.catalogNavLinks.map((item) => {
-                              const active = navLinkIsActive(
-                                pathname,
-                                searchParams,
-                                item.href,
-                              );
-                              return (
-                                <li key={item.href}>
-                                  <Link
-                                    href={item.href}
-                                    onClick={close}
-                                    className={`${categoryLinkBase} ${
-                                      active
-                                        ? "border-accent-gold bg-accent-gold/10 text-accent-gold"
-                                        : "border-transparent text-museum-light/60 hover:bg-museum-light/[0.04] hover:text-accent-gold"
-                                    }`}
-                                  >
-                                    {item.label}
-                                  </Link>
-                                </li>
-                              );
-                            })
-                          : null}
-                        {group.items.map((item) => {
-                          const active = pathname === categoryHref(item.slug);
-                          const highlighted =
-                            "highlight" in item && item.highlight;
+                      <div key={group.label}>
+                        <p className={groupLabelClass}>
+                          {isFeatured ? "Подборка" : group.label}
+                        </p>
+                        <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                          {isFeatured
+                            ? siteConfig.catalogNavLinks.map((item) => {
+                                const active = navLinkIsActive(
+                                  pathname,
+                                  searchParams,
+                                  item.href,
+                                );
+                                return (
+                                  <li key={item.href}>
+                                    <Link
+                                      href={item.href}
+                                      onClick={close}
+                                      className={`${categoryLinkBase} ${
+                                        active
+                                          ? "border-accent-gold bg-accent-gold/10 text-accent-gold"
+                                          : "border-transparent text-museum-light/60 hover:bg-museum-light/[0.04] hover:text-accent-gold"
+                                      }`}
+                                    >
+                                      {item.label}
+                                    </Link>
+                                  </li>
+                                );
+                              })
+                            : null}
+                          {group.items.map((item) => {
+                            const active = pathname === categoryHref(item.slug);
+                            const highlighted =
+                              "highlight" in item && item.highlight;
 
-                          return (
-                            <li key={item.slug}>
-                              <Link
-                                href={categoryHref(item.slug)}
-                                onClick={close}
-                                className={`${categoryLinkBase} ${
-                                  active
-                                    ? highlighted
-                                      ? "border-[#E8A6AB] bg-[#E8A6AB]/10 text-[#F5C7CA]"
-                                      : "border-accent-gold bg-accent-gold/10 text-accent-gold"
-                                    : highlighted
-                                      ? "border-transparent text-[#E8A6AB]/80 hover:bg-[#E8A6AB]/[0.06] hover:text-[#F5C7CA]"
-                                      : "border-transparent text-museum-light/50 hover:bg-museum-light/[0.04] hover:text-museum-light/85"
-                                }`}
-                              >
-                                <span className="line-clamp-2">{item.label}</span>
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
+                            return (
+                              <li key={item.slug}>
+                                <Link
+                                  href={categoryHref(item.slug)}
+                                  onClick={close}
+                                  className={`${categoryLinkBase} ${
+                                    active
+                                      ? highlighted
+                                        ? "border-[#E8A6AB] bg-[#E8A6AB]/10 text-[#F5C7CA]"
+                                        : "border-accent-gold bg-accent-gold/10 text-accent-gold"
+                                      : highlighted
+                                        ? "border-transparent text-[#E8A6AB]/80 hover:bg-[#E8A6AB]/[0.06] hover:text-[#F5C7CA]"
+                                        : "border-transparent text-museum-light/50 hover:bg-museum-light/[0.04] hover:text-museum-light/85"
+                                  }`}
+                                >
+                                  <span className="line-clamp-2">{item.label}</span>
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
                     );
                   })}
                 </div>
@@ -232,14 +265,14 @@ export default function HeaderBurgerMenu() {
     <>
       <button
         type="button"
-        className="site-header-burger relative isolate cursor-pointer flex h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
+        className="site-header-burger relative isolate cursor-pointer flex h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors duration-300 hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
         aria-expanded={open}
         aria-controls={mounted ? panelId : undefined}
         aria-label={open ? "Закрыть каталог" : "Открыть каталог категорий"}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          if (open) close();
+          if (open || mounted) close();
           else show();
         }}
       >
