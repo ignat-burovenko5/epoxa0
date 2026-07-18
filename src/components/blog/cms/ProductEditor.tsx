@@ -243,6 +243,7 @@ export default function ProductEditor({ product }: ProductEditorProps) {
             onChange={(e) => patch("era", e.target.value)}
           />
         </div>
+        </div>
         <div>
           <label className={cmsLabelClass} htmlFor="badge">
             Бейдж (опционально)
