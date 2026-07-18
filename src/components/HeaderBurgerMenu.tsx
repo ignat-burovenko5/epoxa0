@@ -178,7 +178,7 @@ export default function HeaderBurgerMenu() {
     <>
       <button
         type="button"
-        className="site-header-burger relative isolate cursor-pointer flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
+        className="site-header-burger relative isolate cursor-pointer flex h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
         aria-expanded={open}
         aria-controls={mounted ? panelId : undefined}
         aria-label={open ? "Закрыть каталог" : "Открыть каталог категорий"}
