@@ -115,7 +115,7 @@ export default function HeaderBurgerMenu() {
               role="dialog"
               aria-modal="true"
               aria-label="Навигация по сайту"
-              className="catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col border-r border-museum-light/10 bg-luxury-base pb-[env(safe-area-inset-bottom,0px)]"
+              className="catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col border-r border-museum-light/5 bg-luxury-base max-md:backdrop-blur-none md:bg-luxury-base/95 md:backdrop-blur-md md:supports-[backdrop-filter]:bg-luxury-base/90 pb-[env(safe-area-inset-bottom,0px)]"
             >
               <nav
                 className="catalog-sidenav-panel__nav flex-1 overflow-y-auto hidden-scrollbar px-3 py-4 space-y-8"
@@ -206,7 +206,7 @@ export default function HeaderBurgerMenu() {
                 </div>
               </nav>
 
-              <div className="border-t border-museum-light/10 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <div className="border-t border-museum-light/5 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
                 <Link
                   href="/collection"
                   onClick={close}
