@@ -225,21 +225,71 @@ def get_product(slug: str) -> CatalogProduct | None:
     return CatalogProduct.objects.filter(slug=slug).first()
 
 
+_LIST_SORTS: dict[str, list[str]] = {
+    "updated_desc": ["-updated_at", "title"],
+    "updated_asc": ["updated_at", "title"],
+    "title_asc": ["title"],
+    "title_desc": ["-title"],
+    "price_asc": ["price", "title"],
+    "price_desc": ["-price", "title"],
+    "sort_asc": ["sort_order", "title"],
+    "sort_desc": ["-sort_order", "title"],
+    "category_asc": ["category", "title"],
+    "era_asc": ["era", "title"],
+    "status": ["status", "title"],
+    "featured": ["-featured", "sort_order", "title"],
+}
+
+
 def list_products(
     *,
     status: str | None = None,
     q: str = "",
+    category: str | None = None,
+    sort: str = "updated_desc",
     offset: int = 0,
     limit: int = 100,
 ) -> dict[str, Any]:
+    from django.db.models import Count
+
     qs = CatalogProduct.objects.all()
     if status and status in PRODUCT_STATUSES:
         qs = qs.filter(status=status)
     q = (q or "").strip()
     if q:
         qs = qs.filter(
-            Q(title__icontains=q) | Q(slug__icontains=q) | Q(category__icontains=q)
+            Q(title__icontains=q)
+            | Q(slug__icontains=q)
+            | Q(category__icontains=q)
+            | Q(era__icontains=q)
         )
+    category = (category or "").strip()
+    if category and category.lower() != "all":
+        qs = qs.filter(category__iexact=category)
+
+    order = _LIST_SORTS.get(sort) or _LIST_SORTS["updated_desc"]
+    qs = qs.order_by(*order)
+
+    # Facets for sidebar: same status/q, ignore category filter
+    facet_qs = CatalogProduct.objects.all()
+    if status and status in PRODUCT_STATUSES:
+        facet_qs = facet_qs.filter(status=status)
+    if q:
+        facet_qs = facet_qs.filter(
+            Q(title__icontains=q)
+            | Q(slug__icontains=q)
+            | Q(category__icontains=q)
+            | Q(era__icontains=q)
+        )
+    category_counts = [
+        {
+            "label": row["category"] or "Без категории",
+            "count": row["count"],
+        }
+        for row in facet_qs.values("category")
+        .annotate(count=Count("id"))
+        .order_by("category")
+    ]
 
     total = qs.count()
     items = [product_summary(p) for p in qs[offset : offset + limit]]
@@ -256,6 +306,7 @@ def list_products(
             "draft": CatalogProduct.objects.filter(status="draft").count(),
             "archived": CatalogProduct.objects.filter(status="archived").count(),
         },
+        "categoryCounts": category_counts,
     }
 
 

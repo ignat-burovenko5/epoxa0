@@ -281,11 +281,20 @@ def blog_admin_products(request: HttpRequest):
     product_service.ensure_seeded()
     if request.method == "GET":
         offset = _safe_int(request.GET.get("offset", 0), 0, minimum=0)
-        limit = _safe_int(request.GET.get("limit", 100), 100, minimum=1, maximum=500)
+        limit = _safe_int(request.GET.get("limit", 36), 36, minimum=1, maximum=100)
         status = (request.GET.get("status") or "").strip() or None
         q = (request.GET.get("q") or "").strip()
+        category = (request.GET.get("category") or "").strip() or None
+        sort = (request.GET.get("sort") or "updated_desc").strip()
         return json_response(
-            product_service.list_products(status=status, q=q, offset=offset, limit=limit)
+            product_service.list_products(
+                status=status,
+                q=q,
+                category=category,
+                sort=sort,
+                offset=offset,
+                limit=limit,
+            )
         )
     body = parse_json(request)
     if body is None:

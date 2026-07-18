@@ -62,4 +62,9 @@ export type ProductListPage = {
     draft: number;
     archived: number;
   };
+  /** Present on newer API responses — category facets for admin sidebar. */
+  categoryCounts?: { label: string; count: number }[];
 };
+
+/** Admin catalog page size (infinite scroll). */
+export const ADMIN_PRODUCT_PAGE_SIZE = 36;
