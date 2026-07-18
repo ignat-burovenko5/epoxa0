@@ -127,7 +127,7 @@ export default function ProductImagesField({
         <p className={cmsLabelClass}>Изображения товара</p>
         <p className="mt-1 font-sans text-xs text-museum-light/45 leading-relaxed">
           Загрузка с максимальной компрессией (AVIF/WebP). Файлы:{" "}
-          <span className="text-museum-light/60">public/products/{slug || "draft"}/</span>
+          <span className="text-museum-light/60">media/products/{slug || "draft"}/</span>
         </p>
       </div>
 
