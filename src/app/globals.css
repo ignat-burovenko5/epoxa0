@@ -38,6 +38,9 @@
     --site-header-offset: var(--site-header-bar-height);
     --mobile-sticky-bar-height: 0px;
     --mobile-fab-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+    /* Drawer tokens on :root so plain CSS (outside @theme) always resolves */
+    --ease-drawer: cubic-bezier(0.22, 1, 0.36, 1);
+    --duration-drawer: 0.52s;
     /* Stacking (low → high): page 0, chrome 40–50, catalog 80, header-when-open 100 */
     /* Above sticky inquiry / footer chrome so curator stays fully tappable */
     --z-site-fab: 55;
@@ -371,7 +374,7 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
   bottom: 0;
   z-index: 1;
   opacity: 0;
-  transition: opacity var(--duration-drawer) var(--ease-drawer);
+  transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Mobile: drawer full viewport height; desktop: flush with bottom of topnav */
@@ -379,8 +382,8 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
   top: 0;
   bottom: 0;
   z-index: 2;
-  transform: translate3d(-100%, 0, 0);
-  transition: transform var(--duration-drawer) var(--ease-drawer);
+  transform: translate3d(-102%, 0, 0);
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
   backface-visibility: hidden;
 }
@@ -395,23 +398,6 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
 
 .catalog-sidenav-panel__nav {
   padding-top: calc(var(--site-header-bar-height) + 0.75rem);
-  opacity: 0;
-  transform: translate3d(-0.75rem, 0, 0);
-  transition:
-    opacity 0.45s var(--ease-drawer),
-    transform 0.55s var(--ease-drawer);
-  transition-delay: 0s;
-}
-
-.catalog-nav-overlay[data-state="open"] .catalog-sidenav-panel__nav {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-  transition-delay: 0.08s;
-}
-
-.catalog-nav-overlay[data-state="closed"] .catalog-sidenav-panel__nav {
-  transition-duration: 0.28s, 0.32s;
-  transition-delay: 0s;
 }
 
 @media (min-width: 768px) {
@@ -502,11 +488,9 @@ body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
 @media (prefers-reduced-motion: reduce) {
   .catalog-sidenav-root__panel,
   .catalog-sidenav-panel,
-  .catalog-sidenav-panel__nav,
   .catalog-sidenav-backdrop {
-    animation-duration: 0.01ms;
-    transition-duration: 0.01ms;
-    transition-delay: 0s;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
