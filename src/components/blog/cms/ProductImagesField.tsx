@@ -308,10 +308,11 @@ export default function ProductImagesField({
         <div className="min-w-0">
           <p className={cmsLabelClass}>Изображения товара</p>
           <p className="mt-1 font-sans text-xs text-museum-light/45 leading-relaxed">
-            Загрузка с максимальной компрессией (AVIF/WebP). Файлы:{" "}
-            <span className="text-museum-light/60">
-              media/products/{slug || "draft"}/
-            </span>
+            Загрузка с максимальной компрессией (AVIF/WebP). Порядок: первое фото —
+            главное на сайте. Перетащите карточку или смените номер.
+          </p>
+          <p className="mt-1 font-sans text-[11px] text-museum-light/35 truncate">
+            media/products/{slug || "draft"}/
           </p>
         </div>
         <div className="flex flex-col items-center gap-1 shrink-0 pt-0.5">
