@@ -61,3 +61,27 @@ class ShopLead(models.Model):
 
     class Meta:
         ordering = ["-at"]
+
+
+class CatalogProduct(models.Model):
+    """CMS-managed catalog item. Storefront reads active rows via catalog_live.json."""
+
+    slug = models.CharField(max_length=220, primary_key=True)
+    title = models.CharField(max_length=500)
+    era = models.CharField(max_length=300, blank=True, default="")
+    category = models.CharField(max_length=300, blank=True, default="", db_index=True)
+    description = models.JSONField(default=list, blank=True)
+    price = models.FloatField(default=0)
+    compare_at_price = models.FloatField(null=True, blank=True)
+    badge = models.CharField(max_length=200, blank=True, null=True)
+    images = models.JSONField(default=list, blank=True)
+    source_url = models.CharField(max_length=500, blank=True, default="")
+    status = models.CharField(max_length=16, default="active", db_index=True)
+    featured = models.BooleanField(default=False)
+    sort_order = models.IntegerField(default=0)
+    admin_notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["sort_order", "title"]

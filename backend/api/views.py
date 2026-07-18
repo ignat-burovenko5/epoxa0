@@ -4,7 +4,14 @@ from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from api import analytics_service, auth_session, blog_media, blog_service, shop_service
+from api import (
+    analytics_service,
+    auth_session,
+    blog_media,
+    blog_service,
+    product_service,
+    shop_service,
+)
 from api.http import json_error, json_response, parse_json, unauthorized
 from api.internal_auth import require_internal_token
 from api.models import BlogPost
