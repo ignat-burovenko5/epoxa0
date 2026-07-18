@@ -31,7 +31,7 @@
   :root {
     --site-header-safe-top: env(safe-area-inset-top, 0px);
     /* Keep offset == bar height so light pages don’t show a dark “extended” band. */
-    --site-header-bar-height: calc(5.6875rem + var(--site-header-safe-top));
+    --site-header-bar-height: calc(4.75rem + var(--site-header-safe-top));
     --site-header-offset: var(--site-header-bar-height);
     --mobile-sticky-bar-height: 0px;
     --mobile-fab-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
@@ -45,25 +45,25 @@
 
   @media (min-width: 640px) {
     :root {
-      --site-header-bar-height: calc(6.125rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(5.125rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 768px) {
     :root {
-      --site-header-bar-height: calc(9.4375rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(7.75rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 1024px) {
     :root {
-      --site-header-bar-height: calc(11.6875rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(9.5rem + var(--site-header-safe-top));
     }
   }
 
   @media (min-width: 1280px) {
     :root {
-      --site-header-bar-height: calc(14.4375rem + var(--site-header-safe-top));
+      --site-header-bar-height: calc(11.75rem + var(--site-header-safe-top));
     }
   }
 
@@ -413,35 +413,35 @@ img.logo-nav-mark {
   display: block;
   filter: none;
   width: auto;
-  height: 4.25rem;
-  max-height: 4.25rem;
+  height: 3.5rem;
+  max-height: 3.5rem;
 }
 
 @media (min-width: 640px) {
   img.logo-nav-mark {
-    height: 5rem;
-    max-height: 5rem;
+    height: 4.25rem;
+    max-height: 4.25rem;
   }
 }
 
 @media (min-width: 768px) {
   img.logo-nav-mark {
-    height: 6.5rem;
-    max-height: 6.5rem;
+    height: 5.25rem;
+    max-height: 5.25rem;
   }
 }
 
 @media (min-width: 1024px) {
   img.logo-nav-mark {
-    height: 10rem;
-    max-height: 10rem;
+    height: 8rem;
+    max-height: 8rem;
   }
 }
 
 @media (min-width: 1280px) {
   img.logo-nav-mark {
-    height: 12rem;
-    max-height: 12rem;
+    height: 9.5rem;
+    max-height: 9.5rem;
   }
 }
 
