@@ -7,7 +7,7 @@ export default function CollectionLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-museum-light min-h-screen text-luxury-charcoal">
+    <div className="bg-museum-light min-h-screen text-luxury-charcoal -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)]">
       <PageContainer className="py-8 md:py-12">
         <div className="flex flex-col md:flex-row gap-6 md:gap-10 lg:gap-12">
           <CollectionSidenav />

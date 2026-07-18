@@ -108,7 +108,7 @@ export default async function ProductDossier({
     const categorySlug = categorySlugFromLabel(product.category);
 
     return (
-    <main className="bg-museum-light text-luxury-charcoal min-h-screen relative pb-mobile-chrome lg:pb-0">
+    <main className="bg-museum-light text-luxury-charcoal min-h-screen relative pb-mobile-chrome lg:pb-0 -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)]">
       <div className="flex flex-col lg:flex-row lg:items-start">
         <div className="w-full lg:w-[68%] xl:w-[70%] lg:shrink-0">
           <ProductImageGallery slides={gallerySlides} />
