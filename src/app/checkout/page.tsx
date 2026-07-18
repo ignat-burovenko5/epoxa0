@@ -17,7 +17,7 @@ function CheckoutContent() {
 
   if (sent) {
     return (
-      <main className="bg-museum-light text-luxury-charcoal min-h-screen">
+      <main className="bg-museum-light text-luxury-charcoal min-h-screen -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)]">
         <CheckoutSuccess />
       </main>
     );
@@ -25,7 +25,7 @@ function CheckoutContent() {
 
   if (!order) {
     return (
-      <main className="bg-museum-light text-luxury-charcoal min-h-screen">
+      <main className="bg-museum-light text-luxury-charcoal min-h-screen -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)]">
         <div className="mx-auto max-w-lg px-4 py-20 text-center">
           <h1 className="font-serif text-3xl mb-3">Выберите предмет</h1>
           <p className="font-sans text-sm text-luxury-charcoal/60 mb-8">

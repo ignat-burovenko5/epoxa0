@@ -46,7 +46,7 @@ export default function BlogPostPage({ post, settings }: BlogPostPageProps) {
   ];
 
   const mainClass = isLight
-    ? "bg-museum-light text-luxury-charcoal min-h-[50vh]"
+    ? "bg-museum-light text-luxury-charcoal min-h-[50vh] -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)]"
     : "bg-luxury-base text-museum-light min-h-[50vh]";
 
   const mutedClass = isLight ? "text-luxury-charcoal/55" : "text-museum-light/50";

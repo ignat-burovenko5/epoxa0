@@ -21,7 +21,7 @@ export default function CheckoutPageLayout({
   productTitle,
 }: CheckoutPageLayoutProps) {
   return (
-    <main className="bg-museum-light text-luxury-charcoal min-h-screen pb-[max(6rem,calc(4rem+env(safe-area-inset-bottom)))] lg:pb-16">
+    <main className="bg-museum-light text-luxury-charcoal min-h-screen pb-[max(6rem,calc(4rem+env(safe-area-inset-bottom)))] lg:pb-16 -mt-[var(--site-header-offset)] pt-[var(--site-header-offset)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-14">
         <nav className="mb-6 font-sans text-[10px] uppercase tracking-[0.14em] text-luxury-charcoal/45">
           <Link href="/" className="hover:text-accent-brass transition-colors">
