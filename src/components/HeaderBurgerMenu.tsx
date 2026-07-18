@@ -28,11 +28,10 @@ function navLinkIsActive(
   return true;
 }
 
-/** Keep in sync with --duration-drawer in globals.css */
+/** Keep in sync with drawer CSS duration (0.52s). */
 const MENU_MS = 520;
 
 function BurgerIcon({ open, className }: { open: boolean; className?: string }) {
-  // Transform-only morph (no top/width animation — those stutter).
   const bar =
     "absolute left-0 right-0 top-1/2 h-[1.5px] origin-center rounded-full bg-current will-change-transform";
   return (
@@ -42,7 +41,9 @@ function BurgerIcon({ open, className }: { open: boolean; className?: string }) 
     >
       <span
         className={`${bar} transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-          open ? "translate-y-0 rotate-45" : "-translate-y-[6px] sm:-translate-y-[7px] rotate-0"
+          open
+            ? "translate-y-0 rotate-45"
+            : "-translate-y-[6px] sm:-translate-y-[7px] rotate-0"
         }`}
       />
       <span
@@ -52,7 +53,9 @@ function BurgerIcon({ open, className }: { open: boolean; className?: string }) 
       />
       <span
         className={`${bar} transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-          open ? "translate-y-0 -rotate-45" : "translate-y-[6px] sm:translate-y-[7px] rotate-0"
+          open
+            ? "translate-y-0 -rotate-45"
+            : "translate-y-[6px] sm:translate-y-[7px] rotate-0"
         }`}
       />
     </span>
@@ -73,17 +76,22 @@ export default function HeaderBurgerMenu() {
   const searchParams = useSearchParams();
   const groups = useMemo(() => groupedCategoryLinks(), []);
   const openTimerRef = useRef<number | null>(null);
-  const closeTimerRef = useRef<number | null>(null);
+  const unmountTimerRef = useRef<number | null>(null);
   const prevPathRef = useRef(pathname);
+  /** True after the panel has been open at least once in this mount cycle. */
+  const hadOpenRef = useRef(false);
 
-  const clearTimers = useCallback(() => {
+  const clearOpenTimer = useCallback(() => {
     if (openTimerRef.current != null) {
       window.clearTimeout(openTimerRef.current);
       openTimerRef.current = null;
     }
-    if (closeTimerRef.current != null) {
-      window.clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
+  }, []);
+
+  const clearUnmountTimer = useCallback(() => {
+    if (unmountTimerRef.current != null) {
+      window.clearTimeout(unmountTimerRef.current);
+      unmountTimerRef.current = null;
     }
   }, []);
 
@@ -92,16 +100,23 @@ export default function HeaderBurgerMenu() {
   }, []);
 
   const show = useCallback(() => {
-    clearTimers();
+    clearOpenTimer();
+    clearUnmountTimer();
     setMounted(true);
-    // If already mounted (e.g. mid-close), open on next frame so CSS can tween.
+    // Paint closed frame, then open so transform transition runs.
     openTimerRef.current = window.setTimeout(() => {
       openTimerRef.current = null;
       setOpen(true);
-    }, mounted ? 0 : 20);
-  }, [clearTimers, mounted]);
+    }, 24);
+  }, [clearOpenTimer, clearUnmountTimer]);
 
-  useEffect(() => () => clearTimers(), [clearTimers]);
+  useEffect(
+    () => () => {
+      clearOpenTimer();
+      clearUnmountTimer();
+    },
+    [clearOpenTimer, clearUnmountTimer],
+  );
 
   useEffect(() => {
     document.body.classList.toggle("catalog-nav-open", mounted);
@@ -123,21 +138,25 @@ export default function HeaderBurgerMenu() {
   }, [mounted, close]);
 
   useEffect(() => {
-    if (!mounted || open) return;
-    clearTimers();
-    closeTimerRef.current = window.setTimeout(() => {
-      closeTimerRef.current = null;
+    if (open) {
+      hadOpenRef.current = true;
+      clearUnmountTimer();
+      return;
+    }
+    // Only unmount after a real close — never on the initial mounted/closed frame
+    // (that used to clear the open timer and kill the sidenav).
+    if (!mounted || !hadOpenRef.current) return;
+
+    clearUnmountTimer();
+    unmountTimerRef.current = window.setTimeout(() => {
+      unmountTimerRef.current = null;
+      hadOpenRef.current = false;
       setMounted(false);
     }, MENU_MS);
-    return () => {
-      if (closeTimerRef.current != null) {
-        window.clearTimeout(closeTimerRef.current);
-        closeTimerRef.current = null;
-      }
-    };
-  }, [mounted, open, clearTimers]);
 
-  // Close only when the route actually changes — not on mount.
+    return () => clearUnmountTimer();
+  }, [mounted, open, clearUnmountTimer]);
+
   useEffect(() => {
     if (prevPathRef.current === pathname) return;
     prevPathRef.current = pathname;
