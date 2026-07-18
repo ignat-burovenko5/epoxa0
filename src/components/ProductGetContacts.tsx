@@ -2,6 +2,12 @@
 
 import { useId, useState } from "react";
 import {
+  MaxIcon,
+  PhoneIcon,
+  TelegramIcon,
+  WhatsAppIcon,
+} from "@/components/NavContactIcons";
+import {
   inquiryMessage,
   maxUrl,
   siteConfig,
@@ -16,10 +22,10 @@ type ProductGetContactsProps = {
 };
 
 const contactLinkClass =
-  "inline-flex min-h-11 w-full items-center justify-center border border-luxury-charcoal/15 bg-museum-light px-2 py-2.5 font-sans text-[10px] sm:text-xs tracking-[0.1em] uppercase text-luxury-charcoal/80 transition-colors hover:border-luxury-charcoal/30 hover:bg-museum-warm hover:text-luxury-base focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation";
+  "inline-flex min-h-11 w-full items-center gap-3 border border-luxury-charcoal/15 bg-museum-light px-3 py-2.5 font-sans text-xs tracking-[0.1em] uppercase text-luxury-charcoal/80 transition-colors hover:border-luxury-charcoal/30 hover:bg-museum-warm hover:text-luxury-base focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation";
 
-const phoneLinkClass =
-  `${contactLinkClass} normal-case tracking-normal whitespace-nowrap sm:w-auto sm:shrink-0 sm:px-3`;
+const contactIconClass =
+  "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent-brass/35 text-accent-brass";
 
 export default function ProductGetContacts({
   productName,
@@ -48,7 +54,7 @@ export default function ProductGetContacts({
       {open ? (
         <div
           id={panelId}
-          className={`flex flex-col gap-2 sm:flex-row sm:items-stretch ${isSticky ? "mt-2 border-t border-luxury-charcoal/10 pt-2" : "mt-3"}`}
+          className={`flex flex-col gap-2 ${isSticky ? "mt-2 border-t border-luxury-charcoal/10 pt-2" : "mt-3"}`}
           role="group"
           aria-label="Контакты куратора"
         >
@@ -57,34 +63,46 @@ export default function ProductGetContacts({
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Написать в MAX"
-            className={`${contactLinkClass} sm:flex-1 sm:min-w-0`}
+            className={contactLinkClass}
           >
-            MAX
+            <span className={`${contactIconClass} overflow-hidden p-0`}>
+              <MaxIcon className="h-8 w-8 rounded-full" />
+            </span>
+            <span>MAX</span>
           </a>
           <a
             href={whatsappUrl(message)}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Написать в WhatsApp"
-            className={`${contactLinkClass} sm:flex-1 sm:min-w-0`}
+            className={contactLinkClass}
           >
-            WhatsApp
+            <span className={contactIconClass}>
+              <WhatsAppIcon className="h-4 w-4" />
+            </span>
+            <span>WhatsApp</span>
           </a>
           <a
             href={telegramUrl(message)}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Написать в Telegram"
-            className={`${contactLinkClass} sm:flex-1 sm:min-w-0`}
+            className={contactLinkClass}
           >
-            Telegram
+            <span className={contactIconClass}>
+              <TelegramIcon className="h-4 w-4" />
+            </span>
+            <span>Telegram</span>
           </a>
           <a
             href={siteConfig.phoneHref}
-            aria-label="Позвонить куратору"
-            className={phoneLinkClass}
+            aria-label={`Позвонить куратору: ${siteConfig.phone}`}
+            className={`${contactLinkClass} normal-case tracking-normal`}
           >
-            {siteConfig.phone}
+            <span className={contactIconClass}>
+              <PhoneIcon className="h-4 w-4" />
+            </span>
+            <span>{siteConfig.phone}</span>
           </a>
         </div>
       ) : null}
