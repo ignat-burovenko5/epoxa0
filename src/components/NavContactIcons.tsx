@@ -21,7 +21,11 @@ export function MaxIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
-/** Envelope — flap opens and letter rises on `.contact-link-email:hover`. */
+/**
+ * Closed / open envelope — SVG Repo pair, swap on `.contact-link-email:hover`
+ * https://www.svgrepo.com/svg/522399/envelope-closed
+ * https://www.svgrepo.com/svg/522400/envelope-open
+ */
 export function EmailIcon({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg
@@ -31,34 +35,34 @@ export function EmailIcon({ className = "h-5 w-5" }: IconProps) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Letter (slides up on hover) */}
-      <rect
-        className="email-icon__letter"
-        x="7.25"
-        y="9.5"
-        width="9.5"
-        height="7"
-        rx="0.6"
-        fill="currentColor"
-        opacity="0.35"
-      />
-      {/* Envelope body */}
-      <path
-        className="email-icon__body"
-        d="M4.5 8.25h15v9.5a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-9.5Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      {/* Closed flap — flips open on hover */}
-      <path
-        className="email-icon__flap"
-        d="M4.5 8.25 12 13.5l7.5-5.25"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g className="email-icon__closed">
+        <path
+          d="M3 17.5V6.5C3 5.94772 3.44772 5.5 4 5.5H20C20.5523 5.5 21 5.94772 21 6.5V17.5C21 18.0523 20.5523 18.5 20 18.5H4C3.44772 18.5 3 18.0523 3 17.5Z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M3 6L12 12L21 6"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+      </g>
+      <g className="email-icon__open">
+        <path
+          d="M3 20V8.5884C3 8.22524 3.19689 7.89062 3.51436 7.71425L11.5144 3.2698C11.8164 3.10201 12.1836 3.10201 12.4856 3.2698L20.4856 7.71425C20.8031 7.89062 21 8.22524 21 8.5884V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20Z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M3 8.5L12 13.5L21 8.5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+      </g>
     </svg>
   );
 }

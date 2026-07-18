@@ -1109,36 +1109,30 @@ img.logo-nav-mark--footer {
       animation: phone-icon-hover 0.55s ease-in-out;
     }
 
-    /* Mail: envelope flap opens + letter rises on hover */
+    /* Mail: SVG Repo closed ↔ open envelope swap on hover */
     .email-icon {
       overflow: visible;
     }
 
-    .email-icon__flap,
-    .email-icon__letter {
-      transform-box: fill-box;
-      transition:
-        transform 0.45s cubic-bezier(0.25, 0.1, 0.25, 1),
-        opacity 0.35s ease;
+    .email-icon__closed,
+    .email-icon__open {
+      transition: opacity 0.28s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
 
-    .email-icon__flap {
-      transform-origin: 12px 8.25px;
+    .email-icon__closed {
+      opacity: 1;
     }
 
-    .email-icon__letter {
-      transform-origin: center bottom;
-      transform: translateY(1.5px) scaleY(0.85);
-      opacity: 0.2;
+    .email-icon__open {
+      opacity: 0;
     }
 
-    .contact-link-email:hover .email-icon__flap {
-      transform: translateY(-1px) scaleY(-1);
+    .contact-link-email:hover .email-icon__closed {
+      opacity: 0;
     }
 
-    .contact-link-email:hover .email-icon__letter {
-      transform: translateY(-3.5px) scaleY(1);
-      opacity: 0.55;
+    .contact-link-email:hover .email-icon__open {
+      opacity: 1;
     }
 
     .contact-link-email:hover .contact-icon-ring {

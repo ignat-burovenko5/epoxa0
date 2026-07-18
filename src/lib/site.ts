@@ -30,7 +30,7 @@ export const siteConfig = {
   areaServed: ["RU", "BY", "KZ", "AE"],
   workingHours:
     "пн–пт 10:00–18:30, сб 10:00–16:30, вс — выходной (осмотр по договорённости)",
-  navLinks: [],
+  navLinks: [] as { label: string; href: string }[],
   catalogNavLinks: [
     { label: "Все товары", href: "/collection" },
     { label: "Акционные товары", href: "/aktsionnye-tovary" },
