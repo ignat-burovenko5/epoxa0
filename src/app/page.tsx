@@ -5,7 +5,6 @@ import ProductPrice from "@/components/ProductPrice";
 import Image from "next/image";
 import Link from "next/link";
 import FloatingConciergeLazy from "@/components/FloatingConciergeLazy";
-import HomeInfoSections from "@/components/HomeInfoSections";
 import PageContainer from "@/components/PageContainer";
 import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
 import {
@@ -152,8 +151,6 @@ export default async function Homepage() {
           </div>
         </PageContainer>
       </section>
-
-      <HomeInfoSections />
 
       <FloatingConciergeLazy />
     </main>
