@@ -39,7 +39,12 @@ export default async function BlogAdminHubPage({ searchParams }: PageProps) {
           <p className="font-sans text-sm text-museum-light/50 text-center py-12">Загрузка…</p>
         }
       >
-        <CmsHub overview={overview} posts={page.items} productsPage={productsPage} />
+        <CmsHub
+          overview={overview}
+          posts={page.items}
+          productsPage={productsPage}
+          initialProductStatus={productStatus}
+        />
       </Suspense>
     </BlogCmsShell>
   );

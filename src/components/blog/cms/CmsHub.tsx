@@ -20,6 +20,7 @@ type CmsHubProps = {
   overview: DashboardOverview;
   posts: BlogPostSummary[];
   productsPage: ProductListPage;
+  initialProductStatus?: string;
 };
 
 const hubBtnClass =
@@ -29,11 +30,12 @@ export default function CmsHub({
   overview: initialOverview,
   posts,
   productsPage,
+  initialProductStatus = "all",
 }: CmsHubProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const view = searchParams.get("view");
-  const productStatus = searchParams.get("status") ?? "all";
+  const productStatus = searchParams.get("status") ?? initialProductStatus;
   const periodDays = parseOverviewPeriodDays(searchParams.get("days"));
   const focusDate = searchParams.get("date") ?? undefined;
   const liveStats = view === null || view === "analytics";
