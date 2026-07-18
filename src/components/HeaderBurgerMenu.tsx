@@ -133,53 +133,72 @@ export default function HeaderBurgerMenu() {
               className={`catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col border-r ${siteChromeSurfaceClass} pb-[env(safe-area-inset-bottom,0px)]`}
             >
               <nav
-                className="catalog-sidenav-panel__nav flex-1 overflow-y-auto hidden-scrollbar px-3 py-4 space-y-8"
+                className="catalog-sidenav-panel__nav collection-category-scroll flex-1 overflow-y-auto overscroll-y-contain px-3 py-4"
                 aria-label="Навигация по сайту"
               >
-                <div>
-                  <p className="mb-2 px-3 font-sans text-[10px] tracking-[0.25em] uppercase text-museum-light/45">
-                    Каталог
+                <header className="mb-4 border-b border-museum-light/10 px-1 pb-4">
+                  <p className="mb-1.5 font-sans text-[9px] tracking-[0.28em] uppercase text-accent-gold/75">
+                    Навигация
                   </p>
-                  <ul>
-                    {siteConfig.catalogNavLinks.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={close}
-                          className={`${categoryLinkBase} ${
-                            pathname === item.href
-                              ? "border-accent-gold text-accent-gold"
-                              : "text-museum-light/65 hover:text-accent-gold"
-                          }`}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                    {siteConfig.categoryLinks.map((item) => {
-                    const active = pathname === categoryHref(item.slug);
-                    const highlighted = "highlight" in item && item.highlight;
+                  <div className="flex items-end justify-between gap-3">
+                    <h2 className="font-serif text-2xl leading-none tracking-tight text-museum-light">
+                      Каталог
+                    </h2>
+                    <span className="pb-0.5 font-sans text-[10px] tabular-nums tracking-[0.12em] uppercase text-museum-light/35">
+                      {categoryCount}
+                    </span>
+                  </div>
+                  <span
+                    className="mt-3 block h-px w-10 bg-gradient-to-r from-accent-gold/70 to-transparent"
+                    aria-hidden="true"
+                  />
+                </header>
 
-                    return (
-                      <li key={item.slug}>
-                        <Link
-                          href={categoryHref(item.slug)}
-                          onClick={close}
-                          className={`${categoryLinkBase} ${
-                            active
-                              ? highlighted
-                                ? "border-[#E8A6AB] text-[#F5C7CA]"
-                                : "border-accent-gold text-accent-gold"
-                              : highlighted
-                                ? "text-[#E8A6AB] hover:text-[#F5C7CA]"
-                                : "text-museum-light/65 hover:text-accent-gold"
-                          }`}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    );
-                  })}
+                {siteConfig.catalogNavLinks.length > 0 ? (
+                  <div className="mb-4">
+                    <p className="mb-1.5 px-3.5 font-sans text-[9px] tracking-[0.2em] uppercase text-museum-light/35">
+                      Обзор
+                    </p>
+                    <ul className="m-0 list-none space-y-0.5 p-0">
+                      {siteConfig.catalogNavLinks.map((item) => (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={close}
+                            className={categoryLinkClass({
+                              active: pathname === item.href,
+                              primary: true,
+                            })}
+                          >
+                            {item.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+
+                <div>
+                  <p className="mb-1.5 px-3.5 font-sans text-[9px] tracking-[0.2em] uppercase text-museum-light/35">
+                    Разделы
+                  </p>
+                  <ul className="m-0 list-none space-y-0.5 border-t border-museum-light/[0.06] p-0 pt-1">
+                    {siteConfig.categoryLinks.map((item) => {
+                      const active = pathname === categoryHref(item.slug);
+                      const highlighted = "highlight" in item && item.highlight;
+
+                      return (
+                        <li key={item.slug}>
+                          <Link
+                            href={categoryHref(item.slug)}
+                            onClick={close}
+                            className={categoryLinkClass({ active, highlighted })}
+                          >
+                            <span className="line-clamp-2">{item.label}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </nav>
