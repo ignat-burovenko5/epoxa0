@@ -270,6 +270,88 @@ def blog_admin_overview(request: HttpRequest):
     return json_response(get_dashboard_overview(days, focus_date))
 
 
+# --- Catalog products admin ---
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def blog_admin_products(request: HttpRequest):
+    if not _require_session(request):
+        return unauthorized()
+    product_service.ensure_seeded()
+    if request.method == "GET":
+        offset = _safe_int(request.GET.get("offset", 0), 0, minimum=0)
+        limit = _safe_int(request.GET.get("limit", 100), 100, minimum=1, maximum=500)
+        status = (request.GET.get("status") or "").strip() or None
+        q = (request.GET.get("q") or "").strip()
+        return json_response(
+            product_service.list_products(status=status, q=q, offset=offset, limit=limit)
+        )
+    body = parse_json(request)
+    if body is None:
+        return json_error("Invalid JSON")
+    try:
+        product = product_service.create_product(body)
+    except ValueError as err:
+        return json_error(str(err), 400)
+    return json_response(product, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PUT", "DELETE"])
+def blog_admin_product_detail(request: HttpRequest, slug: str):
+    if not _require_session(request):
+        return unauthorized()
+    if request.method == "GET":
+        product = product_service.get_product(slug)
+        if not product:
+            return json_error("Товар не найден", 404)
+        return json_response(product_service.product_to_dict(product))
+    if request.method == "PUT":
+        body = parse_json(request)
+        if body is None:
+            return json_error("Invalid JSON")
+        try:
+            product = product_service.update_product(slug, body)
+        except ValueError as err:
+            return json_error(str(err), 400)
+        if not product:
+            return json_error("Товар не найден", 404)
+        return json_response(product)
+    if product_service.delete_product(slug):
+        return json_response({"ok": True})
+    return json_error("Товар не найден", 404)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def blog_admin_product_status(request: HttpRequest, slug: str):
+    if not _require_session(request):
+        return unauthorized()
+    body = parse_json(request)
+    if body is None:
+        return json_error("Invalid JSON")
+    status = (body.get("status") or "").strip()
+    try:
+        product = product_service.set_status(slug, status)
+    except ValueError as err:
+        return json_error(str(err), 400)
+    if not product:
+        return json_error("Товар не найден", 404)
+    return json_response(product)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def blog_admin_products_seed(request: HttpRequest):
+    if not _require_session(request):
+        return unauthorized()
+    body = parse_json(request) or {}
+    force = bool(body.get("force"))
+    result = product_service.seed_from_catalog_json(force=force)
+    return json_response({"ok": True, **result})
+
+
 # --- Analytics ---
 
 
