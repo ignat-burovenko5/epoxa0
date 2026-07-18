@@ -293,10 +293,11 @@ export default function ProductList({
 
   const sidebarCategories = useMemo(() => {
     const knownOrder = siteConfig.categoryLinks.map((c) => c.label);
+    const knownSet = new Set<string>(knownOrder);
     const map = new Map(categoryCounts.map((c) => [c.label, c.count]));
     const known = knownOrder.filter((label) => map.has(label));
     const extras = [...map.keys()]
-      .filter((label) => !known.includes(label))
+      .filter((label) => !knownSet.has(label))
       .sort((a, b) => a.localeCompare(b, "ru"));
     const facetTotal = categoryCounts.reduce((s, c) => s + c.count, 0);
     return [
