@@ -17,6 +17,7 @@ type CatalogInfiniteGridProps = {
   initialTotal: number;
   initialHasMore: boolean;
   categorySlug?: string | null;
+  saleOnly?: boolean;
 };
 
 export default function CatalogInfiniteGrid({
@@ -24,6 +25,7 @@ export default function CatalogInfiniteGrid({
   initialTotal,
   initialHasMore,
   categorySlug = null,
+  saleOnly = false,
 }: CatalogInfiniteGridProps) {
   const [items, setItems] = useState(initialItems);
   const [total, setTotal] = useState(initialTotal);
@@ -38,7 +40,7 @@ export default function CatalogInfiniteGrid({
     setTotal(initialTotal);
     setHasMore(initialHasMore);
     setError(null);
-  }, [initialItems, initialTotal, initialHasMore, categorySlug]);
+  }, [initialItems, initialTotal, initialHasMore, categorySlug, saleOnly]);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) return;
@@ -52,7 +54,9 @@ export default function CatalogInfiniteGrid({
         offset: String(items.length),
         limit: String(CATALOG_PAGE_SIZE),
       });
-      if (categorySlug) {
+      if (saleOnly) {
+        params.set("sale", "1");
+      } else if (categorySlug) {
         params.set("category", categorySlug);
       }
 
@@ -76,7 +80,7 @@ export default function CatalogInfiniteGrid({
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [categorySlug, hasMore, items.length]);
+  }, [categorySlug, hasMore, items.length, saleOnly]);
 
   useEffect(() => {
     const node = sentinelRef.current;
@@ -129,7 +133,9 @@ export default function CatalogInfiniteGrid({
 
       {!hasMore && items.length === 0 ? (
         <p className="mt-10 text-center font-sans text-sm text-luxury-charcoal/60">
-          В этой категории пока нет предметов.
+          {saleOnly
+            ? "Сейчас нет товаров со скидкой."
+            : "В этой категории пока нет предметов."}
         </p>
       ) : null}
     </div>
