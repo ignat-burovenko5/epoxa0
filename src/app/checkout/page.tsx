@@ -1,19 +1,18 @@
-"use client";
-
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import CheckoutPageLayout from "@/components/checkout/CheckoutPageLayout";
 import CheckoutSuccess from "@/components/checkout/CheckoutSuccess";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { orderFromSlug } from "@/lib/order";
 
-function CheckoutContent() {
-  const searchParams = useSearchParams();
-  const sent = searchParams.get("sent") === "1";
-  const slug = searchParams.get("slug");
-  const order = orderFromSlug(slug);
+type CheckoutPageProps = {
+  searchParams: Promise<{ sent?: string; slug?: string }>;
+};
+
+export default async function CheckoutPage({ searchParams }: CheckoutPageProps) {
+  const { sent: sentParam, slug } = await searchParams;
+  const sent = sentParam === "1";
+  const order = orderFromSlug(slug ?? null);
 
   if (sent) {
     return (
@@ -56,19 +55,5 @@ function CheckoutContent() {
     >
       <CheckoutForm order={order} backHref={backHref} />
     </CheckoutPageLayout>
-  );
-}
-
-export default function CheckoutPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="bg-museum-light min-h-[50vh] flex items-center justify-center">
-          <p className="font-sans text-sm text-luxury-charcoal/50">Загрузка…</p>
-        </main>
-      }
-    >
-      <CheckoutContent />
-    </Suspense>
   );
 }
