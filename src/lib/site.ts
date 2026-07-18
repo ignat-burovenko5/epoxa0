@@ -32,16 +32,7 @@ export const siteConfig = {
   areaServed: ["RU", "BY", "KZ", "AE"],
   workingHours:
     "пн–пт 10:00–18:30, сб 10:00–16:30, вс — выходной (осмотр по договорённости)",
-  navLinks: [
-    { label: "О «Эпохе»", href: "/o-salone" },
-    { label: "Блог", href: blogIndexPath() },
-    { label: "Новости", href: "/novosti" },
-    { label: "Акции", href: "/skidki" },
-    { label: "Услуги", href: "/uslugi" },
-    { label: "Партнёрам", href: "/sotrudnichestvo" },
-    { label: "Статьи", href: "/stati" },
-    { label: "Как нас найти", href: "/adres" },
-  ],
+  navLinks: [],
   catalogNavLinks: [
     { label: "Все товары", href: "/collection" },
     { label: "Акционные товары", href: "/aktsionnye-tovary" },
