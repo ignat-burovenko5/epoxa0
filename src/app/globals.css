@@ -1143,6 +1143,7 @@ img.logo-nav-mark--footer {
 
     .contact-link-email:hover .contact-icon-ring {
       overflow: visible;
+      contain: none;
     }
   }
 }
