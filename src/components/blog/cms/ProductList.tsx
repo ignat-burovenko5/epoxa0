@@ -124,13 +124,13 @@ export default function ProductList({
   ];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]">
+    <div className="grid gap-6 lg:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)] xl:gap-10">
       <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
-        <div className="border border-museum-light/10 bg-luxury-base/30 p-4">
-          <p className="font-sans text-[10px] tracking-widest uppercase text-accent-gold/75 mb-3">
+        <div className="border border-museum-light/10 bg-luxury-base/30 p-5 md:p-6">
+          <p className="font-sans text-xs tracking-[0.2em] uppercase text-accent-gold/80 mb-4">
             Категории
           </p>
-          <ul className="list-none m-0 p-0 max-h-[min(70vh,40rem)] overflow-y-auto hidden-scrollbar space-y-0.5">
+          <ul className="list-none m-0 p-0 max-h-[min(75vh,48rem)] overflow-y-auto hidden-scrollbar space-y-1">
             {categoryCounts.map((item) => {
               const id = item.label;
               const active = category === id;
@@ -140,14 +140,14 @@ export default function ProductList({
                   <button
                     type="button"
                     onClick={() => setCategory(id)}
-                    className={`flex w-full items-start justify-between gap-2 min-h-10 px-2.5 py-2 text-left font-sans text-[11px] leading-snug tracking-wide transition-colors ${
+                    className={`flex w-full items-center justify-between gap-3 min-h-12 px-3.5 py-3 text-left font-sans text-sm leading-snug tracking-wide transition-colors ${
                       active
-                        ? "bg-accent-brass/15 text-accent-gold border-l-2 border-accent-gold"
-                        : "text-museum-light/60 hover:text-museum-light border-l-2 border-transparent hover:bg-museum-light/[0.04]"
+                        ? "bg-accent-brass/15 text-accent-gold border-l-[3px] border-accent-gold"
+                        : "text-museum-light/65 hover:text-museum-light border-l-[3px] border-transparent hover:bg-museum-light/[0.04]"
                     }`}
                   >
                     <span className="min-w-0 break-words">{label}</span>
-                    <span className="shrink-0 tabular-nums text-museum-light/35">
+                    <span className="shrink-0 tabular-nums text-base text-museum-light/40">
                       {item.count}
                     </span>
                   </button>
@@ -158,15 +158,15 @@ export default function ProductList({
         </div>
       </aside>
 
-      <div className="min-w-0 space-y-5">
+      <div className="min-w-0 space-y-6">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5">
             {statusFilters.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => setFilter(item.id)}
-                className={`min-h-10 px-3.5 font-sans text-[10px] tracking-widest uppercase border transition-colors ${
+                className={`min-h-11 px-4 font-sans text-[11px] tracking-widest uppercase border transition-colors ${
                   filter === item.id
                     ? "border-accent-gold/70 text-accent-gold bg-accent-brass/10"
                     : "border-museum-light/20 text-museum-light/55 hover:border-museum-light/40"
@@ -176,15 +176,15 @@ export default function ProductList({
               </button>
             ))}
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:min-w-[20rem] sm:flex-1 xl:flex-none xl:w-[22rem]">
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:min-w-[22rem] sm:flex-1 xl:flex-none xl:w-[26rem]">
             <input
               type="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Поиск по названию, slug, эпохе…"
-              className="w-full min-h-11 bg-luxury-base border border-museum-light/20 px-3 py-2 font-sans text-sm text-museum-light focus:border-accent-gold/50 focus:outline-none"
+              className="w-full min-h-12 bg-luxury-base border border-museum-light/20 px-4 py-2.5 font-sans text-sm md:text-base text-museum-light focus:border-accent-gold/50 focus:outline-none"
             />
-            <p className="font-sans text-xs text-museum-light/45 whitespace-nowrap sm:px-1">
+            <p className="font-sans text-sm text-museum-light/45 whitespace-nowrap sm:px-1">
               {visible.length} из {products.length}
             </p>
           </div>
