@@ -6,19 +6,21 @@ import {
 } from "@/lib/site";
 
 /**
- * Homepage catalog index — grouped columns for scanability.
+ * Homepage catalog index — featured strip + height-balanced columns.
  */
 export default function HomeCategoriesNav() {
   const groups = groupedCategoryLinks();
+  const featured = groups[0];
+  const rest = groups.slice(1);
 
   return (
     <nav
       aria-label="Категории каталога"
-      className="home-categories-nav mb-12 md:mb-16"
+      className="home-categories-nav mb-12 md:mb-14"
     >
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 md:mb-8">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2 md:mb-6">
         <div>
-          <p className="mb-2 font-sans text-[10px] tracking-[0.22em] uppercase text-accent-brass/85">
+          <p className="mb-1.5 font-sans text-[10px] tracking-[0.22em] uppercase text-accent-brass/85">
             Каталог
           </p>
           <h3 className="font-serif text-2xl md:text-[1.75rem] leading-none tracking-tight text-luxury-base">
@@ -34,34 +36,61 @@ export default function HomeCategoriesNav() {
       </div>
 
       <span
-        className="mb-7 block h-px w-14 bg-gradient-to-r from-accent-brass/75 to-transparent md:mb-8"
+        className="mb-6 block h-px w-14 bg-gradient-to-r from-accent-brass/75 to-transparent md:mb-7"
         aria-hidden="true"
       />
 
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        {groups.map((group, groupIndex) => (
-          <div key={group.label}>
-            <p className="mb-3 font-sans text-[10px] tracking-[0.18em] uppercase text-luxury-charcoal/40">
-              {group.label}
-            </p>
-            <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-              {groupIndex === 0 ? (
-                <li>
+      {/* Featured — one short horizontal band */}
+      {featured ? (
+        <div className="mb-8 md:mb-10">
+          <p className="mb-3 font-sans text-[10px] tracking-[0.18em] uppercase text-luxury-charcoal/40">
+            {featured.label}
+          </p>
+          <ul className="m-0 flex list-none flex-wrap items-baseline gap-x-5 gap-y-2.5 p-0 sm:gap-x-7">
+            <li>
+              <Link
+                href={COLLECTION_SALE_HREF}
+                className="cursor-pointer font-sans text-[12px] leading-snug tracking-[0.06em] uppercase text-luxury-bordeaux transition-colors hover:text-luxury-bordeaux/80"
+              >
+                Акционные товары
+              </Link>
+            </li>
+            {featured.items.map((item) => {
+              const highlighted = "highlight" in item && item.highlight;
+              return (
+                <li key={item.slug}>
                   <Link
-                    href={COLLECTION_SALE_HREF}
-                    className="cursor-pointer block py-0.5 font-sans text-[12px] leading-relaxed tracking-[0.06em] uppercase text-luxury-bordeaux transition-colors duration-300 hover:text-luxury-bordeaux/80"
+                    href={categoryHref(item.slug)}
+                    className={`cursor-pointer font-sans text-[12px] leading-snug tracking-[0.06em] uppercase transition-colors ${
+                      highlighted
+                        ? "text-luxury-bordeaux hover:text-luxury-bordeaux/80"
+                        : "text-luxury-charcoal/70 hover:text-accent-brass"
+                    }`}
                   >
-                    Акционные товары
+                    {item.label}
                   </Link>
                 </li>
-              ) : null}
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
+
+      {/* Remaining groups — CSS columns balance height across the band */}
+      <div className="home-categories-columns gap-x-10 sm:gap-x-12 lg:gap-x-14">
+        {rest.map((group) => (
+          <div key={group.label} className="home-categories-group mb-7 break-inside-avoid last:mb-0 sm:mb-8">
+            <p className="mb-2.5 font-sans text-[10px] tracking-[0.18em] uppercase text-luxury-charcoal/40">
+              {group.label}
+            </p>
+            <ul className="m-0 flex list-none flex-col gap-2 p-0">
               {group.items.map((item) => {
                 const highlighted = "highlight" in item && item.highlight;
                 return (
                   <li key={item.slug}>
                     <Link
                       href={categoryHref(item.slug)}
-                      className={`cursor-pointer block py-0.5 font-sans text-[12px] leading-relaxed tracking-[0.06em] uppercase transition-colors duration-300 ${
+                      className={`cursor-pointer block font-sans text-[12px] leading-snug tracking-[0.05em] uppercase transition-colors duration-300 ${
                         highlighted
                           ? "text-luxury-bordeaux hover:text-luxury-bordeaux/80"
                           : "text-luxury-charcoal/65 hover:text-accent-brass"
