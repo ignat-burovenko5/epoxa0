@@ -378,7 +378,6 @@ body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
 @media (prefers-reduced-motion: reduce) {
   .catalog-sidenav-root__panel,
   .catalog-sidenav-panel,
-  .catalog-sidenav-panel::after,
   .catalog-sidenav-backdrop {
     animation-duration: 0.01ms;
     transition-duration: 0.01ms;
