@@ -98,6 +98,8 @@ export default function ProductImagesField({
   const [batchStatus, setBatchStatus] = useState<"idle" | "uploading" | "done" | "error">(
     "idle",
   );
+  const [dragFrom, setDragFrom] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const urls = useMemo(() => parseUrls(value), [value]);
 
@@ -232,11 +234,22 @@ export default function ProductImagesField({
   }
 
   function move(index: number, dir: -1 | 1) {
+    moveTo(index, index + dir);
+  }
+
+  function moveTo(from: number, to: number) {
+    if (from === to || from < 0 || to < 0 || from >= urls.length || to >= urls.length) {
+      return;
+    }
     const next = [...urls];
-    const target = index + dir;
-    if (target < 0 || target >= next.length) return;
-    [next[index], next[target]] = [next[target], next[index]];
+    const [item] = next.splice(from, 1);
+    if (!item) return;
+    next.splice(to, 0, item);
     setUrls(next);
+  }
+
+  function makeMain(index: number) {
+    moveTo(index, 0);
   }
 
   function removeAt(index: number) {
@@ -249,6 +262,36 @@ export default function ProductImagesField({
       });
     }
     setUrls(urls.filter((_, i) => i !== index));
+  }
+
+  function onReorderDragStart(index: number, e: React.DragEvent) {
+    if (uploading) {
+      e.preventDefault();
+      return;
+    }
+    setDragFrom(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index));
+  }
+
+  function onReorderDragOver(index: number, e: React.DragEvent) {
+    if (dragFrom === null) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverIndex !== index) setDragOverIndex(index);
+  }
+
+  function onReorderDrop(index: number, e: React.DragEvent) {
+    e.preventDefault();
+    const from = dragFrom ?? Number(e.dataTransfer.getData("text/plain"));
+    if (Number.isFinite(from)) moveTo(from, index);
+    setDragFrom(null);
+    setDragOverIndex(null);
+  }
+
+  function onReorderDragEnd() {
+    setDragFrom(null);
+    setDragOverIndex(null);
   }
 
   function dismissPending(id: string) {
