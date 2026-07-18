@@ -1,14 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 type GallerySlide = {
@@ -21,18 +14,7 @@ type ProductImageGalleryProps = {
   slides: readonly GallerySlide[];
 };
 
-/** Keep this image point under the cursor after a zoom step. */
-type ZoomAnchor = {
-  ratioX: number;
-  ratioY: number;
-  clientX: number;
-  clientY: number;
-};
-
-/** Discrete zoom levels (fit → 1st zoom → 2nd zoom). Two zoom-in clicks,
- * then the next click zooms back out. Not shown in UI. */
-const ZOOM_LEVELS = 3;
-const DEFAULT_ZOOM = 0;
+const ZOOM_SCALE = 2.4;
 
 const mainImageClass =
   "left-0 right-0 top-1/2 mx-auto h-auto w-full max-w-full -translate-y-1/2 max-h-[calc(100dvh-var(--site-header-offset)-6rem)] object-contain transition-[opacity,transform] duration-500 ease-luxury-ease motion-reduce:transition-none";
@@ -42,9 +24,6 @@ const arrowButtonClass =
 
 const lightboxArrowClass =
   "absolute top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center border border-museum-light/25 bg-luxury-base/70 text-museum-light backdrop-blur-sm transition-colors hover:border-accent-gold/50 hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation";
-
-const zoomControlBtnClass =
-  "flex h-9 min-w-9 items-center justify-center border border-museum-light/20 px-2 font-sans text-[10px] tracking-[0.14em] uppercase text-museum-light/75 transition-colors hover:border-accent-gold/50 hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-museum-light/20 disabled:hover:text-museum-light/75";
 
 function GalleryArrow({
   direction,
@@ -82,94 +61,36 @@ function GalleryArrow({
   );
 }
 
-function clamp01(value: number) {
-  return Math.min(1, Math.max(0, value));
-}
-
-function captureAnchor(
+function originFromPointer(
   clientX: number,
   clientY: number,
-  imageEl: HTMLElement,
-): ZoomAnchor {
-  const rect = imageEl.getBoundingClientRect();
+  el: HTMLElement,
+): { x: number; y: number } {
+  const rect = el.getBoundingClientRect();
   const width = rect.width || 1;
   const height = rect.height || 1;
   return {
-    ratioX: clamp01((clientX - rect.left) / width),
-    ratioY: clamp01((clientY - rect.top) / height),
-    clientX,
-    clientY,
+    x: Math.min(100, Math.max(0, ((clientX - rect.left) / width) * 100)),
+    y: Math.min(100, Math.max(0, ((clientY - rect.top) / height) * 100)),
   };
-}
-
-function captureViewportCenterAnchor(
-  stage: HTMLElement,
-  imageEl: HTMLElement,
-): ZoomAnchor {
-  const stageRect = stage.getBoundingClientRect();
-  return captureAnchor(
-    stageRect.left + stageRect.width / 2,
-    stageRect.top + stageRect.height / 2,
-    imageEl,
-  );
-}
-
-function applyZoomAnchor(
-  stage: HTMLElement,
-  imageEl: HTMLElement,
-  anchor: ZoomAnchor,
-) {
-  const stageRect = stage.getBoundingClientRect();
-  const imgRect = imageEl.getBoundingClientRect();
-  const pointX =
-    stage.scrollLeft +
-    (imgRect.left - stageRect.left) +
-    anchor.ratioX * imgRect.width;
-  const pointY =
-    stage.scrollTop +
-    (imgRect.top - stageRect.top) +
-    anchor.ratioY * imgRect.height;
-
-  stage.scrollLeft = pointX - (anchor.clientX - stageRect.left);
-  stage.scrollTop = pointY - (anchor.clientY - stageRect.top);
-}
-
-function zoomWidthFor(level: number): string | undefined {
-  if (level <= 0) return undefined;
-  if (level === 1) return "min(160vw, 1600px)";
-  return "min(240vw, 2400px)";
 }
 
 export default function ProductImageGallery({ slides }: ProductImageGalleryProps) {
   const lightboxTitleId = useId();
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+  const [zoomed, setZoomed] = useState(false);
+  const [origin, setOrigin] = useState({ x: 50, y: 50 });
   const touchStartX = useRef(0);
   const lightboxTouchStartX = useRef(0);
   const stageRef = useRef<HTMLDivElement | null>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
-  const pendingAnchorRef = useRef<ZoomAnchor | null>(null);
+  const imageButtonRef = useRef<HTMLButtonElement | null>(null);
   const hasMultiple = slides.length > 1;
   const activeSlide = slides[activeIndex] ?? slides[0];
-  const canZoomOut = zoom > 0;
-  const canZoomIn = zoom < ZOOM_LEVELS - 1;
-  const zoomedIn = zoom > DEFAULT_ZOOM;
-  const zoomWidth = zoomWidthFor(zoom);
 
   const resetZoom = useCallback(() => {
-    pendingAnchorRef.current = null;
-    setZoom(DEFAULT_ZOOM);
-  }, []);
-
-  const zoomIn = useCallback((anchor?: ZoomAnchor | null) => {
-    if (anchor) pendingAnchorRef.current = anchor;
-    setZoom((current) => Math.min(current + 1, ZOOM_LEVELS - 1));
-  }, []);
-
-  const zoomOut = useCallback((anchor?: ZoomAnchor | null) => {
-    if (anchor) pendingAnchorRef.current = anchor;
-    setZoom((current) => Math.max(current - 1, 0));
+    setZoomed(false);
+    setOrigin({ x: 50, y: 50 });
   }, []);
 
   const goPrev = useCallback(() => {
@@ -195,33 +116,34 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   const onImageClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
-      const imageEl = imageRef.current ?? event.currentTarget;
-      const anchor = captureAnchor(event.clientX, event.clientY, imageEl);
-
-      if (canZoomIn) {
-        zoomIn(anchor);
-      } else {
+      if (zoomed) {
         resetZoom();
+        return;
       }
+      const next = originFromPointer(event.clientX, event.clientY, event.currentTarget);
+      setOrigin(next);
+      setZoomed(true);
     },
-    [canZoomIn, zoomIn, resetZoom],
+    [zoomed, resetZoom],
   );
 
-  const onToolbarZoomIn = useCallback(() => {
-    const stage = stageRef.current;
-    const imageEl = imageRef.current;
-    const anchor =
-      stage && imageEl ? captureViewportCenterAnchor(stage, imageEl) : null;
-    zoomIn(anchor);
-  }, [zoomIn]);
+  const onPointerMove = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (!zoomed) return;
+      setOrigin(originFromPointer(event.clientX, event.clientY, event.currentTarget));
+    },
+    [zoomed],
+  );
 
-  const onToolbarZoomOut = useCallback(() => {
-    const stage = stageRef.current;
-    const imageEl = imageRef.current;
-    const anchor =
-      stage && imageEl ? captureViewportCenterAnchor(stage, imageEl) : null;
-    zoomOut(anchor);
-  }, [zoomOut]);
+  const onTouchMovePan = useCallback(
+    (event: React.TouchEvent<HTMLButtonElement>) => {
+      if (!zoomed) return;
+      const touch = event.touches[0];
+      if (!touch) return;
+      setOrigin(originFromPointer(touch.clientX, touch.clientY, event.currentTarget));
+    },
+    [zoomed],
+  );
 
   useEffect(() => {
     for (const slide of slides) {
@@ -229,28 +151,6 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
       img.src = slide.src;
     }
   }, [slides]);
-
-  useLayoutEffect(() => {
-    if (!lightboxOpen) return;
-
-    const stage = stageRef.current;
-    const imageEl = imageRef.current;
-    if (!stage || !imageEl) return;
-
-    if (zoom === DEFAULT_ZOOM) {
-      stage.scrollLeft = 0;
-      stage.scrollTop = 0;
-      pendingAnchorRef.current = null;
-      return;
-    }
-
-    const anchor = pendingAnchorRef.current;
-    if (!anchor) return;
-    pendingAnchorRef.current = null;
-
-    // Layout after width style is applied (no CSS transition on size).
-    applyZoomAnchor(stage, imageEl, anchor);
-  }, [lightboxOpen, zoom, activeIndex]);
 
   useEffect(() => {
     if (!lightboxOpen) return;
@@ -261,17 +161,18 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        closeLightbox();
+        if (zoomed) resetZoom();
+        else closeLightbox();
       } else if (event.key === "+" || event.key === "=") {
         event.preventDefault();
-        onToolbarZoomIn();
+        setZoomed(true);
       } else if (event.key === "-" || event.key === "_") {
         event.preventDefault();
-        onToolbarZoomOut();
-      } else if (hasMultiple && event.key === "ArrowLeft" && zoom === DEFAULT_ZOOM) {
+        resetZoom();
+      } else if (hasMultiple && event.key === "ArrowLeft" && !zoomed) {
         event.preventDefault();
         goPrev();
-      } else if (hasMultiple && event.key === "ArrowRight" && zoom === DEFAULT_ZOOM) {
+      } else if (hasMultiple && event.key === "ArrowRight" && !zoomed) {
         event.preventDefault();
         goNext();
       }
@@ -282,16 +183,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [
-    lightboxOpen,
-    hasMultiple,
-    zoom,
-    closeLightbox,
-    goPrev,
-    goNext,
-    onToolbarZoomIn,
-    onToolbarZoomOut,
-  ]);
+  }, [lightboxOpen, hasMultiple, zoomed, closeLightbox, goPrev, goNext, resetZoom]);
 
   useEffect(() => {
     if (lightboxOpen || !hasMultiple) return;
@@ -317,20 +209,22 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
 
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
-      const imageEl = imageRef.current;
-      if (!imageEl) return;
-
-      const anchor = captureAnchor(event.clientX, event.clientY, imageEl);
       if (event.deltaY < 0) {
-        if (canZoomIn) zoomIn(anchor);
-      } else if (canZoomOut) {
-        zoomOut(anchor);
+        const target = imageButtonRef.current;
+        if (target) {
+          setOrigin(originFromPointer(event.clientX, event.clientY, target));
+        }
+        setZoomed(true);
+      } else {
+        resetZoom();
       }
     };
 
     stage.addEventListener("wheel", onWheel, { passive: false });
     return () => stage.removeEventListener("wheel", onWheel);
-  }, [lightboxOpen, canZoomIn, canZoomOut, zoomIn, zoomOut]);
+  }, [lightboxOpen, resetZoom]);
+
+  const imageButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const onTouchStart = (event: React.TouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? 0;
@@ -350,7 +244,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   };
 
   const onLightboxTouchEnd = (event: React.TouchEvent) => {
-    if (!hasMultiple || zoom !== DEFAULT_ZOOM) return;
+    if (!hasMultiple || zoomed) return;
     const endX = event.changedTouches[0]?.clientX ?? 0;
     const delta = lightboxTouchStartX.current - endX;
     if (Math.abs(delta) < 48) return;
@@ -388,7 +282,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
               </svg>
             </button>
 
-            {hasMultiple && zoom === DEFAULT_ZOOM ? (
+            {hasMultiple && !zoomed ? (
               <GalleryArrow
                 direction="prev"
                 onClick={(e) => {
@@ -401,48 +295,44 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
 
             <div
               ref={stageRef}
-              className="relative h-full w-full overflow-auto overscroll-contain px-4 py-20 sm:px-16"
+              className="relative flex h-full w-full items-center justify-center overflow-hidden px-4 py-20 sm:px-16"
               onClick={(e) => e.stopPropagation()}
               onTouchStart={onLightboxTouchStart}
               onTouchEnd={onLightboxTouchEnd}
             >
-              <div
-                className={`flex min-h-full min-w-full ${
-                  zoomedIn ? "items-start justify-start" : "items-center justify-center"
+              <button
+                ref={imageButtonRef}
+                type="button"
+                onClick={onImageClick}
+                onMouseMove={onPointerMove}
+                onTouchMove={onTouchMovePan}
+                aria-label={
+                  zoomed
+                    ? "Уменьшить. Двигайте курсор, чтобы рассмотреть детали"
+                    : "Увеличить. Затем двигайте курсор по фото"
+                }
+                className={`relative block max-h-full max-w-[min(100%,1100px)] border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 ${
+                  zoomed ? "cursor-zoom-out" : "cursor-zoom-in"
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={onImageClick}
-                  aria-label={
-                    canZoomIn
-                      ? "Увеличить в точке клика"
-                      : "Сбросить масштаб"
-                  }
-                  className={`relative block border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 ${
-                    canZoomIn ? "cursor-zoom-in" : "cursor-zoom-out"
-                  }`}
+                {/* eslint-disable-next-line @next/next/no-img-element -- full-res lightbox zoom */}
+                <img
+                  src={activeSlide.src}
+                  alt={activeSlide.alt}
+                  draggable={false}
+                  className="block h-auto max-h-[min(78dvh,860px)] w-full max-w-none select-none object-contain will-change-transform"
                   style={{
-                    width: zoomWidth,
-                    maxWidth: zoomedIn ? "none" : "min(100%, 1100px)",
+                    transform: zoomed ? `scale(${ZOOM_SCALE})` : "scale(1)",
+                    transformOrigin: `${origin.x}% ${origin.y}%`,
+                    transition: zoomed
+                      ? "none"
+                      : "transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1)",
                   }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element -- full-res lightbox zoom */}
-                  <img
-                    ref={imageRef}
-                    src={activeSlide.src}
-                    alt={activeSlide.alt}
-                    draggable={false}
-                    className="block h-auto w-full max-w-none select-none object-contain"
-                    style={{
-                      maxHeight: zoomedIn ? "none" : "min(78dvh, 860px)",
-                    }}
-                  />
-                </button>
-              </div>
+                />
+              </button>
             </div>
 
-            {hasMultiple && zoom === DEFAULT_ZOOM ? (
+            {hasMultiple && !zoomed ? (
               <GalleryArrow
                 direction="next"
                 onClick={(e) => {
@@ -454,7 +344,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
             ) : null}
 
             <div
-              className="pointer-events-auto absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-30 flex w-[min(100%-1.5rem,28rem)] -translate-x-1/2 flex-col items-center gap-2 px-2"
+              className="pointer-events-none absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-30 flex w-[min(100%-1.5rem,28rem)] -translate-x-1/2 flex-col items-center gap-2 px-2"
               onClick={(e) => e.stopPropagation()}
             >
               {hasMultiple ? (
@@ -462,31 +352,9 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
                   {activeIndex + 1} / {slides.length}
                 </p>
               ) : null}
-
-              <div
-                className="flex items-center justify-center gap-1.5 rounded-sm border border-museum-light/15 bg-luxury-base/80 px-2 py-2 backdrop-blur-sm"
-                role="toolbar"
-                aria-label="Масштаб изображения"
-              >
-                <button
-                  type="button"
-                  className={zoomControlBtnClass}
-                  onClick={onToolbarZoomOut}
-                  disabled={!canZoomOut}
-                  aria-label="Уменьшить"
-                >
-                  −
-                </button>
-                <button
-                  type="button"
-                  className={zoomControlBtnClass}
-                  onClick={onToolbarZoomIn}
-                  disabled={!canZoomIn}
-                  aria-label="Увеличить"
-                >
-                  +
-                </button>
-              </div>
+              <p className="font-sans text-[10px] tracking-[0.14em] uppercase text-museum-light/40">
+                {zoomed ? "Двигайте курсор · клик — уменьшить" : "Клик — увеличить"}
+              </p>
             </div>
           </div>,
           document.body,
