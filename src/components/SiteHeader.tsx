@@ -34,14 +34,14 @@ export default function SiteHeader() {
               className={`${navIconOnlyClass} contact-link-email`}
               aria-label={`Написать на ${siteConfig.salonEmail}`}
             >
-              <EmailIcon className="h-5 w-5" />
+              <EmailIcon className="h-4 w-4" />
             </a>
             <a
               href={siteConfig.phoneHref}
               className={`${navIconOnlyClass} contact-link-phone`}
               aria-label={`Позвонить: ${siteConfig.phone}`}
             >
-              <PhoneIcon className="h-5 w-5" />
+              <PhoneIcon className="h-4 w-4" />
             </a>
           </div>
           <div className="hidden md:flex flex-col justify-center gap-0.5 sm:gap-1">
