@@ -50,3 +50,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# CMS uploads (keep folder placeholders)
+/media/products/**
+!/media/products/.gitkeep
+/media/blog/uploads/**
+!/media/blog/uploads/.gitkeep
+/public/products/**
+!/public/products/.gitkeep
