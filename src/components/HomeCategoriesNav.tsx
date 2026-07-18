@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { categoryHref, groupedCategoryLinks } from "@/lib/site";
+import {
+  categoryHref,
+  COLLECTION_SALE_HREF,
+  groupedCategoryLinks,
+} from "@/lib/site";
 
 /**
  * Homepage catalog index — grouped columns for scanability.
@@ -35,12 +39,22 @@ export default function HomeCategoriesNav() {
       />
 
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        {groups.map((group) => (
+        {groups.map((group, groupIndex) => (
           <div key={group.label}>
             <p className="mb-3 font-sans text-[10px] tracking-[0.18em] uppercase text-luxury-charcoal/40">
               {group.label}
             </p>
             <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
+              {groupIndex === 0 ? (
+                <li>
+                  <Link
+                    href={COLLECTION_SALE_HREF}
+                    className="cursor-pointer block py-0.5 font-sans text-[12px] leading-relaxed tracking-[0.06em] uppercase text-luxury-bordeaux transition-colors duration-300 hover:text-luxury-bordeaux/80"
+                  >
+                    Акционные товары
+                  </Link>
+                </li>
+              ) : null}
               {group.items.map((item) => {
                 const highlighted = "highlight" in item && item.highlight;
                 return (
