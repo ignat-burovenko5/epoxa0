@@ -14,17 +14,23 @@ export const metadata: Metadata = {
 };
 
 type PageProps = {
-  searchParams: Promise<{ days?: string; date?: string; status?: string }>;
+  searchParams: Promise<{ days?: string; date?: string; status?: string; view?: string }>;
 };
 
 export default async function BlogAdminHubPage({ searchParams }: PageProps) {
   await requireDashboardAuth();
-  const { days: daysParam, date: dateParam, status: statusParam } = await searchParams;
+  const {
+    days: daysParam,
+    date: dateParam,
+    status: statusParam,
+    view: viewParam,
+  } = await searchParams;
   const periodDays = parseOverviewPeriodDays(daysParam);
   const productStatus =
     statusParam === "active" || statusParam === "draft" || statusParam === "archived"
       ? statusParam
       : "all";
+  const wide = viewParam === "products";
 
   const [page, overview, productsPage] = await Promise.all([
     getBlogListPage(0, 100, { includeDrafts: true }),
@@ -33,7 +39,7 @@ export default async function BlogAdminHubPage({ searchParams }: PageProps) {
   ]);
 
   return (
-    <BlogCmsShell>
+    <BlogCmsShell size={wide ? "wide" : "default"}>
       <Suspense
         fallback={
           <p className="font-sans text-sm text-museum-light/50 text-center py-12">Загрузка…</p>
