@@ -13,6 +13,7 @@ export const siteConfig = {
   phoneHref: "tel:+79637806430",
   salonEmail: "salon@epoxa.ru",
   salonEmailHref: "mailto:salon@epoxa.ru",
+  curatorName: "Макс",
   whatsapp: "79637806430",
   telegram: "epoxa_gallery",
   email: "gallery@epoxa.ru",

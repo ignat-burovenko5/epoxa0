@@ -18,12 +18,31 @@ export const photoIds = {
 
 const defaultCatalogImage = unsplashPhoto(photoIds.vintageFurniture, 1974);
 
+/**
+ * Local-only placeholder image, used so the catalog is not full of broken
+ * `/products/...` paths when the real photos are absent on a dev machine.
+ * Gated so the production build serving levushkin.art is never affected:
+ *   - `next dev` (NODE_ENV !== "production") → placeholder on
+ *   - `next start` production build → placeholder off unless explicitly
+ *     opted in via EPOXA_PLACEHOLDER_IMAGES=1 (set at build time)
+ * Production keeps using the real catalog image paths.
+ */
+const usePlaceholderImages =
+  process.env.EPOXA_PLACEHOLDER_IMAGES === "1" ||
+  process.env.NODE_ENV !== "production";
+
+/** Single shared local asset shown for every product in dev. */
+const placeholderImage = "/images/hero-salon.jpg";
+
 export function getCatalogImage(slug: string, _width = 1974): string {
   const images = getProductImages(slug);
   return images[0] ?? defaultCatalogImage;
 }
 
 export function getProductImages(slug: string): string[] {
+  if (usePlaceholderImages) {
+    return [placeholderImage];
+  }
   const product = getCatalogProduct(slug);
   if (product?.images?.length) return product.images;
   return [];

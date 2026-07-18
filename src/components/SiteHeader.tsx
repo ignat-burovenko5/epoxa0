@@ -18,7 +18,7 @@ const navIconOnlyClass =
 export default function SiteHeader() {
   return (
     <header className="site-header fixed top-0 left-0 right-0 overflow-x-clip border-b border-museum-light/5 bg-luxury-base max-md:backdrop-blur-none md:bg-luxury-base/95 md:backdrop-blur-md md:supports-[backdrop-filter]:bg-luxury-base/90 pt-[env(safe-area-inset-top,0px)]">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 py-2 sm:py-2.5 md:py-4 px-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1760px] items-center justify-between gap-4 py-2 sm:py-2.5 md:py-4 px-3 sm:px-4 lg:px-6">
         <div className="flex min-w-0 items-center gap-4">
           <div className="site-header-menu relative shrink-0">
             <HeaderBurgerMenu />

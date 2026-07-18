@@ -8,6 +8,7 @@ import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductPrice from "@/components/ProductPrice";
 import ProductGetContacts from "@/components/ProductGetContacts";
 import StickyInquiryBar from "@/components/StickyInquiryBar";
+import { ClockIcon } from "@/components/NavContactIcons";
 import YandexSalonMap from "@/components/YandexSalonMap";
 import { catalogProducts, getCatalogProduct } from "@/lib/catalog";
 import { getContentEntryBySlug } from "@/lib/content";
@@ -141,14 +142,6 @@ export default async function ProductDossier({
               size="lg"
               className="mb-4"
             />
-            <div className="flex flex-wrap gap-2 mb-4">
-              <span className="text-xs font-sans uppercase tracking-widest border border-accent-brass/40 px-3 py-1">
-                Экспертиза
-              </span>
-              <span className="text-xs font-sans uppercase tracking-widest border border-accent-brass/40 px-3 py-1">
-                Белые перчатки
-              </span>
-            </div>
             <ProductGetContacts
               productName={title}
               className="mb-8 lg:mb-10 hidden lg:block"
@@ -166,15 +159,18 @@ export default async function ProductDossier({
               heading="Шоурум — осмотр и самовывоз"
               className="mb-6 pt-8 border-t border-luxury-charcoal/10"
             />
-            <p className="font-sans text-xs text-luxury-charcoal/55 leading-relaxed mb-0 lg:mb-10">
-              {siteConfig.workingHours}
-              {" · "}
-              <Link
-                href={siteConfig.addressHref}
-                className="text-accent-brass underline underline-offset-2 hover:text-luxury-charcoal"
-              >
-                как добраться
-              </Link>
+            <p className="flex items-start gap-2 font-sans text-xs text-luxury-charcoal/55 leading-relaxed mb-0 lg:mb-10">
+              <ClockIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-brass" />
+              <span>
+                {siteConfig.workingHours}
+                {" · "}
+                <Link
+                  href={siteConfig.addressHref}
+                  className="text-accent-brass underline underline-offset-2 hover:text-luxury-charcoal"
+                >
+                  как добраться
+                </Link>
+              </span>
             </p>
 
           </div>

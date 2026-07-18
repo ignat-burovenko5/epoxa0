@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PersonIcon, PhoneIcon, TelegramIcon, WhatsAppIcon } from "@/components/NavContactIcons";
 import { siteConfig } from "@/lib/site";
 
 const WHATSAPP_HREF = `https://wa.me/${siteConfig.whatsapp}`;
@@ -14,6 +15,12 @@ function telegramHref(message: string) {
   return `${TELEGRAM_HREF}?text=${encodeURIComponent(message)}`;
 }
 
+const contactLinkClass =
+  "contact-link-animated group flex min-h-12 w-full cursor-pointer items-center gap-3 border border-accent-brass/40 px-3 py-2.5 font-sans text-xs tracking-widest uppercase text-museum-light transition-colors hover:border-accent-gold/70 hover:bg-accent-brass/10";
+
+const contactIconClass =
+  "contact-icon-ring flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent-gold/25 text-accent-gold";
+
 export default function FloatingConcierge() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,32 +33,57 @@ export default function FloatingConcierge() {
         aria-hidden={!isOpen}
       >
         <div className="bg-luxury-base text-museum-light p-5 sm:p-8 w-[min(20rem,calc(100vw-2rem))] shadow-2xl border border-luxury-charcoal max-h-[min(70dvh,28rem)] overflow-y-auto hidden-scrollbar">
-          <p className="font-serif text-2xl mb-2 text-accent-gold">Личный куратор</p>
+          <p className="font-serif text-2xl mb-2 text-accent-gold">
+            Ваш личный куратор
+          </p>
           <p className="font-sans text-sm text-museum-warm/80 leading-relaxed mb-6">
-            Ответим на вопросы о провенансе, состоянии и доставке по России. Работаем через WhatsApp и Telegram — как вам удобнее.
+            Ответит на вопросы о провенансе, состоянии и доставке по России. Выберите удобный способ связи.
           </p>
           <div className="space-y-3">
+            <div
+              className="flex w-full items-center gap-3 border border-accent-gold/30 bg-accent-brass/10 px-3 py-2.5 font-sans text-xs tracking-widest uppercase text-museum-light"
+              aria-label={`Куратор: ${siteConfig.curatorName}`}
+            >
+              <span className={contactIconClass}>
+                <PersonIcon className="h-5 w-5" />
+              </span>
+              <span className="font-serif text-sm tracking-normal normal-case text-accent-gold">
+                {siteConfig.curatorName}
+              </span>
+            </div>
             <a
               href={whatsappHref("Здравствуйте! Хотел(а) бы получить консультацию по коллекции.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="cursor-pointer block w-full text-center border border-accent-brass/50 py-3 font-sans text-xs tracking-widest uppercase hover:bg-accent-brass/10 transition-colors"
+              className={contactLinkClass}
+              aria-label={`Написать куратору ${siteConfig.curatorName} в WhatsApp`}
             >
-              WhatsApp
+              <span className={contactIconClass}>
+                <WhatsAppIcon className="h-5 w-5" />
+              </span>
+              <span>WhatsApp</span>
             </a>
             <a
               href={telegramHref("Здравствуйте! Хотел(а) бы получить консультацию по коллекции.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="cursor-pointer block w-full text-center border border-accent-brass/50 py-3 font-sans text-xs tracking-widest uppercase hover:bg-accent-brass/10 transition-colors"
+              className={contactLinkClass}
+              aria-label={`Написать куратору ${siteConfig.curatorName} в Telegram`}
             >
-              Telegram
+              <span className={contactIconClass}>
+                <TelegramIcon className="h-5 w-5" />
+              </span>
+              <span>Telegram</span>
             </a>
             <a
               href={siteConfig.phoneHref}
-              className="cursor-pointer block w-full text-center py-3 font-sans text-xs tracking-widest uppercase text-museum-light/60 hover:text-museum-light transition-colors"
+              className={`${contactLinkClass} contact-link-phone`}
+              aria-label={`Позвонить куратору ${siteConfig.curatorName}: ${siteConfig.phone}`}
             >
-              {siteConfig.phone}
+              <span className={contactIconClass}>
+                <PhoneIcon className="h-5 w-5" />
+              </span>
+              <span>{siteConfig.phone}</span>
             </a>
           </div>
         </div>

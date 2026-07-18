@@ -2,6 +2,46 @@ type IconProps = {
   className?: string;
 };
 
+/** Person silhouette — curator identity */
+export function PersonIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M5 19c0-3.6 3.2-6 7-6s7 2.4 7 6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/** Yandex Maps pin — red marker with inner dot */
+export function YandexMapsIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M12 2c4.4 0 8 3.5 8 7.9 0 5.6-6.2 11.4-7.5 12.5a.8.8 0 0 1-1 0C10.2 21.3 4 15.5 4 9.9 4 5.5 7.6 2 12 2Z"
+        fill="#F33"
+      />
+      <circle cx="12" cy="9.5" r="2.6" fill="#fff" />
+    </svg>
+  );
+}
+
 /** SVG Repo: email-1 — https://www.svgrepo.com/svg/521128/email-1 */
 export function EmailIcon({ className = "h-5 w-5" }: IconProps) {
   return (
@@ -16,6 +56,57 @@ export function EmailIcon({ className = "h-5 w-5" }: IconProps) {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M3.75 5.25L3 6V18L3.75 18.75H20.25L21 18V6L20.25 5.25H3.75ZM4.5 7.6955V17.25H19.5V7.69525L11.9999 14.5136L4.5 7.6955ZM18.3099 6.75H5.68986L11.9999 12.4864L18.3099 6.75Z"
+      />
+    </svg>
+  );
+}
+
+/** WhatsApp — message bubble with phone handset */
+export function WhatsAppIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M20 11.7a8 8 0 0 1-11.78 7.04L4 20l1.3-4.08A8 8 0 1 1 20 11.7Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.15 7.75c.18-.2.43-.24.66-.12l1.12.6c.24.13.34.41.24.66l-.4 1c-.08.2-.04.43.1.6.56.7 1.2 1.3 1.92 1.8.17.12.4.15.58.05l.93-.48c.24-.13.54-.05.7.17l.68 1.02c.15.22.14.5-.04.7-.5.58-1.23.9-2 .78-2.42-.37-5.64-3.43-6.02-5.75-.11-.7.1-1.45.53-2.03Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/** Telegram — paper plane */
+export function TelegramIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M20.4 4.35 3.9 10.7c-.74.29-.72 1.33.04 1.58l4.08 1.33 1.55 4.62c.25.75 1.26.86 1.67.18l2.28-3.73 4.18 3.08c.6.44 1.46.1 1.6-.63l2.24-11.61c.16-.83-.36-1.47-1.14-1.17Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m8.18 13.55 8.9-5.5-6.88 7.6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

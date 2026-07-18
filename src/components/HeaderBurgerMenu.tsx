@@ -7,41 +7,33 @@ import { useCallback, useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { categoryHref, siteConfig } from "@/lib/site";
 
-function MenuIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M4 7h16M4 12h16M4 17h16"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+const menuTransitionMs = 420;
 
-function CloseIcon({ className }: { className?: string }) {
+function BurgerIcon({ open, className }: { open: boolean; className?: string }) {
+  const bar =
+    "absolute left-0 h-[1.5px] w-full rounded-full bg-current transition-all duration-300 ease-luxury-ease";
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M6 6l12 12M18 6L6 18"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
+    <span className={className} aria-hidden="true">
+      <span
+        className={`${bar} ${
+          open
+            ? "top-1/2 -translate-y-1/2 rotate-45"
+            : "top-[5px] sm:top-[6px]"
+        }`}
       />
-    </svg>
+      <span
+        className={`${bar} top-1/2 -translate-y-1/2 ${
+          open ? "opacity-0 [transform:translateY(-50%)_scaleX(0)]" : "opacity-100"
+        }`}
+      />
+      <span
+        className={`${bar} ${
+          open
+            ? "top-1/2 -translate-y-1/2 -rotate-45"
+            : "top-[20px] sm:top-[24px]"
+        }`}
+      />
+    </span>
   );
 }
 
@@ -62,17 +54,24 @@ function navLinkClass(active: boolean) {
 export default function HeaderBurgerMenu() {
   const panelId = useId();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
   const close = useCallback(() => setOpen(false), []);
+  const show = useCallback(() => {
+    setMounted(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setOpen(true));
+    });
+  }, []);
 
   useEffect(() => {
-    document.body.classList.toggle("catalog-nav-open", open);
+    document.body.classList.toggle("catalog-nav-open", mounted);
     return () => document.body.classList.remove("catalog-nav-open");
-  }, [open]);
+  }, [mounted]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!mounted) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
@@ -83,19 +82,30 @@ export default function HeaderBurgerMenu() {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, close]);
+  }, [mounted, close]);
 
   useEffect(() => {
-    close();
+    if (!mounted || open) return;
+    const timeout = window.setTimeout(() => setMounted(false), menuTransitionMs);
+    return () => window.clearTimeout(timeout);
+  }, [mounted, open]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(close);
+    return () => cancelAnimationFrame(frame);
   }, [pathname, close]);
 
   const menuOverlay =
-    open && typeof document !== "undefined"
+    mounted && typeof document !== "undefined"
       ? createPortal(
-          <div className="catalog-nav-overlay" role="presentation">
+          <div
+            className="catalog-nav-overlay"
+            data-state={open ? "open" : "closed"}
+            role="presentation"
+          >
             <button
               type="button"
-              className="catalog-sidenav-backdrop pointer-events-auto fixed inset-0 cursor-pointer border-0 bg-luxury-base/80 backdrop-blur-[2px] touch-manipulation"
+              className="catalog-sidenav-backdrop pointer-events-auto fixed inset-0 cursor-pointer border-0 bg-luxury-base/80 touch-manipulation"
               aria-label="Закрыть меню"
               onClick={close}
             />
@@ -105,7 +115,7 @@ export default function HeaderBurgerMenu() {
               role="dialog"
               aria-modal="true"
               aria-label="Навигация по сайту"
-              className="catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col border-r border-museum-light/10 bg-luxury-base shadow-2xl pb-[env(safe-area-inset-bottom,0px)]"
+              className="catalog-sidenav-panel pointer-events-auto fixed left-0 flex w-full max-w-[min(100vw,22rem)] flex-col border-r border-museum-light/10 bg-luxury-base pb-[env(safe-area-inset-bottom,0px)]"
             >
               <nav
                 className="catalog-sidenav-panel__nav flex-1 overflow-y-auto hidden-scrollbar px-3 py-4 space-y-8"
@@ -180,10 +190,10 @@ export default function HeaderBurgerMenu() {
                           className={`${categoryLinkBase} ${
                             active
                               ? highlighted
-                                ? "border-luxury-bordeaux text-luxury-bordeaux"
+                                ? "border-[#E8A6AB] text-[#F5C7CA]"
                                 : "border-accent-gold text-accent-gold"
                               : highlighted
-                                ? "text-luxury-bordeaux/85 hover:text-luxury-bordeaux"
+                                ? "text-[#E8A6AB] hover:text-[#F5C7CA]"
                                 : "text-museum-light/65 hover:text-accent-gold"
                           }`}
                         >
@@ -218,19 +228,19 @@ export default function HeaderBurgerMenu() {
         type="button"
         className="site-header-burger relative isolate cursor-pointer flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-sm text-museum-light transition-colors hover:text-accent-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 touch-manipulation"
         aria-expanded={open}
-        aria-controls={open ? panelId : undefined}
+        aria-controls={mounted ? panelId : undefined}
         aria-label={open ? "Закрыть каталог" : "Открыть каталог категорий"}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          setOpen((v) => !v);
+          if (open) close();
+          else show();
         }}
       >
-        {open ? (
-          <CloseIcon className="h-7 w-7 sm:h-8 sm:w-8 pointer-events-none" />
-        ) : (
-          <MenuIcon className="h-7 w-7 sm:h-8 sm:w-8 pointer-events-none" />
-        )}
+        <BurgerIcon
+          open={open}
+          className="relative h-7 w-7 sm:h-8 sm:w-8 pointer-events-none"
+        />
       </button>
       {menuOverlay}
     </>

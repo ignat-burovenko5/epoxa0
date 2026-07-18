@@ -85,6 +85,32 @@
     min-height: 100dvh;
   }
 
+  /* Brand-tinted scrollbar — gold thumb on a transparent track */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-accent-gold) 65%, transparent) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--color-accent-gold) 65%, transparent);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-accent-gold);
+  }
+
   /* iOS: clipped sr-only radios/checkboxes must not steal taps from labels & buttons */
   .sr-only {
     pointer-events: none;
@@ -124,6 +150,49 @@
   label[for],
   summary {
     cursor: pointer;
+  }
+
+  button:disabled,
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+/* ── Antique manicule cursor ─────────────────────────────────────────
+   Brass pointing-hand (manicule) cursor for pointer devices, adapted
+   from the CC0 work "Hand Cursor.svg" by Cowemoji (Wikimedia Commons,
+   public domain). Touch / coarse pointers keep the native cursor.
+   Hotspot sits on the index fingertip. */
+@media (pointer: fine) {
+  :root {
+    --cursor-antique: url("/cursor-antique.svg") 5 2, auto;
+    --cursor-antique-pointer: url("/cursor-antique-pointer.svg") 5 2, pointer;
+  }
+
+  html {
+    cursor: var(--cursor-antique);
+  }
+
+  a,
+  button:not(:disabled),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  label[for],
+  summary,
+  .site-header-burger,
+  .logo-nav-link,
+  .footer-legal-link,
+  .footer-link-text,
+  .checkout-option,
+  .checkout-upsell,
+  .cart-drawer-backdrop,
+  .catalog-sidenav-root__backdrop {
+    cursor: var(--cursor-antique-pointer);
   }
 
   button:disabled,
@@ -206,10 +275,12 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
 }
 
 .catalog-sidenav-backdrop {
-  left: min(100vw, 22rem);
+  left: 0;
   top: 0;
   bottom: 0;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.42s var(--ease-luxury-ease);
 }
 
 /* Mobile: drawer full viewport height; desktop: flush with bottom of topnav */
@@ -217,7 +288,40 @@ body.catalog-nav-open .site-header-contacts-icons-mobile {
   top: 0;
   bottom: 0;
   z-index: 2;
-  animation: catalog-sidenav-slide-in 0.42s var(--ease-luxury-ease) both;
+  transform: translateX(-100%);
+  transition: transform 0.42s var(--ease-luxury-ease);
+  will-change: transform;
+}
+
+/* A soft, layered edge shadow visually joins the drawer to the dimmed page. */
+.catalog-sidenav-panel::after {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 100%;
+  width: clamp(2.75rem, 7vw, 4.5rem);
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at left center, rgb(0 0 0 / 42%) 0%, rgb(0 0 0 / 20%) 36%, transparent 74%),
+    linear-gradient(to right, rgb(12 12 12 / 28%), transparent 55%);
+  filter: blur(0.75px);
+  mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+  opacity: 0;
+  transform: translateX(-1px);
+  transition: opacity 0.42s var(--ease-luxury-ease);
+}
+
+.catalog-nav-overlay[data-state="open"] .catalog-sidenav-backdrop {
+  opacity: 1;
+}
+
+.catalog-nav-overlay[data-state="open"] .catalog-sidenav-panel {
+  transform: translateX(0);
+}
+
+.catalog-nav-overlay[data-state="open"] .catalog-sidenav-panel::after {
+  opacity: 0.82;
 }
 
 .catalog-sidenav-panel__nav {
@@ -299,8 +403,11 @@ body:has(#catalog-nav-toggle:checked) .catalog-sidenav-root {
 
 @media (prefers-reduced-motion: reduce) {
   .catalog-sidenav-root__panel,
-  .catalog-sidenav-panel {
+  .catalog-sidenav-panel,
+  .catalog-sidenav-panel::after,
+  .catalog-sidenav-backdrop {
     animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
   }
 }
 
@@ -919,7 +1026,7 @@ img.logo-nav-mark--footer {
       transform: translateY(0);
     }
     50% {
-      transform: translateY(-3px);
+      transform: translateY(-1.5px);
     }
   }
 
@@ -929,16 +1036,16 @@ img.logo-nav-mark--footer {
       transform: rotate(0deg);
     }
     20% {
-      transform: rotate(-10deg);
+      transform: rotate(-5deg);
     }
     40% {
-      transform: rotate(10deg);
+      transform: rotate(5deg);
     }
     60% {
-      transform: rotate(-6deg);
+      transform: rotate(-3deg);
     }
     80% {
-      transform: rotate(6deg);
+      transform: rotate(3deg);
     }
   }
 
@@ -990,6 +1097,8 @@ img.logo-nav-mark--footer {
 
     .contact-icon-ring {
       position: relative;
+      overflow: clip;
+      contain: paint;
       transition:
         transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
         border-color 0.35s ease,
@@ -998,11 +1107,15 @@ img.logo-nav-mark--footer {
     }
 
     .contact-link-animated:hover .contact-icon-ring {
-      transform: scale(1.06);
+      transform: scale(1.02);
       border-color: rgba(184, 154, 112, 0.5);
       background-color: rgba(166, 124, 82, 0.12);
       color: var(--color-museum-light);
-      animation: contact-icon-glow 1.4s ease-in-out infinite;
+    }
+
+    .contact-icon-ring svg {
+      transform-box: fill-box;
+      transform-origin: center;
     }
 
     .contact-link-email:hover .contact-icon-ring svg {
@@ -1011,7 +1124,6 @@ img.logo-nav-mark--footer {
 
     .contact-link-phone:hover .contact-icon-ring svg {
       animation: phone-icon-hover 0.55s ease-in-out;
-      transform-origin: center bottom;
     }
   }
 }

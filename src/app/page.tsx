@@ -67,14 +67,10 @@ export default async function Homepage() {
           <div className="max-w-3xl mr-auto">
             <BrandLines variant="hero" className="mb-5 md:mb-6" />
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.15] mb-5 text-museum-light">
-              Где история
-              <br />
-              становится
-              <br />
-              архитектурой интерьера
+              Исторически редкая антиквариатная мебель
             </h1>
             <p className="font-sans text-sm md:text-base text-museum-light/70 max-w-lg mb-8 leading-relaxed">
-              Антикварная мебель на продажу — для коллекционеров, дизайнеров и частных интерьеров. Купить с доставкой по Москве, Петербургу и всей России.
+              Антикварная мебель на продажу — для коллекционеров, дизайнеров и частных интерьеров. Покупайте с доставкой по Москве, Петербургу и всей России.
             </p>
             <Link
               href="/collection"
