@@ -29,9 +29,9 @@ type ZoomAnchor = {
   clientY: number;
 };
 
-const ZOOM_STEPS = [25, 50, 75, 100] as const;
-type ZoomStep = (typeof ZOOM_STEPS)[number];
-const DEFAULT_ZOOM: ZoomStep = 25;
+/** Discrete zoom levels (fit → 2× → 3× → 4×). Not shown in UI. */
+const ZOOM_LEVELS = 4;
+const DEFAULT_ZOOM = 0;
 
 const mainImageClass =
   "left-0 right-0 top-1/2 mx-auto h-auto w-full max-w-full -translate-y-1/2 max-h-[calc(100dvh-var(--site-header-offset)-6rem)] object-contain transition-[opacity,transform] duration-500 ease-luxury-ease motion-reduce:transition-none";
@@ -79,10 +79,6 @@ function GalleryArrow({
       </svg>
     </button>
   );
-}
-
-function stepIndex(zoom: ZoomStep) {
-  return ZOOM_STEPS.indexOf(zoom);
 }
 
 function clamp01(value: number) {
@@ -137,10 +133,10 @@ function applyZoomAnchor(
   stage.scrollTop = pointY - (anchor.clientY - stageRect.top);
 }
 
-function zoomWidthFor(zoom: ZoomStep): string | undefined {
-  if (zoom === 25) return undefined;
-  if (zoom === 50) return "min(160vw, 1600px)";
-  if (zoom === 75) return "min(240vw, 2400px)";
+function zoomWidthFor(level: number): string | undefined {
+  if (level <= 0) return undefined;
+  if (level === 1) return "min(160vw, 1600px)";
+  if (level === 2) return "min(240vw, 2400px)";
   return "min(320vw, 3200px)";
 }
 
@@ -148,7 +144,7 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   const lightboxTitleId = useId();
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [zoom, setZoom] = useState<ZoomStep>(DEFAULT_ZOOM);
+  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const touchStartX = useRef(0);
   const lightboxTouchStartX = useRef(0);
   const stageRef = useRef<HTMLDivElement | null>(null);
@@ -156,9 +152,8 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
   const pendingAnchorRef = useRef<ZoomAnchor | null>(null);
   const hasMultiple = slides.length > 1;
   const activeSlide = slides[activeIndex] ?? slides[0];
-  const zoomIdx = stepIndex(zoom);
-  const canZoomOut = zoomIdx > 0;
-  const canZoomIn = zoomIdx < ZOOM_STEPS.length - 1;
+  const canZoomOut = zoom > 0;
+  const canZoomIn = zoom < ZOOM_LEVELS - 1;
   const zoomedIn = zoom > DEFAULT_ZOOM;
   const zoomWidth = zoomWidthFor(zoom);
 
@@ -169,23 +164,12 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
 
   const zoomIn = useCallback((anchor?: ZoomAnchor | null) => {
     if (anchor) pendingAnchorRef.current = anchor;
-    setZoom((current) => {
-      const index = stepIndex(current);
-      return ZOOM_STEPS[Math.min(index + 1, ZOOM_STEPS.length - 1)] ?? current;
-    });
+    setZoom((current) => Math.min(current + 1, ZOOM_LEVELS - 1));
   }, []);
 
   const zoomOut = useCallback((anchor?: ZoomAnchor | null) => {
     if (anchor) pendingAnchorRef.current = anchor;
-    setZoom((current) => {
-      const index = stepIndex(current);
-      return ZOOM_STEPS[Math.max(index - 1, 0)] ?? current;
-    });
-  }, []);
-
-  const setZoomAt = useCallback((next: ZoomStep, anchor?: ZoomAnchor | null) => {
-    if (anchor) pendingAnchorRef.current = anchor;
-    setZoom(next);
+    setZoom((current) => Math.max(current - 1, 0));
   }, []);
 
   const goPrev = useCallback(() => {
@@ -432,8 +416,8 @@ export default function ProductImageGallery({ slides }: ProductImageGalleryProps
                   onClick={onImageClick}
                   aria-label={
                     canZoomIn
-                      ? `Увеличить до ${ZOOM_STEPS[zoomIdx + 1]}% в точке клика`
-                      : "Сбросить масштаб до 25%"
+                      ? "Увеличить в точке клика"
+                      : "Сбросить масштаб"
                   }
                   className={`relative block border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent-gold/70 ${
                     canZoomIn ? "cursor-zoom-in" : "cursor-zoom-out"
