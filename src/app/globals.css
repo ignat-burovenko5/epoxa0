@@ -514,6 +514,35 @@ img.logo-nav-mark--footer {
     display: none;
   }
 
+  /* Collection category pane — visible scrollbar, no scroll chaining lag */
+  .collection-category-scroll {
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-accent-brass) 55%, transparent) transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .collection-category-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .collection-category-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .collection-category-scroll::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--color-accent-brass) 55%, transparent);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .collection-category-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-accent-brass);
+  }
+
   .section-y {
     padding-top: 3rem;
     padding-bottom: 3rem;
