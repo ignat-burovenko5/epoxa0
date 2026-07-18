@@ -39,8 +39,8 @@ export default function FloatingConcierge() {
               className={contactLinkClass}
               aria-label="Написать куратору в MAX"
             >
-              <span className={`${contactIconClass} overflow-hidden p-0`}>
-                <MaxIcon className="h-9 w-9 rounded-full" />
+              <span className={contactIconClass}>
+                <MaxIcon className="h-5 w-5" />
               </span>
               <span>MAX</span>
             </a>
