@@ -6,6 +6,7 @@ import {
   mergeDashboardOverview,
   type RemoteDashboardOverview,
 } from "@/lib/dashboard/merge-overview";
+import type { ShopCatalogStats } from "@/lib/shop/stats";
 
 const POLL_MS = 5_000;
 
@@ -16,16 +17,32 @@ type UseLiveDashboardOverviewOptions = {
   enabled?: boolean;
 };
 
+function extractShopStats(overview: DashboardOverview): ShopCatalogStats {
+  const { productCount, totalStockValue, totalStockValueLabel, onSaleCount, averagePrice, averagePriceLabel, topCategories } =
+    overview.shop;
+  return {
+    productCount,
+    totalStockValue,
+    totalStockValueLabel,
+    onSaleCount,
+    averagePrice,
+    averagePriceLabel,
+    topCategories,
+  };
+}
+
 export function useLiveDashboardOverview(
   initial: DashboardOverview,
   { periodDays = 7, focusDate, enabled = true }: UseLiveDashboardOverviewOptions = {},
 ) {
   const [overview, setOverview] = useState(initial);
   const etagRef = useRef<string | null>(null);
+  const shopStatsRef = useRef<ShopCatalogStats>(extractShopStats(initial));
 
   useEffect(() => {
     setOverview(initial);
     etagRef.current = null;
+    shopStatsRef.current = extractShopStats(initial);
   }, [initial]);
 
   const refresh = useCallback(async () => {
@@ -39,7 +56,7 @@ export function useLiveDashboardOverview(
       if (!res.ok) return;
 
       const remote = (await res.json()) as RemoteDashboardOverview;
-      const next = mergeDashboardOverview(remote);
+      const next = mergeDashboardOverview(remote, shopStatsRef.current);
       const fingerprint = JSON.stringify({
         d: next.analytics.focusDate,
         h: next.analytics.focusDay.pageViews,
