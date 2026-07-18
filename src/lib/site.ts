@@ -43,28 +43,31 @@ export const siteConfig = {
     { label: "Все товары", href: "/collection" },
     { label: "Акционные товары", href: "/aktsionnye-tovary" },
   ],
+  /** Flat catalog — order follows categoryGroups (sorted for nav / CMS). */
   categoryLinks: [
     { slug: "novye-postupleniya", label: "НОВЫЕ ПОСТУПЛЕНИЯ" },
+    { slug: "vesennyaya-rasprodazha", label: "ВЕСЕННЯЯ РАСПРОДАЖА", highlight: true },
     { slug: "bufety-gorki", label: "БУФЕТЫ, ГОРКИ" },
     { slug: "shkafy-dressuary", label: "ШКАФЫ, ДРЕССУАРЫ" },
     { slug: "vitriny-nastennye-vitrinki", label: "ВИТРИНЫ, НАСТЕННЫЕ ВИТРИНКИ" },
+    { slug: "komody-tryumo-tumby", label: "КОМОДЫ, ТРЮМО, ТУМБЫ" },
+    { slug: "veshalki-prihozhie-polki", label: "ВЕШАЛКИ, ПРИХОЖИЕ, ПОЛКИ" },
     { slug: "stoly-obedennye", label: "СТОЛЫ ОБЕДЕННЫЕ" },
     { slug: "stoly-pismennye-byuro", label: "СТОЛЫ ПИСЬМЕННЫЕ, БЮРО" },
     { slug: "stoly-zhurnalnye-konsolnye", label: "СТОЛЫ ЖУРНАЛЬНЫЕ, КОНСОЛЬНЫЕ" },
     { slug: "myagkaya-mebel-lavki", label: "МЯГКАЯ МЕБЕЛЬ, ЛАВКИ" },
     { slug: "stulya-kresla", label: "СТУЛЬЯ, КРЕСЛА" },
-    { slug: "komody-tryumo-tumby", label: "КОМОДЫ, ТРЮМО, ТУМБЫ" },
+    { slug: "krovati", label: "КРОВАТИ" },
     {
       slug: "svetilniki",
       label: "СВЕТИЛЬНИКИ (ТОРШЕРЫ, НАСТОЛЬНЫЕ ЛАМПЫ, БРА)",
     },
     { slug: "antikvarnye-lyustry", label: "АНТИКВАРНЫЕ ЛЮСТРЫ" },
-    { slug: "veshalki-prihozhie-polki", label: "ВЕШАЛКИ, ПРИХОЖИЕ, ПОЛКИ" },
+    { slug: "zerkala", label: "ЗЕРКАЛА" },
     {
       slug: "chasy-mekhanicheskie",
       label: "ЧАСЫ МЕХАНИЧЕСКИЕ НАПОЛЬНЫЕ, НАСТЕННЫЕ, КАМИННЫЕ",
     },
-    { slug: "zerkala", label: "ЗЕРКАЛА" },
     {
       slug: "farfor-keramika",
       label: "ПРЕДМЕТЫ ИНТЕРЬЕРА ИЗ ФАРФОРА, КЕРАМИКИ",
@@ -75,17 +78,68 @@ export const siteConfig = {
     },
     { slug: "vazy-kuvshiny", label: "ВАЗЫ и КУВШИНЫ" },
     { slug: "statuetki-skulptury", label: "СТАТУЭТКИ, СКУЛЬПТУРЫ" },
-    { slug: "predmety-interera", label: "ПРЕДМЕТЫ ИНТЕРЬЕРА" },
     { slug: "kartiny-gobeleny-panno", label: "КАРТИНЫ, ГОБЕЛЕНЫ, ПАННО" },
     {
       slug: "pechi-kaminnye-prinadlezhnosti",
       label: "ПЕЧИ, КАМИННЫЕ ПРИНАДЛЕЖНОСТИ, ЗОЛЬНИКИ",
     },
+    { slug: "predmety-interera", label: "ПРЕДМЕТЫ ИНТЕРЬЕРА" },
     { slug: "antikvarnye-podarki", label: "АНТИКВАРНЫЕ ПОДАРКИ" },
-    { slug: "krovati", label: "КРОВАТИ" },
-    { slug: "vesennyaya-rasprodazha", label: "ВЕСЕННЯЯ РАСПРОДАЖА", highlight: true },
+  ],
+  /**
+   * Burger / collection sidenav sections.
+   * Slugs must exist in categoryLinks; order here is display order.
+   */
+  categoryGroups: [
+    {
+      label: "Подборка",
+      slugs: ["novye-postupleniya", "vesennyaya-rasprodazha"],
+    },
+    {
+      label: "Корпусная мебель",
+      slugs: [
+        "bufety-gorki",
+        "shkafy-dressuary",
+        "vitriny-nastennye-vitrinki",
+        "komody-tryumo-tumby",
+        "veshalki-prihozhie-polki",
+      ],
+    },
+    {
+      label: "Столы",
+      slugs: [
+        "stoly-obedennye",
+        "stoly-pismennye-byuro",
+        "stoly-zhurnalnye-konsolnye",
+      ],
+    },
+    {
+      label: "Сиденья",
+      slugs: ["myagkaya-mebel-lavki", "stulya-kresla", "krovati"],
+    },
+    {
+      label: "Освещение",
+      slugs: ["svetilniki", "antikvarnye-lyustry"],
+    },
+    {
+      label: "Декор и аксессуары",
+      slugs: [
+        "zerkala",
+        "chasy-mekhanicheskie",
+        "farfor-keramika",
+        "chajnye-kofejnye-servizy",
+        "vazy-kuvshiny",
+        "statuetki-skulptury",
+        "kartiny-gobeleny-panno",
+        "pechi-kaminnye-prinadlezhnosti",
+        "predmety-interera",
+        "antikvarnye-podarki",
+      ],
+    },
   ],
 } as const;
+
+export type CategoryLink = (typeof siteConfig.categoryLinks)[number];
 
 export function categoryHref(slug: string) {
   return `/collection/${slug}`;
@@ -93,6 +147,19 @@ export function categoryHref(slug: string) {
 
 export function categoryLabel(slug: string) {
   return siteConfig.categoryLinks.find((item) => item.slug === slug)?.label ?? slug;
+}
+
+/** Resolve grouped categories for sidenav / burger menus. */
+export function groupedCategoryLinks(): { label: string; items: CategoryLink[] }[] {
+  const bySlug = new Map(
+    siteConfig.categoryLinks.map((item) => [item.slug, item] as const),
+  );
+  return siteConfig.categoryGroups.map((group) => ({
+    label: group.label,
+    items: group.slugs
+      .map((slug) => bySlug.get(slug))
+      .filter((item): item is CategoryLink => Boolean(item)),
+  }));
 }
 
 export function categorySlugFromLabel(label: string): string | null {
