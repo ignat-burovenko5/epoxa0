@@ -10,7 +10,7 @@ import ProductGetContacts from "@/components/ProductGetContacts";
 import StickyInquiryBar from "@/components/StickyInquiryBar";
 import { ClockIcon } from "@/components/NavContactIcons";
 import YandexSalonMap from "@/components/YandexSalonMap";
-import { catalogProducts, getCatalogProduct } from "@/lib/catalog";
+import { getCatalogProduct } from "@/lib/catalog";
 import { getContentEntryBySlug } from "@/lib/content";
 import { getHomeSection } from "@/lib/info-sections";
 import {
@@ -93,7 +93,7 @@ export default async function ProductDossier({
     return <ContentEntryPage entry={contentEntry} />;
   }
 
-  const product = catalogProducts[slug];
+  const product = getCatalogProduct(slug);
   if (product) {
     const title = product.title;
     const [galleryMain, galleryDetail, galleryInterior] = getProductGallery(slug);

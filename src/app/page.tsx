@@ -10,8 +10,8 @@ import TradeProgramSection from "@/components/TradeProgramSection";
 import PageContainer from "@/components/PageContainer";
 import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
 import {
-  catalogItems,
-  catalogProducts,
+  getCatalogItems,
+  getCatalogProduct,
   getDiscountPercent,
   getRandomFeaturedSlugs,
 } from "@/lib/catalog";
@@ -27,13 +27,16 @@ export const metadata: Metadata = pageMetadata({
 });
 
 function buildFeatured(slugs: string[]) {
-  return slugs.map((slug) => {
-    const product = catalogProducts[slug];
-    return {
-      ...product,
-      image: getCatalogImage(slug, 2070),
-      alt: `${product.title}, ${product.era}`,
-    };
+  return slugs.flatMap((slug) => {
+    const product = getCatalogProduct(slug);
+    if (!product) return [];
+    return [
+      {
+        ...product,
+        image: getCatalogImage(slug, 2070),
+        alt: `${product.title}, ${product.era}`,
+      },
+    ];
   });
 }
 

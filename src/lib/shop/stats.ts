@@ -1,5 +1,5 @@
 import { blogIndexPath } from "@/lib/blog/urls";
-import { catalogItems, formatPrice, hasDiscount } from "@/lib/catalog";
+import { formatPrice, getCatalogItems, hasDiscount } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site";
 
 export type ShopCatalogStats = {
@@ -13,7 +13,7 @@ export type ShopCatalogStats = {
 };
 
 export function getShopCatalogStats(): ShopCatalogStats {
-  const products = catalogItems;
+  const products = getCatalogItems();
   const totalStockValue = products.reduce((sum, p) => sum + p.price, 0);
   const onSaleCount = products.filter((p) =>
     hasDiscount(p.price, p.compareAtPrice),
