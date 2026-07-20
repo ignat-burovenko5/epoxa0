@@ -148,6 +148,24 @@ export function categoryHref(slug: string) {
   return `/collection/${slug}`;
 }
 
+type CatalogQueryOpts = {
+  sale?: boolean;
+  sort?: string | null;
+};
+
+/** Build /collection or /collection/[slug] with sale + sort query params. */
+export function collectionHref(
+  categorySlug?: string | null,
+  opts: CatalogQueryOpts = {},
+) {
+  const path = categorySlug ? categoryHref(categorySlug) : "/collection";
+  const params = new URLSearchParams();
+  if (opts.sale) params.set("sale", "1");
+  if (opts.sort && opts.sort !== "default") params.set("sort", opts.sort);
+  const qs = params.toString();
+  return qs ? `${path}?${qs}` : path;
+}
+
 export function categoryLabel(slug: string) {
   return siteConfig.categoryLinks.find((item) => item.slug === slug)?.label ?? slug;
 }
