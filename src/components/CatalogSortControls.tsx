@@ -101,8 +101,8 @@ function PriceRangeFields({
 
   const hasRange = fromUrl.min != null || fromUrl.max != null;
   const labelClass = dark
-    ? "font-sans text-[10px] tracking-[0.18em] uppercase text-museum-light/35"
-    : "font-sans text-[10px] tracking-[0.18em] uppercase text-luxury-charcoal/40";
+    ? "catalog-price-range__label font-serif text-[1.05rem] leading-none tracking-tight text-museum-light"
+    : "catalog-price-range__label font-serif text-[1.05rem] leading-none tracking-tight text-luxury-base";
   const inputClass = dark
     ? "catalog-price-input w-full min-h-11 border-0 border-b border-museum-light/20 bg-transparent px-0 py-2 font-sans text-sm text-museum-light placeholder:text-museum-light/30 focus:border-accent-gold focus:outline-none"
     : "catalog-price-input w-full min-h-11 border-0 border-b border-luxury-charcoal/20 bg-transparent px-0 py-2 font-sans text-sm text-luxury-charcoal placeholder:text-luxury-charcoal/30 focus:border-accent-brass focus:outline-none";
@@ -115,14 +115,33 @@ function PriceRangeFields({
       onSubmit={onSubmit}
       className={
         layout === "row"
-          ? "catalog-price-range mt-5 flex flex-wrap items-end gap-x-5 gap-y-3"
-          : "catalog-price-range mt-5 flex flex-col gap-3"
+          ? "catalog-price-range catalog-price-range--row mt-8 pt-7 flex flex-wrap items-end gap-x-5 gap-y-3 border-t border-luxury-charcoal/10"
+          : dark
+            ? "catalog-price-range catalog-price-range--stack mt-6 pt-5 flex flex-col gap-3 border-t border-museum-light/10"
+            : "catalog-price-range catalog-price-range--stack mt-6 pt-5 flex flex-col gap-3 border-t border-luxury-charcoal/10"
       }
       aria-labelledby={`${formId}-label`}
     >
-      <p id={`${formId}-label`} className={`${labelClass} w-full mb-0`}>
-        Цена, ₽
-      </p>
+      <div className="w-full">
+        <p id={`${formId}-label`} className={`${labelClass} mb-0`}>
+          Цена
+        </p>
+        <span
+          className={`mt-2 block h-px w-8 ${
+            dark
+              ? "bg-gradient-to-r from-accent-gold to-transparent"
+              : "bg-gradient-to-r from-accent-brass to-transparent"
+          }`}
+          aria-hidden="true"
+        />
+        <p
+          className={`mt-2 mb-0 font-sans text-[10px] tracking-[0.14em] uppercase ${
+            dark ? "text-museum-light/40" : "text-luxury-charcoal/45"
+          }`}
+        >
+          Диапазон, ₽
+        </p>
+      </div>
       <div
         className={
           layout === "row"
@@ -194,8 +213,8 @@ export default function CatalogSortControls({
         className={`catalog-sort catalog-sort--${variant} ${className}`.trim()}
       >
         <p
-          className={`mb-2 font-sans text-[10px] tracking-[0.18em] uppercase ${
-            dark ? "text-museum-light/35" : "text-luxury-charcoal/40"
+          className={`catalog-sort__heading mb-2 font-sans text-[10px] tracking-[0.22em] uppercase ${
+            dark ? "text-accent-gold/55" : "text-accent-brass/70"
           }`}
         >
           Сортировка
@@ -242,7 +261,7 @@ export default function CatalogSortControls({
       role="group"
       aria-label="Сортировка и цена"
     >
-      <p className="mb-3 font-sans text-[10px] tracking-[0.22em] uppercase text-luxury-charcoal/35">
+      <p className="catalog-sort__heading mb-3 font-sans text-[10px] tracking-[0.22em] uppercase text-accent-brass/70">
         Сортировка
       </p>
       <ul className="m-0 flex list-none flex-wrap items-baseline gap-x-5 gap-y-2.5 p-0 sm:gap-x-7">
