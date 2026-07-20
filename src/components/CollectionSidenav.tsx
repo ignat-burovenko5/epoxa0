@@ -81,9 +81,14 @@ export default function CollectionSidenav() {
     >
       {/* Mobile — category strip scrolls on its own; filters stay fixed below */}
       <div className="md:hidden mb-8">
-        <div className="mb-3 flex items-baseline gap-3">
-          <p className="font-serif text-lg text-luxury-base">Каталог</p>
-          <span className="h-px flex-1 max-w-[3rem] bg-accent-brass/50" aria-hidden />
+        <div className="mb-4 flex items-baseline gap-3">
+          <p className="font-serif font-bold text-3xl sm:text-4xl leading-none tracking-tight text-luxury-base">
+            Каталог
+          </p>
+          <span
+            className="h-px flex-1 max-w-[4rem] bg-gradient-to-r from-accent-brass to-transparent"
+            aria-hidden
+          />
         </div>
         <div className="collection-category-scroll -mx-4 px-4 overflow-x-auto overscroll-x-contain pb-3 [scrollbar-width:thin]">
           <ul className="flex gap-1 min-w-max">
@@ -148,11 +153,11 @@ export default function CollectionSidenav() {
         aria-label="Категории"
       >
         <header className="shrink-0 pb-5 mb-1">
-          <h2 className="font-serif text-[1.65rem] leading-none tracking-tight text-luxury-base select-text">
+          <h2 className="font-serif font-bold text-[2rem] lg:text-[2.25rem] leading-none tracking-tight text-luxury-base select-text">
             Каталог
           </h2>
           <span
-            className="mt-3 block h-px w-11 bg-gradient-to-r from-accent-brass to-accent-brass/0"
+            className="mt-3.5 block h-px w-14 bg-gradient-to-r from-accent-brass to-accent-brass/0"
             aria-hidden="true"
           />
         </header>
