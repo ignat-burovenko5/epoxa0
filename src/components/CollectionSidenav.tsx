@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
+import CatalogSortControls from "@/components/CatalogSortControls";
+import { parseCatalogSort } from "@/lib/catalog-shared";
 import {
   categoryHref,
   COLLECTION_SALE_HREF,
+  collectionHref,
   groupedCategoryLinks,
 } from "@/lib/site";
 
@@ -40,6 +43,7 @@ export default function CollectionSidenav() {
   const searchParams = useSearchParams();
   const saleOnly =
     searchParams.get("sale") === "1" || searchParams.get("sale") === "true";
+  const sort = parseCatalogSort(searchParams.get("sort"));
   const allActive = pathname === "/collection" && !saleOnly;
   const saleActive = pathname === "/collection" && saleOnly;
   const groups = useMemo(() => groupedCategoryLinks(), []);
@@ -47,6 +51,13 @@ export default function CollectionSidenav() {
     () => groups.flatMap((group) => group.items),
     [groups],
   );
+
+  const withSort = (href: string) => {
+    if (sort === "default") return href;
+    const url = new URL(href, "https://example.local");
+    url.searchParams.set("sort", sort);
+    return `${url.pathname}${url.search}`;
+  };
 
   return (
     <aside
@@ -62,7 +73,7 @@ export default function CollectionSidenav() {
         <ul className="flex gap-1 min-w-max">
           <li>
             <Link
-              href="/collection"
+              href={withSort("/collection")}
               className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
                 allActive
                   ? "border-accent-brass text-accent-brass"
@@ -74,7 +85,7 @@ export default function CollectionSidenav() {
           </li>
           <li>
             <Link
-              href={COLLECTION_SALE_HREF}
+              href={withSort(COLLECTION_SALE_HREF)}
               className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
                 saleActive
                   ? "border-luxury-bordeaux text-luxury-bordeaux"
@@ -90,7 +101,7 @@ export default function CollectionSidenav() {
             return (
               <li key={item.slug}>
                 <Link
-                  href={categoryHref(item.slug)}
+                  href={withSort(categoryHref(item.slug))}
                   className={`inline-flex min-h-10 max-w-[15rem] items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.1em] uppercase select-text ${
                     active
                       ? highlighted
@@ -107,6 +118,11 @@ export default function CollectionSidenav() {
             );
           })}
         </ul>
+        <div className="mt-4">
+          <Suspense fallback={null}>
+            <CatalogSortControls variant="featured" />
+          </Suspense>
+        </div>
       </div>
 
       {/* Desktop — grouped */}
@@ -125,6 +141,10 @@ export default function CollectionSidenav() {
         </header>
 
         <div className="flex flex-col gap-6 pb-8">
+          <Suspense fallback={null}>
+            <CatalogSortControls variant="sidenav" />
+          </Suspense>
+
           {groups.map((group, groupIndex) => {
             const isFeatured = groupIndex === 0;
             return (
@@ -136,13 +156,16 @@ export default function CollectionSidenav() {
                 {isFeatured ? (
                   <>
                     <li>
-                      <Link href="/collection" className={itemClass(allActive)}>
+                      <Link
+                        href={collectionHref(null, { sort })}
+                        className={itemClass(allActive)}
+                      >
                         Все категории
                       </Link>
                     </li>
                     <li>
                       <Link
-                        href={COLLECTION_SALE_HREF}
+                        href={collectionHref(null, { sale: true, sort })}
                         className={itemClass(saleActive, true)}
                       >
                         Акционные товары
@@ -156,7 +179,7 @@ export default function CollectionSidenav() {
                   return (
                     <li key={item.slug}>
                       <Link
-                        href={categoryHref(item.slug)}
+                        href={collectionHref(item.slug, { sort })}
                         className={itemClass(active, Boolean(highlighted))}
                       >
                         <span className="line-clamp-2">{item.label}</span>

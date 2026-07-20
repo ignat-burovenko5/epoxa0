@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import CatalogSortControls from "@/components/CatalogSortControls";
 import {
   categoryHref,
   COLLECTION_SALE_HREF,
@@ -7,7 +9,7 @@ import {
 
 /**
  * Homepage catalog index — featured strip + height-balanced columns.
- * Hierarchy: section title → featured picks → group labels → item links.
+ * Hierarchy: section title → featured picks → sort → group labels → item links.
  * Category groups start collapsed; click the label to expand.
  */
 export default function HomeCategoriesNav() {
@@ -77,6 +79,13 @@ export default function HomeCategoriesNav() {
           </ul>
         </div>
       ) : null}
+
+      {/* Sort — after featured strip */}
+      <div className="home-categories-sort mb-10 md:mb-12 pb-8 md:pb-10 border-b border-luxury-charcoal/10">
+        <Suspense fallback={null}>
+          <CatalogSortControls variant="featured" />
+        </Suspense>
+      </div>
 
       {/* Remaining groups — CSS columns balance height across the band */}
       <div className="home-categories-columns gap-x-10 sm:gap-x-12 lg:gap-x-16">
