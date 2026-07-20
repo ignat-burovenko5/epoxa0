@@ -5,11 +5,14 @@ import { categoryLabel } from "@/lib/site";
 import {
   CATALOG_PAGE_SIZE,
   HOMEPAGE_FEATURED_COUNT,
+  filterByPriceRange,
   formatPrice,
   getDiscountPercent,
   hasDiscount,
+  parseCatalogPriceRange,
   parseCatalogSort,
   sortCatalogProducts,
+  type CatalogPriceRange,
   type CatalogProduct,
   type CatalogSort,
 } from "@/lib/catalog-shared";
@@ -17,13 +20,15 @@ import {
 export {
   CATALOG_PAGE_SIZE,
   HOMEPAGE_FEATURED_COUNT,
+  filterByPriceRange,
   formatPrice,
   getDiscountPercent,
   hasDiscount,
+  parseCatalogPriceRange,
   parseCatalogSort,
   sortCatalogProducts,
 };
-export type { CatalogProduct, CatalogSort };
+export type { CatalogPriceRange, CatalogProduct, CatalogSort };
 
 let cachedProducts: CatalogProduct[] | null = null;
 let cachedMtimeMs = -1;

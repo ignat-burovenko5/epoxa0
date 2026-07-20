@@ -51,6 +51,46 @@ export function sortCatalogProducts<T extends { price: number; slug: string }>(
   return copy;
 }
 
+/** Parse a price query bound (`min` / `max`). Returns null when unset/invalid. */
+export function parsePriceBound(value: string | null | undefined): number | null {
+  if (value == null || value.trim() === "") return null;
+  const n = Number(String(value).replace(/\s/g, "").replace(",", "."));
+  if (!Number.isFinite(n) || n < 0) return null;
+  return Math.round(n);
+}
+
+export type CatalogPriceRange = {
+  min: number | null;
+  max: number | null;
+};
+
+export function parseCatalogPriceRange(
+  minRaw: string | null | undefined,
+  maxRaw: string | null | undefined,
+): CatalogPriceRange {
+  let min = parsePriceBound(minRaw);
+  let max = parsePriceBound(maxRaw);
+  if (min != null && max != null && min > max) {
+    const swap = min;
+    min = max;
+    max = swap;
+  }
+  return { min, max };
+}
+
+export function filterByPriceRange<T extends { price: number }>(
+  items: T[],
+  range: CatalogPriceRange,
+): T[] {
+  const { min, max } = range;
+  if (min == null && max == null) return items;
+  return items.filter((item) => {
+    if (min != null && item.price < min) return false;
+    if (max != null && item.price > max) return false;
+    return true;
+  });
+}
+
 export function formatPrice(amount: number) {
   return new Intl.NumberFormat("ru-RU", {
     style: "currency",
