@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CatalogGrid, type CatalogItem } from "@/components/CatalogGrid";
-import { CATALOG_PAGE_SIZE } from "@/lib/catalog-shared";
+import {
+  CATALOG_PAGE_SIZE,
+  type CatalogSort,
+} from "@/lib/catalog-shared";
 
 type CatalogPageResponse = {
   items: CatalogItem[];
@@ -18,6 +21,7 @@ type CatalogInfiniteGridProps = {
   initialHasMore: boolean;
   categorySlug?: string | null;
   saleOnly?: boolean;
+  sort?: CatalogSort;
 };
 
 export default function CatalogInfiniteGrid({
@@ -26,6 +30,7 @@ export default function CatalogInfiniteGrid({
   initialHasMore,
   categorySlug = null,
   saleOnly = false,
+  sort = "default",
 }: CatalogInfiniteGridProps) {
   const [items, setItems] = useState(initialItems);
   const [total, setTotal] = useState(initialTotal);
@@ -40,7 +45,7 @@ export default function CatalogInfiniteGrid({
     setTotal(initialTotal);
     setHasMore(initialHasMore);
     setError(null);
-  }, [initialItems, initialTotal, initialHasMore, categorySlug, saleOnly]);
+  }, [initialItems, initialTotal, initialHasMore, categorySlug, saleOnly, sort]);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) return;
@@ -58,6 +63,9 @@ export default function CatalogInfiniteGrid({
         params.set("sale", "1");
       } else if (categorySlug) {
         params.set("category", categorySlug);
+      }
+      if (sort !== "default") {
+        params.set("sort", sort);
       }
 
       const res = await fetch(`/api/catalog?${params.toString()}`);
@@ -80,7 +88,7 @@ export default function CatalogInfiniteGrid({
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [categorySlug, hasMore, items.length, saleOnly]);
+  }, [categorySlug, hasMore, items.length, saleOnly, sort]);
 
   useEffect(() => {
     const node = sentinelRef.current;

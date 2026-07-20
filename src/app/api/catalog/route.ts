@@ -1,4 +1,5 @@
 import { getCatalogPage, CATALOG_PAGE_SIZE } from "@/lib/catalog";
+import { parseCatalogSort } from "@/lib/catalog-shared";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -6,6 +7,7 @@ export async function GET(request: Request) {
   const category = searchParams.get("category");
   const saleOnly =
     searchParams.get("sale") === "1" || searchParams.get("sale") === "true";
+  const sort = parseCatalogSort(searchParams.get("sort"));
   const offset = Math.max(0, Number(searchParams.get("offset") ?? 0) || 0);
   const limit = Math.min(
     24,
@@ -14,7 +16,7 @@ export async function GET(request: Request) {
 
   const categorySlug =
     !saleOnly && category && category.length > 0 ? category : null;
-  const page = getCatalogPage(categorySlug, offset, limit, saleOnly);
+  const page = getCatalogPage(categorySlug, offset, limit, saleOnly, sort);
 
   return NextResponse.json(page);
 }
