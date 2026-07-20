@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useMemo } from "react";
 import CatalogSortControls from "@/components/CatalogSortControls";
-import { parseCatalogSort } from "@/lib/catalog-shared";
+import {
+  parseCatalogPriceRange,
+  parseCatalogSort,
+} from "@/lib/catalog-shared";
 import {
   categoryHref,
   COLLECTION_SALE_HREF,
@@ -44,6 +47,10 @@ export default function CollectionSidenav() {
   const saleOnly =
     searchParams.get("sale") === "1" || searchParams.get("sale") === "true";
   const sort = parseCatalogSort(searchParams.get("sort"));
+  const priceRange = parseCatalogPriceRange(
+    searchParams.get("min"),
+    searchParams.get("max"),
+  );
   const allActive = pathname === "/collection" && !saleOnly;
   const saleActive = pathname === "/collection" && saleOnly;
   const groups = useMemo(() => groupedCategoryLinks(), []);
@@ -52,11 +59,19 @@ export default function CollectionSidenav() {
     [groups],
   );
 
-  const withSort = (href: string) => {
-    if (sort === "default") return href;
+  const withFilters = (href: string) => {
     const url = new URL(href, "https://example.local");
-    url.searchParams.set("sort", sort);
-    return `${url.pathname}${url.search}`;
+    if (sort !== "default") url.searchParams.set("sort", sort);
+    if (priceRange.min != null) url.searchParams.set("min", String(priceRange.min));
+    if (priceRange.max != null) url.searchParams.set("max", String(priceRange.max));
+    const qs = url.searchParams.toString();
+    return qs ? `${url.pathname}?${qs}` : url.pathname;
+  };
+
+  const filterOpts = {
+    sort,
+    min: priceRange.min,
+    max: priceRange.max,
   };
 
   return (

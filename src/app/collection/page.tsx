@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import CollectionCatalog from "@/components/CollectionCatalog";
 import FloatingConcierge from "@/components/FloatingConcierge";
-import { getCategoryProductCount, getSaleProductCount } from "@/lib/catalog";
-import { parseCatalogSort } from "@/lib/catalog-shared";
+import { getFilteredProducts } from "@/lib/catalog";
+import {
+  parseCatalogPriceRange,
+  parseCatalogSort,
+} from "@/lib/catalog-shared";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -15,12 +18,23 @@ export const metadata: Metadata = pageMetadata({
 export default async function CollectionListing({
   searchParams,
 }: {
-  searchParams: Promise<{ sale?: string; sort?: string }>;
+  searchParams: Promise<{
+    sale?: string;
+    sort?: string;
+    min?: string;
+    max?: string;
+  }>;
 }) {
   const params = await searchParams;
   const saleOnly = params.sale === "1" || params.sale === "true";
   const sort = parseCatalogSort(params.sort);
-  const total = saleOnly ? getSaleProductCount() : getCategoryProductCount(null);
+  const priceRange = parseCatalogPriceRange(params.min, params.max);
+  const total = getFilteredProducts({
+    saleOnly,
+    sort,
+    priceMin: priceRange.min,
+    priceMax: priceRange.max,
+  }).length;
 
   return (
     <div className="pb-24 md:pb-20">
@@ -64,7 +78,11 @@ export default async function CollectionListing({
         ) : null}
       </p>
 
-      <CollectionCatalog saleOnly={saleOnly} sort={sort} />
+      <CollectionCatalog
+        saleOnly={saleOnly}
+        sort={sort}
+        priceRange={priceRange}
+      />
       <FloatingConcierge />
     </div>
   );
