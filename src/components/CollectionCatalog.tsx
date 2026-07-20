@@ -1,17 +1,22 @@
 import { getCatalogPage } from "@/lib/catalog";
-import type { CatalogSort } from "@/lib/catalog-shared";
+import type {
+  CatalogPriceRange,
+  CatalogSort,
+} from "@/lib/catalog-shared";
 import CatalogInfiniteGrid from "@/components/CatalogInfiniteGrid";
 
 type CollectionCatalogProps = {
   categorySlug?: string | null;
   saleOnly?: boolean;
   sort?: CatalogSort;
+  priceRange?: CatalogPriceRange;
 };
 
 export default function CollectionCatalog({
   categorySlug = null,
   saleOnly = false,
   sort = "default",
+  priceRange = { min: null, max: null },
 }: CollectionCatalogProps) {
   const { items, total, hasMore } = getCatalogPage(
     saleOnly ? null : categorySlug,
@@ -19,6 +24,7 @@ export default function CollectionCatalog({
     undefined,
     saleOnly,
     sort,
+    priceRange,
   );
 
   return (
@@ -29,6 +35,7 @@ export default function CollectionCatalog({
       categorySlug={saleOnly ? null : categorySlug}
       saleOnly={saleOnly}
       sort={sort}
+      priceRange={priceRange}
     />
   );
 }
