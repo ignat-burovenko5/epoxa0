@@ -115,10 +115,10 @@ function PriceRangeFields({
       onSubmit={onSubmit}
       className={
         layout === "row"
-          ? "catalog-price-range catalog-price-range--row mt-8 pt-7 flex flex-wrap items-end gap-x-5 gap-y-3 border-t border-luxury-charcoal/10"
+          ? "catalog-price-range catalog-price-range--row mt-8 pt-2 flex flex-wrap items-end gap-x-5 gap-y-3"
           : dark
-            ? "catalog-price-range catalog-price-range--stack mt-6 pt-5 flex flex-col gap-3 border-t border-museum-light/10"
-            : "catalog-price-range catalog-price-range--stack mt-6 pt-5 flex flex-col gap-3 border-t border-luxury-charcoal/10"
+            ? "catalog-price-range catalog-price-range--stack mt-6 pt-2 flex flex-col gap-3"
+            : "catalog-price-range catalog-price-range--stack mt-6 pt-2 flex flex-col gap-3"
       }
       aria-labelledby={`${formId}-label`}
     >
