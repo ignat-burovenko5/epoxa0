@@ -7,7 +7,6 @@ import {
   CATALOG_SORT_OPTIONS,
   parseCatalogPriceRange,
   parseCatalogSort,
-  parsePriceBound,
   type CatalogSort,
 } from "@/lib/catalog-shared";
 import { collectionHref } from "@/lib/site";
@@ -141,11 +140,6 @@ function PriceRangeFields({
             placeholder="От"
             value={minText}
             onChange={(e) => setMinText(e.target.value.replace(/[^\d\s]/g, ""))}
-            onBlur={() => {
-              if (parsePriceBound(minText) !== fromUrl.min || minText === "") {
-                /* keep draft until submit / apply */
-              }
-            }}
             className={inputClass}
           />
         </label>
