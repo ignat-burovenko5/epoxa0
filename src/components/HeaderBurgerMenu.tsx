@@ -1,5 +1,6 @@
 "use client";
 
+import CatalogSortControls from "@/components/CatalogSortControls";
 import { ArrowSquareUpRightIcon } from "@/components/NavContactIcons";
 import { siteChromeSurfaceClass } from "@/components/site-chrome";
 import Link from "next/link";
@@ -200,6 +201,7 @@ export default function HeaderBurgerMenu() {
                 </header>
 
                 <div className="flex flex-col gap-7">
+                  <CatalogSortControls variant="burger" />
                   {groups.map((group, groupIndex) => {
                     const isFeatured = groupIndex === 0;
                     return (

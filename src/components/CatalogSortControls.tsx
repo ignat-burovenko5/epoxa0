@@ -10,8 +10,8 @@ import {
 import { collectionHref } from "@/lib/site";
 
 type CatalogSortControlsProps = {
-  /** Visual placement: homepage strip vs collection sidenav. */
-  variant?: "featured" | "sidenav";
+  /** Visual placement: homepage strip, collection sidenav, or burger drawer. */
+  variant?: "featured" | "sidenav" | "burger";
   className?: string;
 };
 
@@ -46,15 +46,22 @@ export default function CatalogSortControls({
   const onCatalog =
     pathname === "/collection" || pathname.startsWith("/collection/");
 
-  if (variant === "sidenav") {
+  if (variant === "sidenav" || variant === "burger") {
+    const dark = variant === "burger";
     return (
-      <div className={`catalog-sort catalog-sort--sidenav ${className}`.trim()}>
-        <p className="mb-2 font-sans text-[10px] tracking-[0.18em] uppercase text-luxury-charcoal/40">
+      <div
+        className={`catalog-sort catalog-sort--${variant} ${className}`.trim()}
+      >
+        <p
+          className={`mb-2 font-sans text-[10px] tracking-[0.18em] uppercase ${
+            dark ? "text-museum-light/35" : "text-luxury-charcoal/40"
+          }`}
+        >
           Сортировка
         </p>
         <ul className="m-0 flex list-none flex-col gap-1 p-0" role="list">
           {CATALOG_SORT_OPTIONS.map((option) => {
-            const active = current === option.id;
+            const active = onCatalog && current === option.id;
             const href = buildSortHref(pathname, saleOnly, option.id);
             return (
               <li key={option.id}>
@@ -62,9 +69,13 @@ export default function CatalogSortControls({
                   href={href}
                   aria-current={active ? "true" : undefined}
                   className={`block rounded-sm border-l-2 pl-3.5 pr-2 py-2.5 min-h-11 font-sans text-[11px] leading-snug tracking-[0.1em] uppercase transition-colors duration-300 select-text ${
-                    active
-                      ? "border-accent-brass bg-accent-brass/[0.08] text-accent-brass"
-                      : "border-transparent text-luxury-charcoal/55 hover:bg-luxury-charcoal/[0.035] hover:text-luxury-charcoal/90"
+                    dark
+                      ? active
+                        ? "border-accent-gold bg-accent-gold/10 text-accent-gold"
+                        : "border-transparent text-museum-light/55 hover:bg-museum-light/[0.04] hover:text-accent-gold"
+                      : active
+                        ? "border-accent-brass bg-accent-brass/[0.08] text-accent-brass"
+                        : "border-transparent text-luxury-charcoal/55 hover:bg-luxury-charcoal/[0.035] hover:text-luxury-charcoal/90"
                   }`}
                 >
                   {option.label}
