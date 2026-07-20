@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import CollectionCatalog from "@/components/CollectionCatalog";
 import FloatingConcierge from "@/components/FloatingConcierge";
 import { getCategoryProductCount } from "@/lib/catalog";
+import { parseCatalogSort } from "@/lib/catalog-shared";
 import { categoryPageDescription, categoryPageTitle, pageMetadata } from "@/lib/seo";
 import { categoryLabel, siteConfig } from "@/lib/site";
 
@@ -28,10 +29,13 @@ function formatCategoryIntro(label: string) {
 
 export default async function CategoryListing({
   params,
+  searchParams,
 }: {
   params: Promise<{ category: string }>;
+  searchParams: Promise<{ sort?: string }>;
 }) {
   const { category } = await params;
+  const { sort: sortParam } = await searchParams;
   const exists = siteConfig.categoryLinks.some((item) => item.slug === category);
 
   if (!exists) {
@@ -41,6 +45,7 @@ export default async function CategoryListing({
   const label = categoryLabel(category);
   const isSale = category === "vesennyaya-rasprodazha";
   const total = getCategoryProductCount(category);
+  const sort = parseCatalogSort(sortParam);
 
   return (
     <div className="pb-16 md:pb-20">
@@ -59,7 +64,7 @@ export default async function CategoryListing({
         </p>
       </header>
 
-      <CollectionCatalog categorySlug={category} />
+      <CollectionCatalog categorySlug={category} sort={sort} />
       <FloatingConcierge />
     </div>
   );

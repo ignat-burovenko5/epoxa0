@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import CollectionCatalog from "@/components/CollectionCatalog";
 import FloatingConcierge from "@/components/FloatingConcierge";
 import { getCategoryProductCount, getSaleProductCount } from "@/lib/catalog";
+import { parseCatalogSort } from "@/lib/catalog-shared";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -14,10 +15,11 @@ export const metadata: Metadata = pageMetadata({
 export default async function CollectionListing({
   searchParams,
 }: {
-  searchParams: Promise<{ sale?: string }>;
+  searchParams: Promise<{ sale?: string; sort?: string }>;
 }) {
   const params = await searchParams;
   const saleOnly = params.sale === "1" || params.sale === "true";
+  const sort = parseCatalogSort(params.sort);
   const total = saleOnly ? getSaleProductCount() : getCategoryProductCount(null);
 
   return (
@@ -62,7 +64,7 @@ export default async function CollectionListing({
         ) : null}
       </p>
 
-      <CollectionCatalog saleOnly={saleOnly} />
+      <CollectionCatalog saleOnly={saleOnly} sort={sort} />
       <FloatingConcierge />
     </div>
   );
