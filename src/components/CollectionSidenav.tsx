@@ -88,7 +88,7 @@ export default function CollectionSidenav() {
         <ul className="flex gap-1 min-w-max">
           <li>
             <Link
-              href={withSort("/collection")}
+              href={withFilters("/collection")}
               className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
                 allActive
                   ? "border-accent-brass text-accent-brass"
@@ -100,7 +100,7 @@ export default function CollectionSidenav() {
           </li>
           <li>
             <Link
-              href={withSort(COLLECTION_SALE_HREF)}
+              href={withFilters(COLLECTION_SALE_HREF)}
               className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
                 saleActive
                   ? "border-luxury-bordeaux text-luxury-bordeaux"
@@ -116,7 +116,7 @@ export default function CollectionSidenav() {
             return (
               <li key={item.slug}>
                 <Link
-                  href={withSort(categoryHref(item.slug))}
+                  href={withFilters(categoryHref(item.slug))}
                   className={`inline-flex min-h-10 max-w-[15rem] items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.1em] uppercase select-text ${
                     active
                       ? highlighted
@@ -172,7 +172,7 @@ export default function CollectionSidenav() {
                   <>
                     <li>
                       <Link
-                        href={collectionHref(null, { sort })}
+                        href={collectionHref(null, filterOpts)}
                         className={itemClass(allActive)}
                       >
                         Все категории
@@ -180,7 +180,7 @@ export default function CollectionSidenav() {
                     </li>
                     <li>
                       <Link
-                        href={collectionHref(null, { sale: true, sort })}
+                        href={collectionHref(null, { sale: true, ...filterOpts })}
                         className={itemClass(saleActive, true)}
                       >
                         Акционные товары
@@ -194,7 +194,7 @@ export default function CollectionSidenav() {
                   return (
                     <li key={item.slug}>
                       <Link
-                        href={collectionHref(item.slug, { sort })}
+                        href={collectionHref(item.slug, filterOpts)}
                         className={itemClass(active, Boolean(highlighted))}
                       >
                         <span className="line-clamp-2">{item.label}</span>
