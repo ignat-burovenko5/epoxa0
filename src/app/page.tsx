@@ -87,7 +87,7 @@ export default async function Homepage() {
 
       <section className="bg-museum-light text-luxury-charcoal pt-8 pb-12 sm:pt-10 sm:pb-16 md:pt-12 md:pb-24">
         <PageContainer>
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl max-w-2xl leading-snug mb-8 md:mb-10">
+          <h2 className="font-serif font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl max-w-3xl leading-[1.05] tracking-tight mb-8 md:mb-10">
             Редкие предметы для вашего интерьера
           </h2>
 
