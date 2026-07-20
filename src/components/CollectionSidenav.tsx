@@ -79,61 +79,63 @@ export default function CollectionSidenav() {
       aria-label="Категории каталога"
       className="shrink-0 md:w-60 lg:w-64 md:sticky md:top-[calc(var(--site-header-offset)+1rem)] md:self-start md:max-h-[calc(100dvh-var(--site-header-offset)-2rem)] md:flex md:flex-col"
     >
-      {/* Mobile — flat sorted strip */}
-      <div className="collection-category-scroll md:hidden mb-8 overflow-x-auto overscroll-x-contain pb-3">
+      {/* Mobile — category strip scrolls on its own; filters stay fixed below */}
+      <div className="md:hidden mb-8">
         <div className="mb-3 flex items-baseline gap-3">
           <p className="font-serif text-lg text-luxury-base">Каталог</p>
           <span className="h-px flex-1 max-w-[3rem] bg-accent-brass/50" aria-hidden />
         </div>
-        <ul className="flex gap-1 min-w-max">
-          <li>
-            <Link
-              href={withFilters("/collection")}
-              className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
-                allActive
-                  ? "border-accent-brass text-accent-brass"
-                  : "border-transparent text-luxury-charcoal/55 hover:text-accent-brass"
-              }`}
-            >
-              Все
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={withFilters(COLLECTION_SALE_HREF)}
-              className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
-                saleActive
-                  ? "border-luxury-bordeaux text-luxury-bordeaux"
-                  : "border-transparent text-luxury-bordeaux/70 hover:text-luxury-bordeaux"
-              }`}
-            >
-              Акционные
-            </Link>
-          </li>
-          {flat.map((item) => {
-            const active = isActive(pathname, item.slug);
-            const highlighted = "highlight" in item && item.highlight;
-            return (
-              <li key={item.slug}>
-                <Link
-                  href={withFilters(categoryHref(item.slug))}
-                  className={`inline-flex min-h-10 max-w-[15rem] items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.1em] uppercase select-text ${
-                    active
-                      ? highlighted
-                        ? "border-luxury-bordeaux text-luxury-bordeaux"
-                        : "border-accent-brass text-accent-brass"
-                      : highlighted
-                        ? "border-transparent text-luxury-bordeaux/70 hover:text-luxury-bordeaux"
-                        : "border-transparent text-luxury-charcoal/50 hover:text-luxury-charcoal/80"
-                  }`}
-                >
-                  <span className="truncate">{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-        <div className="mt-4">
+        <div className="collection-category-scroll -mx-4 px-4 overflow-x-auto overscroll-x-contain pb-3 [scrollbar-width:thin]">
+          <ul className="flex gap-1 min-w-max">
+            <li>
+              <Link
+                href={withFilters("/collection")}
+                className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
+                  allActive
+                    ? "border-accent-brass text-accent-brass"
+                    : "border-transparent text-luxury-charcoal/55 hover:text-accent-brass"
+                }`}
+              >
+                Все
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={withFilters(COLLECTION_SALE_HREF)}
+                className={`inline-flex min-h-10 items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap select-text ${
+                  saleActive
+                    ? "border-luxury-bordeaux text-luxury-bordeaux"
+                    : "border-transparent text-luxury-bordeaux/70 hover:text-luxury-bordeaux"
+                }`}
+              >
+                Акционные
+              </Link>
+            </li>
+            {flat.map((item) => {
+              const active = isActive(pathname, item.slug);
+              const highlighted = "highlight" in item && item.highlight;
+              return (
+                <li key={item.slug}>
+                  <Link
+                    href={withFilters(categoryHref(item.slug))}
+                    className={`inline-flex min-h-10 max-w-[15rem] items-center border-b-2 px-3 font-sans text-[11px] tracking-[0.1em] uppercase select-text ${
+                      active
+                        ? highlighted
+                          ? "border-luxury-bordeaux text-luxury-bordeaux"
+                          : "border-accent-brass text-accent-brass"
+                        : highlighted
+                          ? "border-transparent text-luxury-bordeaux/70 hover:text-luxury-bordeaux"
+                          : "border-transparent text-luxury-charcoal/50 hover:text-luxury-charcoal/80"
+                    }`}
+                  >
+                    <span className="truncate">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="mt-5">
           <Suspense fallback={null}>
             <CatalogSortControls variant="featured" />
           </Suspense>
