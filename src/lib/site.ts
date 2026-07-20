@@ -151,9 +151,11 @@ export function categoryHref(slug: string) {
 type CatalogQueryOpts = {
   sale?: boolean;
   sort?: string | null;
+  min?: number | null;
+  max?: number | null;
 };
 
-/** Build /collection or /collection/[slug] with sale + sort query params. */
+/** Build /collection or /collection/[slug] with sale + sort + price range. */
 export function collectionHref(
   categorySlug?: string | null,
   opts: CatalogQueryOpts = {},
@@ -162,6 +164,8 @@ export function collectionHref(
   const params = new URLSearchParams();
   if (opts.sale) params.set("sale", "1");
   if (opts.sort && opts.sort !== "default") params.set("sort", opts.sort);
+  if (opts.min != null && opts.min >= 0) params.set("min", String(opts.min));
+  if (opts.max != null && opts.max >= 0) params.set("max", String(opts.max));
   const qs = params.toString();
   return qs ? `${path}?${qs}` : path;
 }

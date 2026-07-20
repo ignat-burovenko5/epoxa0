@@ -91,6 +91,8 @@ export type CatalogListFilter = {
   /** Products with compareAtPrice > price (скидка). */
   saleOnly?: boolean;
   sort?: CatalogSort;
+  priceMin?: number | null;
+  priceMax?: number | null;
 };
 
 /** Filter catalog by category and/or sale flag, then sort. */
@@ -115,6 +117,11 @@ export function getFilteredProducts(filter: CatalogListFilter = {}) {
     }
   }
 
+  filtered = filterByPriceRange(filtered, {
+    min: filter.priceMin ?? null,
+    max: filter.priceMax ?? null,
+  });
+
   return sortCatalogProducts(filtered, filter.sort ?? "default");
 }
 
@@ -137,11 +144,14 @@ export function getCatalogPage(
   limit: number = CATALOG_PAGE_SIZE,
   saleOnly = false,
   sort: CatalogSort = "default",
+  priceRange: CatalogPriceRange = { min: null, max: null },
 ) {
   const filtered = getFilteredProducts({
     categorySlug: saleOnly ? null : categorySlug,
     saleOnly,
     sort,
+    priceMin: priceRange.min,
+    priceMax: priceRange.max,
   });
   const items = filtered.slice(offset, offset + limit);
   const nextOffset = offset + items.length;
