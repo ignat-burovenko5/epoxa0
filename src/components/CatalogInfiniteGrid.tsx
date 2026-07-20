@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CatalogGrid, type CatalogItem } from "@/components/CatalogGrid";
 import {
   CATALOG_PAGE_SIZE,
+  type CatalogPriceRange,
   type CatalogSort,
 } from "@/lib/catalog-shared";
 
@@ -22,6 +23,7 @@ type CatalogInfiniteGridProps = {
   categorySlug?: string | null;
   saleOnly?: boolean;
   sort?: CatalogSort;
+  priceRange?: CatalogPriceRange;
 };
 
 export default function CatalogInfiniteGrid({
@@ -31,6 +33,7 @@ export default function CatalogInfiniteGrid({
   categorySlug = null,
   saleOnly = false,
   sort = "default",
+  priceRange = { min: null, max: null },
 }: CatalogInfiniteGridProps) {
   const [items, setItems] = useState(initialItems);
   const [total, setTotal] = useState(initialTotal);
@@ -39,13 +42,22 @@ export default function CatalogInfiniteGrid({
   const [error, setError] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
+  const priceKey = `${priceRange.min ?? ""}:${priceRange.max ?? ""}`;
 
   useEffect(() => {
     setItems(initialItems);
     setTotal(initialTotal);
     setHasMore(initialHasMore);
     setError(null);
-  }, [initialItems, initialTotal, initialHasMore, categorySlug, saleOnly, sort]);
+  }, [
+    initialItems,
+    initialTotal,
+    initialHasMore,
+    categorySlug,
+    saleOnly,
+    sort,
+    priceKey,
+  ]);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) return;
@@ -67,6 +79,8 @@ export default function CatalogInfiniteGrid({
       if (sort !== "default") {
         params.set("sort", sort);
       }
+      if (priceRange.min != null) params.set("min", String(priceRange.min));
+      if (priceRange.max != null) params.set("max", String(priceRange.max));
 
       const res = await fetch(`/api/catalog?${params.toString()}`);
       if (!res.ok) {
@@ -88,7 +102,7 @@ export default function CatalogInfiniteGrid({
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [categorySlug, hasMore, items.length, saleOnly, sort]);
+  }, [categorySlug, hasMore, items.length, saleOnly, sort, priceRange.min, priceRange.max]);
 
   useEffect(() => {
     const node = sentinelRef.current;
@@ -107,6 +121,13 @@ export default function CatalogInfiniteGrid({
     observer.observe(node);
     return () => observer.disconnect();
   }, [hasMore, loadMore]);
+
+  const emptyMessage =
+    priceRange.min != null || priceRange.max != null
+      ? "Нет предметов в выбранном диапазоне цен."
+      : saleOnly
+        ? "Сейчас нет товаров со скидкой."
+        : "В этой категории пока нет предметов.";
 
   return (
     <div>
@@ -141,9 +162,7 @@ export default function CatalogInfiniteGrid({
 
       {!hasMore && items.length === 0 ? (
         <p className="mt-10 text-center font-sans text-sm text-luxury-charcoal/60">
-          {saleOnly
-            ? "Сейчас нет товаров со скидкой."
-            : "В этой категории пока нет предметов."}
+          {emptyMessage}
         </p>
       ) : null}
     </div>
