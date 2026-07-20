@@ -8,6 +8,7 @@ import {
 /**
  * Homepage catalog index — featured strip + height-balanced columns.
  * Hierarchy: section title → featured picks → group labels → item links.
+ * Category groups start collapsed; click the label to expand.
  */
 export default function HomeCategoriesNav() {
   const groups = groupedCategoryLinks();
@@ -80,14 +81,15 @@ export default function HomeCategoriesNav() {
       {/* Remaining groups — CSS columns balance height across the band */}
       <div className="home-categories-columns gap-x-10 sm:gap-x-12 lg:gap-x-16">
         {rest.map((group) => (
-          <div
+          <details
             key={group.label}
             className="home-categories-group mb-8 break-inside-avoid last:mb-0 sm:mb-10"
           >
-            <p className="home-categories-group__label mb-3.5">
-              {group.label}
-            </p>
-            <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
+            <summary className="home-categories-group__label mb-0 cursor-pointer list-none">
+              <span className="home-categories-group__label-text">{group.label}</span>
+              <span className="home-categories-group__chevron" aria-hidden="true" />
+            </summary>
+            <ul className="home-categories-group__items m-0 mt-3.5 flex list-none flex-col gap-2.5 p-0">
               {group.items.map((item) => {
                 const highlighted = "highlight" in item && item.highlight;
                 return (
@@ -106,7 +108,7 @@ export default function HomeCategoriesNav() {
                 );
               })}
             </ul>
-          </div>
+          </details>
         ))}
       </div>
     </nav>

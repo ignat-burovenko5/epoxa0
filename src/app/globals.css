@@ -624,8 +624,12 @@ img.logo-nav-mark--footer {
     page-break-inside: avoid;
   }
 
-  /* Group labels sit above item links — serif + brass tick */
+  /* Group labels sit above item links — serif + brass tick; accordion summary */
   .home-categories-group__label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
     font-family: var(--font-serif);
     font-size: 1.05rem;
     line-height: 1.15;
@@ -633,6 +637,54 @@ img.logo-nav-mark--footer {
     color: var(--color-luxury-base);
     padding-bottom: 0.55rem;
     border-bottom: 1px solid color-mix(in srgb, var(--color-accent-brass) 35%, transparent);
+    transition: color 0.3s var(--ease-luxury-ease);
+  }
+
+  .home-categories-group__label::-webkit-details-marker,
+  .home-categories-group__label::marker {
+    display: none;
+    content: "";
+  }
+
+  .home-categories-group__label:hover,
+  .home-categories-group__label:focus-visible {
+    color: color-mix(in srgb, var(--color-luxury-base) 75%, var(--color-accent-brass));
+  }
+
+  .home-categories-group__label:focus-visible {
+    outline: 1px solid color-mix(in srgb, var(--color-accent-brass) 55%, transparent);
+    outline-offset: 4px;
+  }
+
+  .home-categories-group__chevron {
+    flex-shrink: 0;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-top: 0.2em;
+    border-right: 1.5px solid color-mix(in srgb, var(--color-accent-brass) 70%, transparent);
+    border-bottom: 1.5px solid color-mix(in srgb, var(--color-accent-brass) 70%, transparent);
+    transform: rotate(45deg);
+    transition: transform 0.35s var(--ease-luxury-ease);
+  }
+
+  .home-categories-group[open] > .home-categories-group__label .home-categories-group__chevron {
+    transform: rotate(225deg);
+    margin-top: 0.35em;
+  }
+
+  .home-categories-group__items {
+    animation: home-categories-reveal 0.35s var(--ease-luxury-ease);
+  }
+
+  @keyframes home-categories-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-0.35rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .home-categories-featured {
