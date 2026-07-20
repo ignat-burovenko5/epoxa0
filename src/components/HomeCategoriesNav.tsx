@@ -47,9 +47,6 @@ export default function HomeCategoriesNav() {
       {/* Featured — primary scan band */}
       {featured ? (
         <div className="home-categories-featured mb-10 md:mb-12">
-          <p className="mb-4 font-sans text-[10px] tracking-[0.22em] uppercase text-luxury-charcoal/35">
-            {featured.label}
-          </p>
           <ul className="m-0 flex list-none flex-wrap items-baseline gap-x-6 gap-y-3 p-0 sm:gap-x-8 md:gap-x-10">
             <li>
               <Link
