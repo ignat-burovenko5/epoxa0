@@ -82,7 +82,7 @@ export default function CollectionSidenav() {
       {/* Mobile — category strip scrolls on its own; filters stay fixed below */}
       <div className="md:hidden mb-8">
         <div className="mb-4 flex items-baseline gap-3">
-          <p className="font-serif font-bold text-3xl sm:text-4xl leading-none tracking-tight text-luxury-base">
+          <p className="font-serif text-3xl sm:text-4xl leading-none tracking-tight text-luxury-base">
             Каталог
           </p>
           <span
@@ -153,7 +153,7 @@ export default function CollectionSidenav() {
         aria-label="Категории"
       >
         <header className="shrink-0 pb-5 mb-1">
-          <h2 className="font-serif font-bold text-[2rem] lg:text-[2.25rem] leading-none tracking-tight text-luxury-base select-text">
+          <h2 className="font-serif text-[2rem] lg:text-[2.25rem] leading-none tracking-tight text-luxury-base select-text">
             Каталог
           </h2>
           <span
