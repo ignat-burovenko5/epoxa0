@@ -8,7 +8,10 @@ import {
   formatPrice,
   getDiscountPercent,
   hasDiscount,
+  parseCatalogSort,
+  sortCatalogProducts,
   type CatalogProduct,
+  type CatalogSort,
 } from "@/lib/catalog-shared";
 
 export {
@@ -17,8 +20,10 @@ export {
   formatPrice,
   getDiscountPercent,
   hasDiscount,
+  parseCatalogSort,
+  sortCatalogProducts,
 };
-export type { CatalogProduct };
+export type { CatalogProduct, CatalogSort };
 
 let cachedProducts: CatalogProduct[] | null = null;
 let cachedMtimeMs = -1;
@@ -80,27 +85,32 @@ export type CatalogListFilter = {
   categorySlug?: string | null;
   /** Products with compareAtPrice > price (скидка). */
   saleOnly?: boolean;
+  sort?: CatalogSort;
 };
 
-/** Filter catalog by category and/or sale flag. */
+/** Filter catalog by category and/or sale flag, then sort. */
 export function getFilteredProducts(filter: CatalogListFilter = {}) {
   const list = getCatalogItems();
+  let filtered: CatalogProduct[];
 
   if (filter.saleOnly) {
-    return list.filter((product) => hasDiscount(product.price, product.compareAtPrice));
+    filtered = list.filter((product) =>
+      hasDiscount(product.price, product.compareAtPrice),
+    );
+  } else {
+    const categorySlug = filter.categorySlug;
+    if (!categorySlug) {
+      filtered = list;
+    } else {
+      const label = categoryLabel(categorySlug);
+      const normalized = normalizeCategoryName(label);
+      filtered = list.filter(
+        (product) => normalizeCategoryName(product.category) === normalized,
+      );
+    }
   }
 
-  const categorySlug = filter.categorySlug;
-  if (!categorySlug) {
-    return list;
-  }
-
-  const label = categoryLabel(categorySlug);
-  const normalized = normalizeCategoryName(label);
-
-  return list.filter(
-    (product) => normalizeCategoryName(product.category) === normalized,
-  );
+  return sortCatalogProducts(filtered, filter.sort ?? "default");
 }
 
 /** Filter catalog by nav category slug; omit slug for full catalog. */
@@ -121,10 +131,12 @@ export function getCatalogPage(
   offset: number,
   limit: number = CATALOG_PAGE_SIZE,
   saleOnly = false,
+  sort: CatalogSort = "default",
 ) {
   const filtered = getFilteredProducts({
     categorySlug: saleOnly ? null : categorySlug,
     saleOnly,
+    sort,
   });
   const items = filtered.slice(offset, offset + limit);
   const nextOffset = offset + items.length;
